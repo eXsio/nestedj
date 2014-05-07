@@ -59,13 +59,13 @@ public class JpaNestedNodeMover implements NestedNodeMover {
 
         NestedNodeConfig config = this.util.getNodeConfig(node.getClass());
         String sign = this.getSign(node, parent, mode);
-        Integer start = this.getStart(node, parent, mode, sign);
-        Integer stop = this.getStop(node, parent, mode, sign);
+        Long start = this.getStart(node, parent, mode, sign);
+        Long stop = this.getStop(node, parent, mode, sign);
         List nodeIds = this.getNodeIds(node, config);
-        Integer delta = this.getDelta(nodeIds);
-        Integer nodeDelta = this.getNodeDelta(start, stop);
+        Long delta = this.getDelta(nodeIds);
+        Long nodeDelta = this.getNodeDelta(start, stop);
         String nodeSign = this.getNodeSign(sign);
-        Integer levelModificator = this.getLevelModificator(node, parent, mode);
+        Long levelModificator = this.getLevelModificator(node, parent, mode);
         NestedNode newParent = this.getNewParent(parent, mode);
 
         this.em.createQuery("update " + config.getEntityName() + " set " + config.getLeftFieldName() + " = " + config.getLeftFieldName() + " " + sign + ":delta where " + config.getLeftFieldName() + " > :start and " + config.getLeftFieldName() + " < :stop").setParameter("delta", delta).setParameter("start", start).setParameter("stop", stop).executeUpdate();
@@ -90,7 +90,7 @@ public class JpaNestedNodeMover implements NestedNodeMover {
         }
     }
 
-    private Integer getLevelModificator(NestedNode node, NestedNode parent, int mode) {
+    private Long getLevelModificator(NestedNode node, NestedNode parent, int mode) {
         switch (mode) {
             case MODE_NEXT_SIBLING:
             case MODE_PREV_SIBLING:
@@ -107,12 +107,12 @@ public class JpaNestedNodeMover implements NestedNodeMover {
         return result;
     }
 
-    private Integer getNodeDelta(Integer start, Integer stop) {
+    private Long getNodeDelta(Long start, Long stop) {
         return stop - start - 1;
     }
 
-    private Integer getDelta(List<Long> nodeIds) {
-        return nodeIds.size() * 2;
+    private Long getDelta(List<Long> nodeIds) {
+        return new Long(nodeIds.size() * 2);
     }
 
     private String getNodeSign(String sign) {
@@ -131,7 +131,7 @@ public class JpaNestedNodeMover implements NestedNodeMover {
         }
     }
 
-    private Integer getStart(NestedNode node, NestedNode parent, int mode, String sign) {
+    private Long getStart(NestedNode node, NestedNode parent, int mode, String sign) {
         switch (mode) {
             case MODE_PREV_SIBLING:
                 return sign.equals(SIGN_PLUS) ? parent.getLeft() - 1 : node.getRight();
@@ -146,7 +146,7 @@ public class JpaNestedNodeMover implements NestedNodeMover {
         }
     }
 
-    private Integer getStop(NestedNode node, NestedNode parent, int mode, String sign) {
+    private Long getStop(NestedNode node, NestedNode parent, int mode, String sign) {
         switch (mode) {
             case MODE_PREV_SIBLING:
                 return sign.equals(SIGN_PLUS) ? node.getLeft() : parent.getLeft();

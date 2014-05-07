@@ -575,16 +575,16 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
 
     private TestNode findNode(String symbol) {
 
-        Map<String, Integer> nodeMap = new HashMap() {
+        Map<String, Long> nodeMap = new HashMap() {
             {
-                put("a", 1);
-                put("b", 2);
-                put("c", 3);
-                put("d", 4);
-                put("e", 5);
-                put("f", 6);
-                put("g", 7);
-                put("h", 8);
+                put("a", new Long(1));
+                put("b", new Long(2));
+                put("c", new Long(3));
+                put("d", new Long(4));
+                put("e", new Long(5));
+                put("f", new Long(6));
+                put("g", new Long(7));
+                put("h", new Long(8));
             }
         };
 

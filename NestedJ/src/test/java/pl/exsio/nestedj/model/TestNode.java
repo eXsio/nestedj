@@ -33,7 +33,7 @@ public class TestNode implements NestedNode {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    protected Integer id;
+    protected Long id;
     
     /**
      *
@@ -46,21 +46,21 @@ public class TestNode implements NestedNode {
      */
     @LeftColumn
     @Column(name = "tree_left", nullable = true)
-    protected Integer lft;
+    protected Long lft;
 
     /**
      *
      */
     @RightColumn
     @Column(name = "tree_right", nullable = true)
-    protected Integer rgt;
+    protected Long rgt;
 
     /**
      *
      */
     @LevelColumn
     @Column(name = "tree_level", nullable = true)
-    protected Integer lvl;
+    protected Long lvl;
  
     /**
      *
@@ -82,7 +82,7 @@ public class TestNode implements NestedNode {
      * @return
      */
     @Override
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
@@ -91,7 +91,7 @@ public class TestNode implements NestedNode {
      * @return
      */
     @Override
-    public Integer getLeft() {
+    public Long getLeft() {
         return lft;
     }
 
@@ -100,7 +100,7 @@ public class TestNode implements NestedNode {
      * @return
      */
     @Override
-    public Integer getRight() {
+    public Long getRight() {
         return rgt;
     }
 
@@ -110,7 +110,7 @@ public class TestNode implements NestedNode {
      * @return
      */
     @Override
-    public Integer getLevel() {
+    public Long getLevel() {
         return lvl;
     }
 
@@ -162,7 +162,7 @@ public class TestNode implements NestedNode {
     
     @Override
     public int hashCode() {
-        return this.getId();
+        return this.getId().intValue();
     }
 
     @Override

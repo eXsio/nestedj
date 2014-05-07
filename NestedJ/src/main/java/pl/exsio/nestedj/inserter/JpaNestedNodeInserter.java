@@ -64,9 +64,9 @@ public class JpaNestedNodeInserter<T extends NestedNode> implements NestedNodeIn
     public T insert(T node, T parent, int mode) {
 
         NestedNodeConfig config = this.util.getNodeConfig(node.getClass());
-        Integer left = this.getNodeLeft(parent, mode);
-        Integer right = left + 1;
-        Integer level = parent.getLevel() + 1;
+        Long left = this.getNodeLeft(parent, mode);
+        Long right = left + 1;
+        Long level = parent.getLevel() + 1;
         this.moveTree(node.getClass(), parent.getRight(), this.isGte(mode), config);
         this.em.persist(node);
         this.em.flush();
@@ -98,7 +98,7 @@ public class JpaNestedNodeInserter<T extends NestedNode> implements NestedNodeIn
      * @param mode
      * @return
      */
-    protected Integer getNodeLeft(NestedNode parent, int mode) {
+    protected Long getNodeLeft(NestedNode parent, int mode) {
         switch (mode) {
             case MODE_NEXT_SIBLING:
                 return parent.getRight() + 1;
@@ -119,7 +119,7 @@ public class JpaNestedNodeInserter<T extends NestedNode> implements NestedNodeIn
      * @param gte
      * @param config
      */
-    protected void moveTree(Class<? extends NestedNode> nodeClass, Integer from, boolean gte, NestedNodeConfig config) {
+    protected void moveTree(Class<? extends NestedNode> nodeClass, Long from, boolean gte, NestedNodeConfig config) {
 
         String sign = gte ? " >= " : " > ";
         String leftQuery = "update " + config.getEntityName() + " set " + config.getLeftFieldName() + " = " + config.getLeftFieldName() + "+2 where " + config.getLeftFieldName() + " " + sign + " :from";

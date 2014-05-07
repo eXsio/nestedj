@@ -16,25 +16,25 @@ public interface NestedNode {
      *
      * @return
      */
-    Integer getId();
+    Long getId();
     
     /**
      *
      * @return
      */
-    Integer getLeft();
+    Long getLeft();
 
     /**
      *
      * @return
      */
-    Integer getRight();
+    Long getRight();
 
     /**
      *
      * @return
      */
-    Integer getLevel();
+    Long getLevel();
 
     /**
      *

@@ -54,7 +54,7 @@ public class JpaNestedNodeRemover implements NestedNodeRemover {
     public void removeSingle(NestedNode node) {
 
         NestedNodeConfig config = this.util.getNodeConfig(node.getClass());
-        Integer from = node.getRight();
+        Long from = node.getRight();
         NestedNode parent = null;
         if (node.getLevel() > 0) {
             parent = (NestedNode) this.em.createQuery("from " + config.getEntityName() + " where " + config.getLeftFieldName() + "<:lft and " + config.getRightFieldName() + ">:rgt and " + config.getLevelFieldName() + " = :lvl").setParameter("lft", node.getLeft()).setParameter("rgt", node.getRight()).setParameter("lvl", node.getLevel() - 1).getSingleResult();
@@ -76,8 +76,8 @@ public class JpaNestedNodeRemover implements NestedNodeRemover {
     public void removeSubtree(NestedNode node) {
 
         NestedNodeConfig config = this.util.getNodeConfig(node.getClass());
-        Integer delta = node.getRight() - node.getLeft() + 1;
-        Integer from = node.getRight();
+        Long delta = node.getRight() - node.getLeft() + 1;
+        Long from = node.getRight();
         String leftQuery = "update " + config.getEntityName() + " set " + config.getLeftFieldName() + " = " + config.getLeftFieldName() + "-:delta where " + config.getLeftFieldName() + " > :from";
         String rightQuery = "update " + config.getEntityName() + " set " + config.getRightFieldName() + " = " + config.getRightFieldName() + "-:delta where " + config.getRightFieldName() + " > :from";
         this.em.createQuery("delete from " + config.getEntityName() + " where " + config.getLeftFieldName() + " >= :lft and " + config.getRightFieldName() + " <= :rgt").setParameter("lft", node.getLeft()).setParameter("rgt", node.getRight()).executeUpdate();
