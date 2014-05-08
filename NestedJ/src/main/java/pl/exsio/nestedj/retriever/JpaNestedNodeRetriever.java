@@ -5,6 +5,7 @@
  */
 package pl.exsio.nestedj.retriever;
 
+import java.util.ArrayList;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import pl.exsio.nestedj.NestedNodeUtil;
@@ -109,6 +110,21 @@ public class JpaNestedNodeRetriever<T extends NestedNode> implements NestedNodeR
             return (T) this.em.createQuery("from " + config.getEntityName() + " where " + config.getLeftFieldName() + "<:lft and " + config.getRightFieldName() + ">:rgt and " + config.getLevelFieldName() + " = :lvl").setParameter("lft", node.getLeft()).setParameter("rgt", node.getRight()).setParameter("lvl", node.getLevel() - 1).getSingleResult();
         } else {
             return null;
+        }
+    }
+
+    /**
+     * 
+     * @param node
+     * @return 
+     */
+    @Override
+    public Iterable<T> getParents(T node) {
+        if (node.getLevel() > 0) {
+            NestedNodeConfig config = this.util.getNodeConfig(node.getClass());
+            return this.em.createQuery("from " + config.getEntityName() + " where " + config.getLeftFieldName() + "<:lft and " + config.getRightFieldName() + ">:rgt order by " + config.getLevelFieldName() + " desc").setParameter("lft", node.getLeft()).setParameter("rgt", node.getRight()).getResultList();
+        } else {
+            return new ArrayList();
         }
     }
 

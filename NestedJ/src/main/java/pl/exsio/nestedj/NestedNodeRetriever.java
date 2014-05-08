@@ -23,4 +23,6 @@ public interface NestedNodeRetriever<T extends NestedNode> {
     T getParent(T node);
     
     Tree<T> getTree(T node);
+    
+    Iterable<T> getParents(T node);
 }

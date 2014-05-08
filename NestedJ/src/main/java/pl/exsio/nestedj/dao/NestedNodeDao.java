@@ -73,6 +73,13 @@ public interface NestedNodeDao<T extends NestedNode> {
      * @return 
      */
      T getParent(T node);
+     
+     /**
+     * 
+     * @param node
+     * @return 
+     */
+     Iterable<T> getParents(T node);
     
     /**
      * 

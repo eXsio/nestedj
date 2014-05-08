@@ -52,6 +52,16 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
      */
     
     @Test
+    public void testGetParents() {
+        TestNode h = this.findNode("h");
+        List<TestNode> parents = (List<TestNode>) this.nodeRepository.getParents(h);
+        assertTrue(parents.size() == 3);
+        assertTrue(parents.get(0).getName().equals("g"));
+        assertTrue(parents.get(1).getName().equals("c"));
+        assertTrue(parents.get(2).getName().equals("a"));
+    }
+    
+    @Test
     public void testGetTree() {
         Tree<TestNode> tree = this.nodeRepository.getTree(this.findNode("a"));
         assertTrue(tree.getNode().getName().equals("a"));

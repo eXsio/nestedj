@@ -225,4 +225,14 @@ public class NestedNodeRepository<T extends NestedNode> implements NestedNodeDao
     public Tree<T> getTree(T node) {
         return this.retriever.getTree(node);
     }
+
+    /**
+     * 
+     * @param node
+     * @return 
+     */
+    @Override
+    public Iterable<T> getParents(T node) {
+        return this.retriever.getParents(node);
+    }
 }
