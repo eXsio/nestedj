@@ -13,7 +13,7 @@ import pl.exsio.nestedj.model.NestedNode;
  * @author exsio
  * @param <T>
  */
-public interface NestedNodeRemover<T extends NestedNode> extends NestedNodeManipulator<T> {
+public interface NestedNodeRemover<T extends NestedNode> {
  
     /**
      *

@@ -67,12 +67,36 @@ public class JpaNestedNodeInserter<T extends NestedNode> implements NestedNodeIn
         Long left = this.getNodeLeft(parent, mode);
         Long right = left + 1;
         Long level = parent.getLevel() + 1;
-        this.moveTree(node.getClass(), parent.getRight(), this.isGte(mode), config);
+        this.makeSpaceForNewElement(node.getClass(), parent.getRight(), this.isGte(mode), config);
         this.em.persist(node);
         this.em.flush();
-        this.em.createQuery("update " + config.getEntityName() + " set " + config.getParentFieldName() + " = :parent," + config.getLeftFieldName() + " = :left," + config.getRightFieldName() + " = :right," + config.getLevelFieldName() + " = :level  where id = :id").setParameter("parent", parent).setParameter("left", left).setParameter("right", right).setParameter("level", level).setParameter("id", node.getId()).executeUpdate();
+        this.performInsertion(config, parent, left, right, level, node);
         this.em.refresh(node);
         return node;
+    }
+
+    /**
+     * 
+     * @param config
+     * @param parent
+     * @param left
+     * @param right
+     * @param level
+     * @param node 
+     */
+    private void performInsertion(NestedNodeConfig config, T parent, Long left, Long right, Long level, T node) {
+        this.em.createQuery(
+                "update " + config.getEntityName()+ " "
+                        + "set " + config.getParentFieldName() + " = :parent,"
+                        + config.getLeftFieldName() + " = :left,"
+                        + config.getRightFieldName() + " = :right," 
+                        + config.getLevelFieldName() + " = :level "
+                        + "where id = :id").setParameter("parent", parent)
+                .setParameter("left", left)
+                .setParameter("right", right)
+                .setParameter("level", level)
+                .setParameter("id", node.getId())
+                .executeUpdate();
     }
 
     /**
@@ -119,13 +143,41 @@ public class JpaNestedNodeInserter<T extends NestedNode> implements NestedNodeIn
      * @param gte
      * @param config
      */
-    protected void moveTree(Class<? extends NestedNode> nodeClass, Long from, boolean gte, NestedNodeConfig config) {
+    protected void makeSpaceForNewElement(Class<? extends NestedNode> nodeClass, Long from, boolean gte, NestedNodeConfig config) {
 
         String sign = gte ? " >= " : " > ";
-        String leftQuery = "update " + config.getEntityName() + " set " + config.getLeftFieldName() + " = " + config.getLeftFieldName() + "+2 where " + config.getLeftFieldName() + " " + sign + " :from";
-        String rightQuery = "update " + config.getEntityName() + " set " + config.getRightFieldName() + " = " + config.getRightFieldName() + "+2 where " + config.getRightFieldName() + " " + sign + " :from";
-        this.em.createQuery(leftQuery).setParameter("from", from).executeUpdate();
-        this.em.createQuery(rightQuery).setParameter("from", from).executeUpdate();
+        this.updateLeftFields(config, sign, from);
+        this.updateRightFields(config, sign, from);
+    }
+
+    /**
+     * 
+     * @param config
+     * @param sign
+     * @param from 
+     */
+    private void updateRightFields(NestedNodeConfig config, String sign, Long from) { 
+        String rightQuery = "update " + config.getEntityName()+ " "
+                + "set " + config.getRightFieldName() + " = " + config.getRightFieldName() + "+2 "
+                + "where " + config.getRightFieldName() + " " + sign + " :from";
+        this.em.createQuery(rightQuery)
+                .setParameter("from", from)
+                .executeUpdate();
+    }
+
+    /**
+     * 
+     * @param config
+     * @param sign
+     * @param from 
+     */
+    private void updateLeftFields(NestedNodeConfig config, String sign, Long from) {
+        String leftQuery = "update " + config.getEntityName()+ " "
+                + "set " + config.getLeftFieldName() + " = " + config.getLeftFieldName() + "+2 "
+                + "where " + config.getLeftFieldName() + " " + sign + " :from";
+        this.em.createQuery(leftQuery)
+                .setParameter("from", from)
+                .executeUpdate();
     }
 
 }

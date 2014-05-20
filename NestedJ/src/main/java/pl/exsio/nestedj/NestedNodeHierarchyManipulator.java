@@ -12,7 +12,7 @@ import pl.exsio.nestedj.model.NestedNode;
  *
  * @author exsio
  */
-public interface NestedNodeManipulator<T extends NestedNode> {
+public interface NestedNodeHierarchyManipulator<T extends NestedNode> {
     
     /**
      *

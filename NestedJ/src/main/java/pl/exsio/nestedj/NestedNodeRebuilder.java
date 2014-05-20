@@ -13,15 +13,7 @@ import pl.exsio.nestedj.model.NestedNode;
  * @author exsio
  * @param <T>
  */
-public interface NestedNodeInserter<T extends NestedNode> extends NestedNodeHierarchyManipulator<T> {
-    
-    /**
-     *
-     * @param node
-     * @param parent
-     * @param mode
-     * @return
-     */
-    T insert(T node, T parent, int mode);
-    
+public interface NestedNodeRebuilder<T extends NestedNode> {
+     
+    void rebuildTree(T node);
 }

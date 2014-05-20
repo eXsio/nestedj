@@ -5,6 +5,7 @@
  */
 package pl.exsio.nestedj.dao;
 
+import pl.exsio.nestedj.ex.InvalidNodesHierarchyException;
 import pl.exsio.nestedj.model.NestedNode;
 import pl.exsio.nestedj.model.Tree;
 
@@ -20,32 +21,36 @@ public interface NestedNodeDao<T extends NestedNode> {
      * @param node
      * @param parent
      * @return
+     * @throws pl.exsio.nestedj.ex.InvalidNodesHierarchyException
      */
-    T insertAsFirstChildOf(T node, T parent);
+    T insertAsFirstChildOf(T node, T parent) throws InvalidNodesHierarchyException;
 
     /**
      *
      * @param node
      * @param parent
      * @return
+     * @throws pl.exsio.nestedj.ex.InvalidNodesHierarchyException
      */
-    T insertAsLastChildOf(T node, T parent);
+    T insertAsLastChildOf(T node, T parent) throws InvalidNodesHierarchyException;
 
     /**
      *
      * @param node
      * @param parent
      * @return
+     * @throws pl.exsio.nestedj.ex.InvalidNodesHierarchyException
      */
-    T insertAsNextSiblingOf(T node, T parent);
+    T insertAsNextSiblingOf(T node, T parent) throws InvalidNodesHierarchyException;
 
     /**
      *
      * @param node
      * @param parent
      * @return
+     * @throws pl.exsio.nestedj.ex.InvalidNodesHierarchyException
      */
-    T insertAsPrevSiblingOf(T node, T parent);
+    T insertAsPrevSiblingOf(T node, T parent) throws InvalidNodesHierarchyException;
     
     /**
      * 
@@ -88,6 +93,16 @@ public interface NestedNodeDao<T extends NestedNode> {
      */
     Iterable<T> getTreeAsList(T node);
     
-   
+   /**
+    * 
+    * @param node
+    * @return 
+    */
     Tree<T> getTree(T node);
+    
+    /**
+     * 
+     * @param node 
+     */
+    void rebuildTree(T node);
 }

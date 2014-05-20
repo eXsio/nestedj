@@ -13,6 +13,7 @@ import pl.exsio.nestedj.model.NestedNode;
 import pl.exsio.nestedj.NestedNodeUtil;
 import pl.exsio.nestedj.NestedNodeMover;
 import pl.exsio.nestedj.config.NestedNodeConfig;
+import pl.exsio.nestedj.ex.InvalidNodesHierarchyException;
 
 /**
  *
@@ -32,14 +33,14 @@ public class JpaNestedNodeMover implements NestedNodeMover {
     protected NestedNodeUtil util;
 
     /**
-     * 
+     *
      */
     public JpaNestedNodeMover() {
     }
 
     /**
-     * 
-     * @param em 
+     *
+     * @param em
      */
     public JpaNestedNodeMover(EntityManager em) {
         this.em = em;
@@ -55,8 +56,11 @@ public class JpaNestedNodeMover implements NestedNodeMover {
 
     @Override
     @Transactional
-    public NestedNode move(NestedNode node, NestedNode parent, int mode) {
+    public NestedNode move(NestedNode node, NestedNode parent, int mode) throws InvalidNodesHierarchyException {
 
+        if (!this.validateNodesHierarchyBeforeMove(node, parent)) {
+            throw new InvalidNodesHierarchyException("You cannot move a parent node to it's child");
+        }
         NestedNodeConfig config = this.util.getNodeConfig(node.getClass());
         String sign = this.getSign(node, parent, mode);
         Long start = this.getStart(node, parent, mode, sign);
@@ -68,14 +72,101 @@ public class JpaNestedNodeMover implements NestedNodeMover {
         Long levelModificator = this.getLevelModificator(node, parent, mode);
         NestedNode newParent = this.getNewParent(parent, mode);
 
-        this.em.createQuery("update " + config.getEntityName() + " set " + config.getLeftFieldName() + " = " + config.getLeftFieldName() + " " + sign + ":delta where " + config.getLeftFieldName() + " > :start and " + config.getLeftFieldName() + " < :stop").setParameter("delta", delta).setParameter("start", start).setParameter("stop", stop).executeUpdate();
-        this.em.createQuery("update " + config.getEntityName() + " set " + config.getRightFieldName() + " = " + config.getRightFieldName() + " " + sign + ":delta where " + config.getRightFieldName() + " > :start and " + config.getRightFieldName() + " < :stop").setParameter("delta", delta).setParameter("start", start).setParameter("stop", stop).executeUpdate();
-        this.em.createQuery("update " + config.getEntityName() + " set " + config.getLevelFieldName() + " = " + config.getLevelFieldName() + " + :levelModificator, " + config.getRightFieldName() + " = " + config.getRightFieldName() + " " + nodeSign + ":nodeDelta, " + config.getLeftFieldName() + " = " + config.getLeftFieldName() + " " + nodeSign + ":nodeDelta where id in :ids").setParameter("nodeDelta", nodeDelta).setParameter("ids", nodeIds).setParameter("levelModificator", levelModificator).executeUpdate();
-        this.em.createQuery("update " + config.getEntityName() + " set " + config.getParentFieldName() + " = :parent where id = :id").setParameter("parent", newParent).setParameter("id", node.getId()).executeUpdate();
+        this.makeSpaceForMovedElement(config, sign, delta, start, stop);
+        this.performMove(config, nodeSign, nodeDelta, nodeIds, levelModificator);
+        this.updateParentField(config, newParent, node);
+
         this.em.refresh(parent);
         this.em.refresh(node);
 
         return node;
+    }
+
+    /**
+     *
+     * @param config
+     * @param sign
+     * @param delta
+     * @param start
+     * @param stop
+     */
+    private void makeSpaceForMovedElement(NestedNodeConfig config, String sign, Long delta, Long start, Long stop) {
+        this.updateLeftFields(config, sign, delta, start, stop);
+        this.updateRightFields(config, sign, delta, start, stop);
+    }
+
+    /**
+     *
+     * @param config
+     * @param newParent
+     * @param node
+     */
+    private void updateParentField(NestedNodeConfig config, NestedNode newParent, NestedNode node) {
+        this.em.createQuery("update " + config.getEntityName()+ " "
+                + "set " + config.getParentFieldName() + " = :parent "
+                + "where id = :id").setParameter("parent", newParent)
+                .setParameter("id", node.getId())
+                .executeUpdate();
+    }
+
+    private void performMove(NestedNodeConfig config, String nodeSign, Long nodeDelta, List nodeIds, Long levelModificator) {
+        this.em.createQuery("update " + config.getEntityName()+ " "
+                + "set " + config.getLevelFieldName() + " = " + config.getLevelFieldName() + " + :levelModificator, "
+                + config.getRightFieldName() + " = " + config.getRightFieldName() + " " + nodeSign + ":nodeDelta, "
+                + config.getLeftFieldName() + " = " + config.getLeftFieldName() + " " + nodeSign + ":nodeDelta "
+                + "where id in :ids")
+                .setParameter("nodeDelta", nodeDelta)
+                .setParameter("ids", nodeIds)
+                .setParameter("levelModificator", levelModificator)
+                .executeUpdate();
+    }
+
+    /**
+     *
+     * @param config
+     * @param sign
+     * @param delta
+     * @param start
+     * @param stop
+     */
+    private void updateRightFields(NestedNodeConfig config, String sign, Long delta, Long start, Long stop) {
+        this.em.createQuery("update " + config.getEntityName()+ " "
+                + "set " + config.getRightFieldName() + " = " + config.getRightFieldName() + " " + sign + ":delta "
+                + "where " + config.getRightFieldName() + " > :start "
+                + "and " + config.getRightFieldName() + " < :stop")
+                .setParameter("delta", delta)
+                .setParameter("start", start)
+                .setParameter("stop", stop)
+                .executeUpdate();
+    }
+
+    /**
+     *
+     * @param config
+     * @param sign
+     * @param delta
+     * @param start
+     * @param stop
+     */
+    private void updateLeftFields(NestedNodeConfig config, String sign, Long delta, Long start, Long stop) {
+        this.em.createQuery("update " + config.getEntityName()+ " "
+                + "set " + config.getLeftFieldName() + " = " + config.getLeftFieldName() + " " + sign + ":delta where "
+                + config.getLeftFieldName() + " > :start "
+                + "and " + config.getLeftFieldName() + " < :stop")
+                .setParameter("delta", delta)
+                .setParameter("start", start)
+                .setParameter("stop", stop)
+                .executeUpdate();
+    }
+
+    /**
+     *
+     * @param node
+     * @param parent
+     * @return
+     */
+    private boolean validateNodesHierarchyBeforeMove(NestedNode node, NestedNode parent) {
+        return node.getLeft() >= parent.getLeft() || node.getRight() <= parent.getRight();
     }
 
     private NestedNode getNewParent(NestedNode parent, int mode) {
@@ -103,7 +194,12 @@ public class JpaNestedNodeMover implements NestedNodeMover {
     }
 
     private List<Long> getNodeIds(NestedNode node, NestedNodeConfig config) {
-        List result = this.em.createQuery("select id from " + config.getEntityName() + " where " + config.getLeftFieldName() + ">=:lft and " + config.getRightFieldName() + " <=:rgt ").setParameter("lft", node.getLeft()).setParameter("rgt", node.getRight()).getResultList();
+        List result = this.em.createQuery("select id from " + config.getEntityName() + " "
+                + "where " + config.getLeftFieldName() + ">=:lft "
+                + "and " + config.getRightFieldName() + " <=:rgt ")
+                .setParameter("lft", node.getLeft())
+                .setParameter("rgt", node.getRight())
+                .getResultList();
         return result;
     }
 

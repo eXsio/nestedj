@@ -81,9 +81,17 @@ public class JpaNestedNodeRetriever<T extends NestedNode> implements NestedNodeR
 
         NestedNodeConfig config = this.util.getNodeConfig(node.getClass());
         if (node instanceof NestedNode) {
-            return this.em.createQuery("from " + config.getEntityName() + " where " + config.getLeftFieldName() + ">=:lft and " + config.getRightFieldName() + " <=:rgt order by " + config.getLeftFieldName() + " asc").setParameter("lft", node.getLeft()).setParameter("rgt", node.getRight()).getResultList();
+            return this.em.createQuery("from " + config.getEntityName() +" "
+                    + "where " + config.getLeftFieldName() + ">=:lft "
+                    + "and " + config.getRightFieldName() + " <=:rgt "
+                    + "order by " + config.getLeftFieldName() + " asc")
+                    .setParameter("lft", node.getLeft())
+                    .setParameter("rgt", node.getRight())
+                    .getResultList();
         } else {
-            return this.em.createQuery("from " + config.getEntityName() + " order by " + config.getLeftFieldName() + " asc").getResultList();
+            return this.em.createQuery("from " + config.getEntityName() + " "
+                    + "order by " + config.getLeftFieldName() + " asc")
+                    .getResultList();
         }
     }
 
@@ -95,7 +103,15 @@ public class JpaNestedNodeRetriever<T extends NestedNode> implements NestedNodeR
     @Override
     public Iterable<T> getChildren(T node) {
         NestedNodeConfig config = this.util.getNodeConfig(node.getClass());
-        return this.em.createQuery("from " + config.getEntityName() + " where " + config.getLeftFieldName() + ">=:lft and " + config.getRightFieldName() + " <=:rgt and " + config.getLevelFieldName() + " = :lvl order by " + config.getLeftFieldName() + " asc").setParameter("lft", node.getLeft()).setParameter("rgt", node.getRight()).setParameter("lvl", node.getLevel() + 1).getResultList();
+        return this.em.createQuery("from " + config.getEntityName() + " "
+                + "where " + config.getLeftFieldName() + ">=:lft "
+                + "and " + config.getRightFieldName() + " <=:rgt "
+                + "and " + config.getLevelFieldName() + " = :lvl "
+                + "order by " + config.getLeftFieldName() + " asc")
+                .setParameter("lft", node.getLeft())
+                .setParameter("rgt", node.getRight())
+                .setParameter("lvl", node.getLevel() + 1)
+                .getResultList();
     }
 
     /**
@@ -107,7 +123,14 @@ public class JpaNestedNodeRetriever<T extends NestedNode> implements NestedNodeR
     public T getParent(T node) {
         if (node.getLevel() > 0) {
             NestedNodeConfig config = this.util.getNodeConfig(node.getClass());
-            return (T) this.em.createQuery("from " + config.getEntityName() + " where " + config.getLeftFieldName() + "<:lft and " + config.getRightFieldName() + ">:rgt and " + config.getLevelFieldName() + " = :lvl").setParameter("lft", node.getLeft()).setParameter("rgt", node.getRight()).setParameter("lvl", node.getLevel() - 1).getSingleResult();
+            return (T) this.em.createQuery("from " + config.getEntityName() + " "
+                    + "where " + config.getLeftFieldName() + "<:lft "
+                    + "and " + config.getRightFieldName() + ">:rgt "
+                    + "and " + config.getLevelFieldName() + " = :lvl")
+                    .setParameter("lft", node.getLeft())
+                    .setParameter("rgt", node.getRight())
+                    .setParameter("lvl", node.getLevel() - 1)
+                    .getSingleResult();
         } else {
             return null;
         }
@@ -122,7 +145,13 @@ public class JpaNestedNodeRetriever<T extends NestedNode> implements NestedNodeR
     public Iterable<T> getParents(T node) {
         if (node.getLevel() > 0) {
             NestedNodeConfig config = this.util.getNodeConfig(node.getClass());
-            return this.em.createQuery("from " + config.getEntityName() + " where " + config.getLeftFieldName() + "<:lft and " + config.getRightFieldName() + ">:rgt order by " + config.getLevelFieldName() + " desc").setParameter("lft", node.getLeft()).setParameter("rgt", node.getRight()).getResultList();
+            return this.em.createQuery("from " + config.getEntityName() + " "
+                    + "where " + config.getLeftFieldName() + "<:lft "
+                    + "and " + config.getRightFieldName() + ">:rgt "
+                    + "order by " + config.getLevelFieldName() + " desc")
+                    .setParameter("lft", node.getLeft())
+                    .setParameter("rgt", node.getRight())
+                    .getResultList();
         } else {
             return new ArrayList();
         }

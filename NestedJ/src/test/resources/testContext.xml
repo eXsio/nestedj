@@ -72,5 +72,9 @@
                 <property name="nestedNodeUtil" ref="NestedNodeUtil"/>
            </bean>
         </property>
+        <property name="rebuilder">
+           <bean class="pl.exsio.nestedj.rebuilder.JpaNestedNodeRebuilder">
+           </bean>
+        </property>
     </bean>
 </beans>

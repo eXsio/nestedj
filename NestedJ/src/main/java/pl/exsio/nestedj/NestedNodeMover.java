@@ -6,6 +6,7 @@
 
 package pl.exsio.nestedj;
 
+import pl.exsio.nestedj.ex.InvalidNodesHierarchyException;
 import pl.exsio.nestedj.model.NestedNode;
 
 /**
@@ -13,7 +14,7 @@ import pl.exsio.nestedj.model.NestedNode;
  * @author exsio
  * @param <T>
  */
-public interface NestedNodeMover<T extends NestedNode> extends NestedNodeManipulator<T> {
+public interface NestedNodeMover<T extends NestedNode> extends NestedNodeHierarchyManipulator<T> {
  
     /**
      *
@@ -22,5 +23,5 @@ public interface NestedNodeMover<T extends NestedNode> extends NestedNodeManipul
      * @param mode
      * @return
      */
-    T move(T node, T parent, int mode);
+    T move(T node, T parent, int mode) throws InvalidNodesHierarchyException;
 }
