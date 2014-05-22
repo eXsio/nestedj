@@ -194,7 +194,8 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         assertTrue(c.getRight() == 13);
         assertTrue(g.getLeft() == 9);
         assertTrue(g.getRight() == 12);
-        
+        assertTrue(d.getLevel() == 1);
+        assertTrue(e.getLevel() == 1);
     }
     
     @Test

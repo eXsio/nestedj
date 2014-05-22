@@ -79,7 +79,8 @@ public class JpaNestedNodeRemover implements NestedNodeRemover {
     private void updateDeletedNodeChildren(NestedNodeConfig config, NestedNode node) {
         this.em.createQuery("update " + config.getEntityName()+ " "
                 + "set " + config.getRightFieldName() + " = " + config.getRightFieldName() + "-1, " 
-                + config.getLeftFieldName() + " = " + config.getLeftFieldName() + "-1 "
+                + config.getLeftFieldName() + " = " + config.getLeftFieldName() + "-1, "
+                + config.getLevelFieldName() + " = " + config.getLevelFieldName() + "-1 "
                 + "where " + config.getLeftFieldName() + " > :lft "
                 + "and " + config.getRightFieldName() + " < :rgt")
                 .setParameter("lft", node.getLeft())
