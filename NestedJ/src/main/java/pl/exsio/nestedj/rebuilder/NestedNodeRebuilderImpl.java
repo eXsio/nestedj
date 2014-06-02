@@ -67,6 +67,7 @@ public class NestedNodeRebuilderImpl<T extends NestedNode> implements NestedNode
         
         NestedNode first = (NestedNode) this.em.createQuery("from "+config.getEntityName()+" "
                 + "where "+config.getParentFieldName() +" is null")
+                .setMaxResults(1)
                 .getSingleResult();
         return first;
     }

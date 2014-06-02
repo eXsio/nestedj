@@ -34,27 +34,28 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
             TestNodeImpl f = this.findNode("f");
             
             assertTrue(a.getLeft() == 1);
-            assertTrue(a.getRight() == 16);
-            assertTrue(b.getLeft() == 10);
-            assertTrue(b.getRight() == 15);
-            assertTrue(c.getLeft() == 2);
-            assertTrue(c.getRight() == 9);
-            assertTrue(d.getLeft() == 13);
-            assertTrue(d.getRight() == 14);
-            assertTrue(e.getLeft() == 11);
-            assertTrue(e.getRight() == 12);
-            assertTrue(f.getLeft() == 7);
-            assertTrue(f.getRight() == 8);
-            assertTrue(g.getLeft() == 3);
-            assertTrue(g.getRight() == 6);
-            assertTrue(h.getLeft() == 4);
-            assertTrue(h.getRight() == 5);
+            assertTrue(a.getRight() == 8);
+            assertTrue(b.getLeft() == 2);
+            assertTrue(b.getRight() == 7);
+            assertTrue(c.getLeft() == 9);
+            assertTrue(c.getRight() == 16);
+            assertTrue(d.getLeft() == 5);
+            assertTrue(d.getRight() == 6);
+            assertTrue(e.getLeft() == 3);
+            assertTrue(e.getRight() == 4);
+            assertTrue(f.getLeft() == 14);
+            assertTrue(f.getRight() == 15);
+            assertTrue(g.getLeft() == 10);
+            assertTrue(g.getRight() == 13);
+            assertTrue(h.getLeft() == 11);
+            assertTrue(h.getRight() == 12);
            
             assertTrue(e.getLevel() == 2);
-            assertTrue(f.getLevel() == 2);
+            assertTrue(f.getLevel() == 1);
+            assertTrue(g.getLevel() == 1);
             assertTrue(b.getLevel() == 1);
-            assertTrue(c.getLevel() == 1);
-            assertTrue(h.getLevel() == 3);
+            assertTrue(c.getLevel() == 0);
+            assertTrue(h.getLevel() == 2);
            
         } catch (InvalidNodesHierarchyException ex) {
             fail("something went wrong:" + ex.getMessage());
@@ -543,6 +544,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         assertTrue(b.getRight() == 9);
         assertTrue(h.getLeft() == 14);
         assertTrue(h.getRight() == 15);
+        assertTrue(i.getLevel().equals(e.getLevel()+1));
     }
 
     @Test
@@ -561,6 +563,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         assertTrue(h.getLeft() == 14);
         assertTrue(h.getRight() == 15);
         assertTrue(c.getLeft() == 10);
+        assertTrue(j.getLevel().equals(b.getLevel()+1));
     }
 
     @Test
@@ -579,6 +582,8 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         assertTrue(h.getLeft() == 14);
         assertTrue(h.getRight() == 15);
         assertTrue(c.getLeft() == 10);
+        assertTrue(k.getLevel().equals(e.getLevel()));
+        assertTrue(k.getParent().equals(e.getParent()));
     }
 
     @Test
@@ -596,6 +601,8 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         assertTrue(a.getRight() == 18);
         assertTrue(g.getRight() == 16);
         assertTrue(c.getRight() == 17);
+        assertTrue(m.getLevel().equals(h.getLevel()));
+        assertTrue(m.getParent().equals(h.getParent()));
     }
     
     
@@ -617,7 +624,10 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
     }
 
     private void breakTree() {
+        
+        this.em.createQuery("update TestNodeImpl set parent = null where id = 3").executeUpdate();
         this.em.createQuery("update TestNodeImpl set lft = 0, rgt = 0, lvl = 0").executeUpdate();
+        
     }
 
 }

@@ -37,16 +37,17 @@ public class NestedNodeInserterImpl<T extends NestedNode> implements NestedNodeI
         NestedNodeConfig config = this.util.getNodeConfig(node.getClass());
         Long left = this.getNodeLeft(parent, mode);
         Long right = left + 1;
-        Long level = parent.getLevel() + 1;
+        Long level = this.getNodeLevel(parent, mode);
+        NestedNode nodeParent = this.getNodeParent(parent, mode);
         this.makeSpaceForNewElement(node.getClass(), parent.getRight(), this.isGte(mode), config);
         this.em.persist(node);
         this.em.flush();
-        this.performInsertion(config, parent, left, right, level, node);
+        this.performInsertion(config, nodeParent, left, right, level, node);
         this.em.refresh(node);
         return node;
     }
 
-    private void performInsertion(NestedNodeConfig config, T parent, Long left, Long right, Long level, T node) {
+    private void performInsertion(NestedNodeConfig config, NestedNode parent, Long left, Long right, Long level, T node) {
         this.em.createQuery(
                 "update " + config.getEntityName()+ " "
                         + "set " + config.getParentFieldName() + " = :parent,"
@@ -59,6 +60,30 @@ public class NestedNodeInserterImpl<T extends NestedNode> implements NestedNodeI
                 .setParameter("level", level)
                 .setParameter("id", node.getId())
                 .executeUpdate();
+    }
+    
+    protected Long getNodeLevel(NestedNode parent, int mode) {
+        switch (mode) {
+            case MODE_NEXT_SIBLING:
+            case MODE_PREV_SIBLING:
+                return parent.getLevel();
+            case MODE_LAST_CHILD:
+            case MODE_FIRST_CHILD:
+            default:
+                return parent.getLevel() + 1;
+        }
+    }
+    
+    protected NestedNode getNodeParent(NestedNode parent, int mode) {
+        switch (mode) {
+            case MODE_NEXT_SIBLING:
+            case MODE_PREV_SIBLING:
+                return parent.getParent();
+            case MODE_LAST_CHILD:
+            case MODE_FIRST_CHILD:
+            default:
+                return parent;
+        }
     }
 
     protected boolean isGte(int mode) {
