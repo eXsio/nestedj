@@ -26,4 +26,8 @@ public interface NestedNodeConfig {
     
     void setParentFieldName(String name);
     
+    String getIdFieldName();
+    
+    void setIdFieldName(String name);
+    
 }

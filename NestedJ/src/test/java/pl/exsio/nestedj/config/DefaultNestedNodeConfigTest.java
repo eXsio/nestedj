@@ -73,6 +73,27 @@ public class DefaultNestedNodeConfigTest {
         NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
         instance.setRightFieldName(rightFieldName);
     }
+    
+    /**
+     * Test of setIdFieldName method, of class NestedNodeConfigImpl.
+     */
+    @Test
+    public void testSetIdFieldName() {
+        String idFieldName = null;
+        NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
+        instance.setIdFieldName(idFieldName);
+    }
+    
+    /**
+     * Test of getIdFieldName method, of class NestedNodeConfigImpl.
+     */
+    @Test
+    public void testGetIdFieldName() {
+        NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
+        String expResult = null;
+        String result = instance.getIdFieldName();
+        assertEquals(expResult, result);
+    }
 
     /**
      * Test of getLeftFieldName method, of class NestedNodeConfigImpl.

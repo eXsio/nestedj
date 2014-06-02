@@ -33,5 +33,5 @@ public interface NestedNodeDao<T extends NestedNode> {
 
     Tree<T> getTree(T node);
 
-    void rebuildTree(T node);
+    void rebuildTree(Class<? extends NestedNode> nodeClass) throws InvalidNodesHierarchyException;
 }

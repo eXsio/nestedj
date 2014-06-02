@@ -77,15 +77,17 @@ public class NestedNodeMoverImpl implements NestedNodeMover {
     }
 
     private void performMove(NestedNodeConfig config, String nodeSign, Long nodeDelta, List nodeIds, Long levelModificator) {
-        this.em.createQuery("update " + config.getEntityName()+ " "
-                + "set " + config.getLevelFieldName() + " = " + config.getLevelFieldName() + " + :levelModificator, "
-                + config.getRightFieldName() + " = " + config.getRightFieldName() + " " + nodeSign + ":nodeDelta, "
-                + config.getLeftFieldName() + " = " + config.getLeftFieldName() + " " + nodeSign + ":nodeDelta "
-                + "where id in :ids")
-                .setParameter("nodeDelta", nodeDelta)
-                .setParameter("ids", nodeIds)
-                .setParameter("levelModificator", levelModificator)
-                .executeUpdate();
+        if(!nodeIds.isEmpty()) {
+            this.em.createQuery("update " + config.getEntityName()+ " "
+                    + "set " + config.getLevelFieldName() + " = " + config.getLevelFieldName() + " + :levelModificator, "
+                    + config.getRightFieldName() + " = " + config.getRightFieldName() + " " + nodeSign + ":nodeDelta, "
+                    + config.getLeftFieldName() + " = " + config.getLeftFieldName() + " " + nodeSign + ":nodeDelta "
+                    + "where id in :ids")
+                    .setParameter("nodeDelta", nodeDelta)
+                    .setParameter("ids", nodeIds)
+                    .setParameter("levelModificator", levelModificator)
+                    .executeUpdate();
+        }
     }
 
     private void updateRightFields(NestedNodeConfig config, String sign, Long delta, Long start, Long stop) {

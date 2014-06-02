@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package pl.exsio.nestedj.util;
 
 import static org.junit.Assert.*;
@@ -46,6 +40,7 @@ public class NestedNodeUtilImplTest extends FunctionalNestedjTest {
         assertEquals(config.getRightFieldName(), "rgt");
         assertEquals(config.getLevelFieldName(), "lvl");
         assertEquals(config.getParentFieldName(), "parent");
+        assertEquals(config.getIdFieldName(), "id");
         
     }
     
@@ -58,6 +53,7 @@ public class NestedNodeUtilImplTest extends FunctionalNestedjTest {
         assertEquals(config.getLevelFieldName(), "inherited_lvl");
         assertEquals(config.getLeftFieldName(), "lft");
         assertEquals(config.getParentFieldName(), "parent");
+        assertEquals(config.getIdFieldName(), "id");
         
     }
     

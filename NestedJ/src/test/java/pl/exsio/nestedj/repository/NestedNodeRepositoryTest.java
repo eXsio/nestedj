@@ -1,13 +1,8 @@
 package pl.exsio.nestedj.repository;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import pl.exsio.nestedj.FunctionalNestedjTest;
 import pl.exsio.nestedj.ex.InvalidNodesHierarchyException;
@@ -24,11 +19,45 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
     
     @Test
     public void testRebuildTree() {
-        TestNodeImpl a = this.findNode("a");
         try {
-            this.nodeRepository.rebuildTree(a);
-            fail("this action should have triggered an exception");
-        } catch (UnsupportedOperationException ex) {
+            
+            this.breakTree();
+            this.nodeRepository.rebuildTree(TestNodeImpl.class);
+            
+            TestNodeImpl a = this.findNode("a");
+            TestNodeImpl e = this.findNode("e");
+            TestNodeImpl b = this.findNode("b");
+            TestNodeImpl d = this.findNode("d");
+            TestNodeImpl g = this.findNode("g");
+            TestNodeImpl c = this.findNode("c");
+            TestNodeImpl h = this.findNode("h");
+            TestNodeImpl f = this.findNode("f");
+            
+            assertTrue(a.getLeft() == 1);
+            assertTrue(a.getRight() == 16);
+            assertTrue(b.getLeft() == 10);
+            assertTrue(b.getRight() == 15);
+            assertTrue(c.getLeft() == 2);
+            assertTrue(c.getRight() == 9);
+            assertTrue(d.getLeft() == 13);
+            assertTrue(d.getRight() == 14);
+            assertTrue(e.getLeft() == 11);
+            assertTrue(e.getRight() == 12);
+            assertTrue(f.getLeft() == 7);
+            assertTrue(f.getRight() == 8);
+            assertTrue(g.getLeft() == 3);
+            assertTrue(g.getRight() == 6);
+            assertTrue(h.getLeft() == 4);
+            assertTrue(h.getRight() == 5);
+           
+            assertTrue(e.getLevel() == 2);
+            assertTrue(f.getLevel() == 2);
+            assertTrue(b.getLevel() == 1);
+            assertTrue(c.getLevel() == 1);
+            assertTrue(h.getLevel() == 3);
+           
+        } catch (InvalidNodesHierarchyException ex) {
+            fail("something went wrong:" + ex.getMessage());
         }
     }
     
@@ -585,6 +614,10 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
             this.em.refresh(parent);
         }
         return parent;
+    }
+
+    private void breakTree() {
+        this.em.createQuery("update TestNodeImpl set lft = 0, rgt = 0, lvl = 0").executeUpdate();
     }
 
 }

@@ -53,28 +53,34 @@
     <bean id="NestedNodeRepository" class="pl.exsio.nestedj.repository.NestedNodeRepository">
         <property name="nestedNodeUtil" ref="NestedNodeUtil" />
         <property name="inserter">
-           <bean class="pl.exsio.nestedj.inserter.NestedNodeInserterImpl">
-               <property name="nestedNodeUtil" ref="NestedNodeUtil"/>
-           </bean>
+            <bean class="pl.exsio.nestedj.inserter.NestedNodeInserterImpl">
+                <property name="nestedNodeUtil" ref="NestedNodeUtil"/>
+            </bean>
         </property>
         <property name="mover">
-           <bean class="pl.exsio.nestedj.mover.NestedNodeMoverImpl">
-               <property name="nestedNodeUtil" ref="NestedNodeUtil"/>
-           </bean>
+            <bean class="pl.exsio.nestedj.mover.NestedNodeMoverImpl">
+                <property name="nestedNodeUtil" ref="NestedNodeUtil"/>
+            </bean>
         </property>
         <property name="remover">
-           <bean class="pl.exsio.nestedj.remover.NestedNodeRemoverImpl">
+            <bean class="pl.exsio.nestedj.remover.NestedNodeRemoverImpl">
                 <property name="nestedNodeUtil" ref="NestedNodeUtil"/>
-           </bean>
+            </bean>
         </property>
         <property name="retriever">
-           <bean class="pl.exsio.nestedj.retriever.NestedNodeRetrieverImpl">
+            <bean class="pl.exsio.nestedj.retriever.NestedNodeRetrieverImpl">
                 <property name="nestedNodeUtil" ref="NestedNodeUtil"/>
-           </bean>
+            </bean>
         </property>
         <property name="rebuilder">
-           <bean class="pl.exsio.nestedj.rebuilder.NestedNodeRebuilderImpl">
-           </bean>
+            <bean class="pl.exsio.nestedj.rebuilder.NestedNodeRebuilderImpl">
+                <property name="nestedNodeUtil" ref="NestedNodeUtil"/>
+                <property name="inserter">
+                    <bean class="pl.exsio.nestedj.inserter.NestedNodeInserterImpl">
+                        <property name="nestedNodeUtil" ref="NestedNodeUtil"/>
+                    </bean>
+                </property>
+            </bean>
         </property>
     </bean>
 </beans>

@@ -16,6 +16,8 @@ public class NestedNodeConfigImpl implements NestedNodeConfig {
 
     private String parentFieldName;
 
+    private String idFieldName;
+
     @Override
     public String getEntityName() {
         return entityName;
@@ -64,6 +66,14 @@ public class NestedNodeConfigImpl implements NestedNodeConfig {
     @Override
     public void setParentFieldName(String parentFieldName) {
         this.parentFieldName = parentFieldName;
+    }
+
+    public String getIdFieldName() {
+        return idFieldName;
+    }
+
+    public void setIdFieldName(String idFieldName) {
+        this.idFieldName = idFieldName;
     }
 
     @Override

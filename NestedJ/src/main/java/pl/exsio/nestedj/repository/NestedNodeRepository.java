@@ -130,7 +130,7 @@ public class NestedNodeRepository<T extends NestedNode> implements NestedNodeDao
         return this.retriever.getParents(node);
     }
 
-    public void rebuildTree(T node) {
-        this.rebuilder.rebuildTree(node);
+    public void rebuildTree(Class<? extends NestedNode> nodeClass) throws InvalidNodesHierarchyException {
+        this.rebuilder.rebuildTree(nodeClass);
     }
 }

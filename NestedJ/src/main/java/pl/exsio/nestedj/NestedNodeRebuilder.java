@@ -1,5 +1,6 @@
 package pl.exsio.nestedj;
 
+import pl.exsio.nestedj.ex.InvalidNodesHierarchyException;
 import pl.exsio.nestedj.model.NestedNode;
 
 /**
@@ -9,5 +10,5 @@ import pl.exsio.nestedj.model.NestedNode;
  */
 public interface NestedNodeRebuilder<T extends NestedNode> {
      
-    void rebuildTree(T node);
+    void rebuildTree(Class<? extends NestedNode> nodeClass) throws InvalidNodesHierarchyException;
 }

@@ -4,14 +4,15 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import javax.persistence.Entity;
-import pl.exsio.nestedj.model.NestedNode;
+import javax.persistence.Id;
 import pl.exsio.nestedj.NestedNodeUtil;
 import pl.exsio.nestedj.annotation.LeftColumn;
 import pl.exsio.nestedj.annotation.LevelColumn;
 import pl.exsio.nestedj.annotation.ParentColumn;
 import pl.exsio.nestedj.annotation.RightColumn;
-import pl.exsio.nestedj.config.NestedNodeConfigImpl;
 import pl.exsio.nestedj.config.NestedNodeConfig;
+import pl.exsio.nestedj.config.NestedNodeConfigImpl;
+import pl.exsio.nestedj.model.NestedNode;
 
 /**
  *
@@ -49,6 +50,8 @@ public class NestedNodeUtilImpl<T extends NestedNode> implements NestedNodeUtil<
                     config.setLevelFieldName(field.getName());
                 } else if (field.getAnnotation(ParentColumn.class) != null) {
                     config.setParentFieldName(field.getName());
+                } else if (field.getAnnotation(Id.class) != null) {
+                    config.setIdFieldName(field.getName());
                 }
             }
             
@@ -71,6 +74,8 @@ public class NestedNodeUtilImpl<T extends NestedNode> implements NestedNodeUtil<
                     config.setLevelFieldName(field.getName());
                 } else if (field.getAnnotation(ParentColumn.class) != null && config.getParentFieldName() == null) {
                     config.setParentFieldName(field.getName());
+                } else if (field.getAnnotation(Id.class) != null && config.getIdFieldName() == null) {
+                    config.setIdFieldName(field.getName());
                 }
             }
             config = this.applyNodeSuperclassesToConfig(superClass, config);
