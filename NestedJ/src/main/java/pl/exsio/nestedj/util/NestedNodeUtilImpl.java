@@ -40,32 +40,17 @@ public class NestedNodeUtilImpl<T extends NestedNode> implements NestedNodeUtil<
             Entity entity = nodeClass.getAnnotation(Entity.class);
             String name = entity.name();
             config.setEntityName((name != null && name.length() > 0) ? name : nodeClass.getSimpleName());
-
-            for (Field field : nodeClass.getDeclaredFields()) {
-                if (field.getAnnotation(LeftColumn.class) != null) {
-                    config.setLeftFieldName(field.getName());
-                } else if (field.getAnnotation(RightColumn.class) != null) {
-                    config.setRightFieldName(field.getName());
-                } else if (field.getAnnotation(LevelColumn.class) != null) {
-                    config.setLevelFieldName(field.getName());
-                } else if (field.getAnnotation(ParentColumn.class) != null) {
-                    config.setParentFieldName(field.getName());
-                } else if (field.getAnnotation(Id.class) != null) {
-                    config.setIdFieldName(field.getName());
-                }
-            }
-            
-            config = this.applyNodeSuperclassesToConfig(nodeClass, config);
+            config = this.getConfigForClass(nodeClass, config);
             this.configs.put(nodeClass, config);
         }
 
         return this.configs.get(nodeClass);
     }
 
-    private NestedNodeConfigImpl applyNodeSuperclassesToConfig(Class<? extends NestedNode> nodeClass, NestedNodeConfigImpl config) {
-        Class superClass = nodeClass.getSuperclass();
-        if(!superClass.getCanonicalName().equals(Object.class.getCanonicalName())) {
-            for (Field field : superClass.getDeclaredFields()) {
+    private NestedNodeConfigImpl getConfigForClass(Class<? extends NestedNode> nodeClass, NestedNodeConfigImpl config) {
+
+        if(!nodeClass.getCanonicalName().equals(Object.class.getCanonicalName())) {
+            for (Field field : nodeClass.getDeclaredFields()) {
                 if (field.getAnnotation(LeftColumn.class) != null && config.getLeftFieldName() == null) {
                     config.setLeftFieldName(field.getName());
                 } else if (field.getAnnotation(RightColumn.class) != null && config.getRightFieldName() == null) {
@@ -78,7 +63,7 @@ public class NestedNodeUtilImpl<T extends NestedNode> implements NestedNodeUtil<
                     config.setIdFieldName(field.getName());
                 }
             }
-            config = this.applyNodeSuperclassesToConfig(superClass, config);
+            config = this.getConfigForClass((Class<? extends NestedNode>) nodeClass.getSuperclass(), config);
         }
         return config;
     }
