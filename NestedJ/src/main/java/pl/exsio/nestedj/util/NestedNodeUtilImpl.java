@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package pl.exsio.nestedj.util;
 
 import java.lang.reflect.Field;
@@ -15,7 +10,7 @@ import pl.exsio.nestedj.annotation.LeftColumn;
 import pl.exsio.nestedj.annotation.LevelColumn;
 import pl.exsio.nestedj.annotation.ParentColumn;
 import pl.exsio.nestedj.annotation.RightColumn;
-import pl.exsio.nestedj.config.DefaultNestedNodeConfig;
+import pl.exsio.nestedj.config.NestedNodeConfigImpl;
 import pl.exsio.nestedj.config.NestedNodeConfig;
 
 /**
@@ -23,36 +18,23 @@ import pl.exsio.nestedj.config.NestedNodeConfig;
  * @author exsio
  * @param <T>
  */
-public class DefaultNestedNodeUtil<T extends NestedNode> implements NestedNodeUtil<T> {
+public class NestedNodeUtilImpl<T extends NestedNode> implements NestedNodeUtil<T> {
 
-    /**
-     *
-     */
     protected Map<Class<? extends NestedNode>, NestedNodeConfig> configs;
 
-    public DefaultNestedNodeUtil() {
+    public NestedNodeUtilImpl() {
         this.configs = new HashMap<Class<? extends NestedNode>, NestedNodeConfig>();
     }
 
-    /**
-     *
-     * @param node
-     * @return
-     */
     @Override
     public boolean isNodeNew(T node) {
         return (node.getLeft() == null && node.getRight() == null);
     }
 
-    /**
-     *
-     * @param nodeClass
-     * @return
-     */
     @Override
     public NestedNodeConfig getNodeConfig(Class<? extends NestedNode> nodeClass) {
         if (!this.configs.containsKey(nodeClass)) {
-            DefaultNestedNodeConfig config = new DefaultNestedNodeConfig();
+            NestedNodeConfigImpl config = new NestedNodeConfigImpl();
 
             Entity entity = nodeClass.getAnnotation(Entity.class);
             String name = entity.name();

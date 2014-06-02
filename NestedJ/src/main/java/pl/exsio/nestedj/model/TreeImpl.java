@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package pl.exsio.nestedj.model;
 
 import java.util.LinkedList;
@@ -13,7 +8,7 @@ import java.util.List;
  * @author exsio
  * @param <T>
  */
-public class NestedTree<T extends NestedNode> implements Tree<T> {
+public class TreeImpl<T extends NestedNode> implements Tree<T> {
 
     private List<Tree<T>> children;
 
@@ -21,16 +16,16 @@ public class NestedTree<T extends NestedNode> implements Tree<T> {
 
     private T node;
     
-    private NestedTree() {
+    private TreeImpl() {
         this.children = new LinkedList<Tree<T>>();
     }
 
-    public NestedTree(T node) {
+    public TreeImpl(T node) {
         this();
         this.node = node;
     }
 
-    public NestedTree(T node, Tree<T> parent) {
+    public TreeImpl(T node, Tree<T> parent) {
         this();
         this.parent = parent;
         this.node = node;

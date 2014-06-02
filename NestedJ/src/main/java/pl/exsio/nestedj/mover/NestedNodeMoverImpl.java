@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package pl.exsio.nestedj.mover;
 
 import java.util.List;
@@ -19,7 +14,7 @@ import pl.exsio.nestedj.ex.InvalidNodesHierarchyException;
  *
  * @author exsio
  */
-public class JpaNestedNodeMover implements NestedNodeMover {
+public class NestedNodeMoverImpl implements NestedNodeMover {
 
     private final static String SIGN_PLUS = "+";
     private final static String SIGN_MINUS = "-";
@@ -27,29 +22,15 @@ public class JpaNestedNodeMover implements NestedNodeMover {
     @PersistenceContext
     protected EntityManager em;
 
-    /**
-     *
-     */
     protected NestedNodeUtil util;
 
-    /**
-     *
-     */
-    public JpaNestedNodeMover() {
+    public NestedNodeMoverImpl() {
     }
 
-    /**
-     *
-     * @param em
-     */
-    public JpaNestedNodeMover(EntityManager em) {
+    public NestedNodeMoverImpl(EntityManager em) {
         this.em = em;
     }
 
-    /**
-     *
-     * @param util
-     */
     public void setNestedNodeUtil(NestedNodeUtil util) {
         this.util = util;
     }
@@ -82,25 +63,11 @@ public class JpaNestedNodeMover implements NestedNodeMover {
         return node;
     }
 
-    /**
-     *
-     * @param config
-     * @param sign
-     * @param delta
-     * @param start
-     * @param stop
-     */
     private void makeSpaceForMovedElement(NestedNodeConfig config, String sign, Long delta, Long start, Long stop) {
         this.updateLeftFields(config, sign, delta, start, stop);
         this.updateRightFields(config, sign, delta, start, stop);
     }
 
-    /**
-     *
-     * @param config
-     * @param newParent
-     * @param node
-     */
     private void updateParentField(NestedNodeConfig config, NestedNode newParent, NestedNode node) {
         this.em.createQuery("update " + config.getEntityName()+ " "
                 + "set " + config.getParentFieldName() + " = :parent "
@@ -121,14 +88,6 @@ public class JpaNestedNodeMover implements NestedNodeMover {
                 .executeUpdate();
     }
 
-    /**
-     *
-     * @param config
-     * @param sign
-     * @param delta
-     * @param start
-     * @param stop
-     */
     private void updateRightFields(NestedNodeConfig config, String sign, Long delta, Long start, Long stop) {
         this.em.createQuery("update " + config.getEntityName()+ " "
                 + "set " + config.getRightFieldName() + " = " + config.getRightFieldName() + " " + sign + ":delta "
@@ -140,14 +99,6 @@ public class JpaNestedNodeMover implements NestedNodeMover {
                 .executeUpdate();
     }
 
-    /**
-     *
-     * @param config
-     * @param sign
-     * @param delta
-     * @param start
-     * @param stop
-     */
     private void updateLeftFields(NestedNodeConfig config, String sign, Long delta, Long start, Long stop) {
         this.em.createQuery("update " + config.getEntityName()+ " "
                 + "set " + config.getLeftFieldName() + " = " + config.getLeftFieldName() + " " + sign + ":delta where "
@@ -159,12 +110,6 @@ public class JpaNestedNodeMover implements NestedNodeMover {
                 .executeUpdate();
     }
 
-    /**
-     *
-     * @param node
-     * @param parent
-     * @return
-     */
     private boolean validateNodesHierarchyBeforeMove(NestedNode node, NestedNode parent) {
         return node.getLeft() >= parent.getLeft() || node.getRight() <= parent.getRight();
     }

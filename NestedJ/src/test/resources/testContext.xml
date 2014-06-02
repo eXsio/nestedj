@@ -17,12 +17,12 @@
     
     <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
         <property name="dataSource" ref="dataSource"/>
-        <property name="persistenceUnitName" value="TestPU"/>
+        <property name="packagesToScan" value="pl.exsio.nestedj"/>
         <property name="jpaVendorAdapter" ref="jpaAdapter" />
         <property name="jpaProperties">
             <props>
                 <prop key="hibernate.hbm2ddl.auto">create-drop</prop> 
-                <prop key="hibernate.show_sql">false</prop>
+                <prop key="hibernate.show_sql">true</prop>
                 <prop key="hibernate.format_sql">false</prop> 
                 <prop key="hibernate.hbm2ddl.import_files">/fixtures/test-import.sql</prop> 
             </props>
@@ -31,7 +31,7 @@
     
     <bean id="jpaAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
         <property name="databasePlatform" value="org.hibernate.dialect.HSQLDialect" />
-        <property name="showSql" value="false" />
+        <property name="showSql" value="true" />
         <property name="generateDdl" value="false" />
     </bean>
     
@@ -47,33 +47,33 @@
     </bean>
     
     
-    <bean id="NestedNodeUtil" class="pl.exsio.nestedj.util.DefaultNestedNodeUtil">
+    <bean id="NestedNodeUtil" class="pl.exsio.nestedj.util.NestedNodeUtilImpl">
     </bean>
     
     <bean id="NestedNodeRepository" class="pl.exsio.nestedj.repository.NestedNodeRepository">
         <property name="nestedNodeUtil" ref="NestedNodeUtil" />
         <property name="inserter">
-           <bean class="pl.exsio.nestedj.inserter.JpaNestedNodeInserter">
+           <bean class="pl.exsio.nestedj.inserter.NestedNodeInserterImpl">
                <property name="nestedNodeUtil" ref="NestedNodeUtil"/>
            </bean>
         </property>
         <property name="mover">
-           <bean class="pl.exsio.nestedj.mover.JpaNestedNodeMover">
+           <bean class="pl.exsio.nestedj.mover.NestedNodeMoverImpl">
                <property name="nestedNodeUtil" ref="NestedNodeUtil"/>
            </bean>
         </property>
         <property name="remover">
-           <bean class="pl.exsio.nestedj.remover.JpaNestedNodeRemover">
+           <bean class="pl.exsio.nestedj.remover.NestedNodeRemoverImpl">
                 <property name="nestedNodeUtil" ref="NestedNodeUtil"/>
            </bean>
         </property>
         <property name="retriever">
-           <bean class="pl.exsio.nestedj.retriever.JpaNestedNodeRetriever">
+           <bean class="pl.exsio.nestedj.retriever.NestedNodeRetrieverImpl">
                 <property name="nestedNodeUtil" ref="NestedNodeUtil"/>
            </bean>
         </property>
         <property name="rebuilder">
-           <bean class="pl.exsio.nestedj.rebuilder.JpaNestedNodeRebuilder">
+           <bean class="pl.exsio.nestedj.rebuilder.NestedNodeRebuilderImpl">
            </bean>
         </property>
     </bean>

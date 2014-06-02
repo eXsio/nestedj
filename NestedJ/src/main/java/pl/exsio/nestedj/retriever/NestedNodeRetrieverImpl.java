@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package pl.exsio.nestedj.retriever;
 
 import java.util.ArrayList;
@@ -12,7 +7,7 @@ import pl.exsio.nestedj.NestedNodeUtil;
 import pl.exsio.nestedj.NestedNodeRetriever;
 import pl.exsio.nestedj.config.NestedNodeConfig;
 import pl.exsio.nestedj.model.NestedNode;
-import pl.exsio.nestedj.model.NestedTree;
+import pl.exsio.nestedj.model.TreeImpl;
 import pl.exsio.nestedj.model.Tree;
 
 /**
@@ -20,50 +15,27 @@ import pl.exsio.nestedj.model.Tree;
  * @author exsio
  * @param <T>
  */
-public class JpaNestedNodeRetriever<T extends NestedNode> implements NestedNodeRetriever<T> {
+public class NestedNodeRetrieverImpl<T extends NestedNode> implements NestedNodeRetriever<T> {
 
-    /**
-     *
-     */
     @PersistenceContext
     protected EntityManager em;
 
-    /**
-     *
-     */
     protected NestedNodeUtil<T> util;
 
-    /**
-     * 
-     */
-    public JpaNestedNodeRetriever() {
+    public NestedNodeRetrieverImpl() {
     }
 
-    /**
-     * 
-     * @param em 
-     */
-    public JpaNestedNodeRetriever(EntityManager em) {
+    public NestedNodeRetrieverImpl(EntityManager em) {
         this.em = em;
     }
 
-    
-    /**
-     *
-     * @param util
-     */
     public void setNestedNodeUtil(NestedNodeUtil util) {
         this.util = util;
     }
 
-    /**
-     *
-     * @param node
-     * @return
-     */
     @Override
     public Tree<T> getTree(T node) {
-        Tree<T> tree = new NestedTree<T>(node);
+        Tree<T> tree = new TreeImpl<T>(node);
         for (T n : this.getChildren(node)) {
             Tree<T> subtree = this.getTree(n);
             tree.addChild(subtree);
@@ -71,11 +43,6 @@ public class JpaNestedNodeRetriever<T extends NestedNode> implements NestedNodeR
         return tree;
     }
 
-    /**
-     *
-     * @param node
-     * @return
-     */
     @Override
     public Iterable<T> getTreeAsList(T node) {
 
@@ -95,11 +62,6 @@ public class JpaNestedNodeRetriever<T extends NestedNode> implements NestedNodeR
         }
     }
 
-    /**
-     *
-     * @param node
-     * @return
-     */
     @Override
     public Iterable<T> getChildren(T node) {
         NestedNodeConfig config = this.util.getNodeConfig(node.getClass());
@@ -114,11 +76,6 @@ public class JpaNestedNodeRetriever<T extends NestedNode> implements NestedNodeR
                 .getResultList();
     }
 
-    /**
-     *
-     * @param node
-     * @return
-     */
     @Override
     public T getParent(T node) {
         if (node.getLevel() > 0) {
@@ -136,11 +93,6 @@ public class JpaNestedNodeRetriever<T extends NestedNode> implements NestedNodeR
         }
     }
 
-    /**
-     * 
-     * @param node
-     * @return 
-     */
     @Override
     public Iterable<T> getParents(T node) {
         if (node.getLevel() > 0) {

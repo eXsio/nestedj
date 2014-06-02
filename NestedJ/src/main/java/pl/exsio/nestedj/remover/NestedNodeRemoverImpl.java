@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package pl.exsio.nestedj.remover;
 
 import javax.persistence.EntityManager;
@@ -17,34 +12,20 @@ import pl.exsio.nestedj.config.NestedNodeConfig;
  *
  * @author exsio
  */
-public class JpaNestedNodeRemover implements NestedNodeRemover {
+public class NestedNodeRemoverImpl implements NestedNodeRemover {
 
     @PersistenceContext
     protected EntityManager em;
 
-    /**
-     *
-     */
     protected NestedNodeUtil util;
 
-    /**
-     *
-     */
-    public JpaNestedNodeRemover() {
+    public NestedNodeRemoverImpl() {
     }
 
-    /**
-     *
-     * @param em
-     */
-    public JpaNestedNodeRemover(EntityManager em) {
+    public NestedNodeRemoverImpl(EntityManager em) {
         this.em = em;
     }
 
-    /**
-     *
-     * @param util
-     */
     public void setNestedNodeUtil(NestedNodeUtil util) {
         this.util = util;
     }
@@ -71,11 +52,6 @@ public class JpaNestedNodeRemover implements NestedNodeRemover {
         this.updateRightFieldsBeforeSingleNodeRemoval(config, from);
     }
 
-    /**
-     * 
-     * @param config
-     * @param node 
-     */
     private void updateDeletedNodeChildren(NestedNodeConfig config, NestedNode node) {
         this.em.createQuery("update " + config.getEntityName()+ " "
                 + "set " + config.getRightFieldName() + " = " + config.getRightFieldName() + "-1, " 
@@ -88,11 +64,6 @@ public class JpaNestedNodeRemover implements NestedNodeRemover {
                 .executeUpdate();
     }
 
-    /**
-     * 
-     * @param config
-     * @param from 
-     */
     private void updateRightFieldsBeforeSingleNodeRemoval(NestedNodeConfig config, Long from) {
         String rightQuery = "update " + config.getEntityName()+ " "
                 + "set " + config.getRightFieldName() + " = " + config.getRightFieldName() + "-2 "
@@ -100,11 +71,6 @@ public class JpaNestedNodeRemover implements NestedNodeRemover {
         this.em.createQuery(rightQuery).setParameter("from", from).executeUpdate();
     }
 
-    /**
-     * 
-     * @param config
-     * @param from 
-     */
     private void updateLeftFieldsBeforeSingleNodeRemoval(NestedNodeConfig config, Long from) {
         String leftQuery = "update " + config.getEntityName()+ " "
                 + "set " + config.getLeftFieldName() + " = " + config.getLeftFieldName() + "-2 "
@@ -112,12 +78,6 @@ public class JpaNestedNodeRemover implements NestedNodeRemover {
         this.em.createQuery(leftQuery).setParameter("from", from).executeUpdate();
     }
 
-    /**
-     * 
-     * @param config
-     * @param node
-     * @param parent 
-     */
     private void updateNodesParent(NestedNodeConfig config, NestedNode node, NestedNode parent) {
         this.em.createQuery("update " + config.getEntityName()+ " "
                 + "set parent = :parent "
@@ -131,13 +91,6 @@ public class JpaNestedNodeRemover implements NestedNodeRemover {
                 .executeUpdate();
     }
 
-    /**
-     * 
-     * @param node
-     * @param parent
-     * @param config
-     * @return 
-     */
     private NestedNode findNodeParent(NestedNode node, NestedNode parent, NestedNodeConfig config) {
         if (node.getLevel() > 0) {
             parent = (NestedNode) this.em.createQuery("from " + config.getEntityName() + " "
@@ -152,10 +105,6 @@ public class JpaNestedNodeRemover implements NestedNodeRemover {
         return parent;
     }
 
-    /**
-     * 
-     * @param node 
-     */
     @Override
     @Transactional
     public void removeSubtree(NestedNode node) {
@@ -170,12 +119,6 @@ public class JpaNestedNodeRemover implements NestedNodeRemover {
 
     }
 
-    /**
-     * 
-     * @param config
-     * @param from
-     * @param delta 
-     */
     private void updateRightFieldsAfterSubtreeRemoval(NestedNodeConfig config, Long from, Long delta) {
         String rightQuery = "update " + config.getEntityName()+ " "
                 + "set " + config.getRightFieldName() + " = " + config.getRightFieldName() + "-:delta "
@@ -183,12 +126,6 @@ public class JpaNestedNodeRemover implements NestedNodeRemover {
         this.em.createQuery(rightQuery).setParameter("from", from).setParameter("delta", delta).executeUpdate();
     }
 
-    /**
-     * 
-     * @param config
-     * @param from
-     * @param delta 
-     */
     private void updateLeftFieldsAfterSubtreeRemoval(NestedNodeConfig config, Long from, Long delta) {
         String leftQuery = "update " + config.getEntityName()+ " "
                 + "set " + config.getLeftFieldName() + " = " + config.getLeftFieldName() + "-:delta "
@@ -196,11 +133,6 @@ public class JpaNestedNodeRemover implements NestedNodeRemover {
         this.em.createQuery(leftQuery).setParameter("from", from).setParameter("delta", delta).executeUpdate();
     }
 
-    /**
-     * 
-     * @param config
-     * @param node 
-     */
     private void performBatchDeletion(NestedNodeConfig config, NestedNode node) {
         this.em.createQuery("delete from " + config.getEntityName()+ " "
                 + "where " + config.getLeftFieldName() + " >= :lft "

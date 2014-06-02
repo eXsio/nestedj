@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package pl.exsio.nestedj.model;
 
 import javax.persistence.Column;
@@ -26,7 +20,7 @@ import pl.exsio.nestedj.annotation.RightColumn;
  */
 @Entity
 @Table(name = "nested_nodes")
-public class TestNode implements NestedNode {
+public class TestNodeImpl implements NestedNode {
            
     /**
      *
@@ -65,15 +59,15 @@ public class TestNode implements NestedNode {
     /**
      *
      */
-    @ManyToOne(fetch = FetchType.EAGER, targetEntity = TestNode.class)
+    @ManyToOne(fetch = FetchType.EAGER, targetEntity = TestNodeImpl.class)
     @JoinColumn(name = "parent_id", nullable = true)
     @ParentColumn
-    protected TestNode parent;
+    protected TestNodeImpl parent;
 
     /**
      *
      */
-    public TestNode() {
+    public TestNodeImpl() {
         super();
     }
     
@@ -127,7 +121,7 @@ public class TestNode implements NestedNode {
      * @param name
      * @return
      */
-    public TestNode setName(String name) {
+    public TestNodeImpl setName(String name) {
         this.name = name;
         return this;
     }
@@ -137,7 +131,7 @@ public class TestNode implements NestedNode {
      * @return
      */
     @Override
-    public TestNode getParent() {
+    public TestNodeImpl getParent() {
         return parent;
     }
     
@@ -153,7 +147,7 @@ public class TestNode implements NestedNode {
     
     @Override
     public boolean equals(Object o) {
-        if(o instanceof TestNode) {
+        if(o instanceof TestNodeImpl) {
             return (this.hashCode() == o.hashCode());
         } else {
             return false;

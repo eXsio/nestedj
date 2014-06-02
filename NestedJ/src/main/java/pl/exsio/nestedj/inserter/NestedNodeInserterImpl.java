@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package pl.exsio.nestedj.inserter;
 
 import javax.persistence.EntityManager;
@@ -17,48 +12,24 @@ import javax.transaction.Transactional;
  * @author exsio
  * @param <T>
  */
-public class JpaNestedNodeInserter<T extends NestedNode> implements NestedNodeInserter<T> {
+public class NestedNodeInserterImpl<T extends NestedNode> implements NestedNodeInserter<T> {
 
-    /**
-     *
-     */
     @PersistenceContext
     protected EntityManager em;
 
-    /**
-     *
-     */
     protected NestedNodeUtil<T> util;
 
-    /**
-     *
-     */
-    public JpaNestedNodeInserter() {
+    public NestedNodeInserterImpl() {
     }
 
-    /**
-     *
-     * @param em
-     */
-    public JpaNestedNodeInserter(EntityManager em) {
+    public NestedNodeInserterImpl(EntityManager em) {
         this.em = em;
     }
 
-    /**
-     *
-     * @param util
-     */
     public void setNestedNodeUtil(NestedNodeUtil<T> util) {
         this.util = util;
     }
 
-    /**
-     *
-     * @param node
-     * @param parent
-     * @param mode
-     * @return
-     */
     @Override
     @Transactional
     public T insert(T node, T parent, int mode) {
@@ -75,15 +46,6 @@ public class JpaNestedNodeInserter<T extends NestedNode> implements NestedNodeIn
         return node;
     }
 
-    /**
-     * 
-     * @param config
-     * @param parent
-     * @param left
-     * @param right
-     * @param level
-     * @param node 
-     */
     private void performInsertion(NestedNodeConfig config, T parent, Long left, Long right, Long level, T node) {
         this.em.createQuery(
                 "update " + config.getEntityName()+ " "
@@ -99,11 +61,6 @@ public class JpaNestedNodeInserter<T extends NestedNode> implements NestedNodeIn
                 .executeUpdate();
     }
 
-    /**
-     *
-     * @param mode
-     * @return
-     */
     protected boolean isGte(int mode) {
         switch (mode) {
             case MODE_NEXT_SIBLING:
@@ -116,12 +73,6 @@ public class JpaNestedNodeInserter<T extends NestedNode> implements NestedNodeIn
         }
     }
 
-    /**
-     *
-     * @param parent
-     * @param mode
-     * @return
-     */
     protected Long getNodeLeft(NestedNode parent, int mode) {
         switch (mode) {
             case MODE_NEXT_SIBLING:
@@ -136,13 +87,6 @@ public class JpaNestedNodeInserter<T extends NestedNode> implements NestedNodeIn
         }
     }
 
-    /**
-     *
-     * @param nodeClass
-     * @param from
-     * @param gte
-     * @param config
-     */
     protected void makeSpaceForNewElement(Class<? extends NestedNode> nodeClass, Long from, boolean gte, NestedNodeConfig config) {
 
         String sign = gte ? " >= " : " > ";
@@ -150,12 +94,6 @@ public class JpaNestedNodeInserter<T extends NestedNode> implements NestedNodeIn
         this.updateRightFields(config, sign, from);
     }
 
-    /**
-     * 
-     * @param config
-     * @param sign
-     * @param from 
-     */
     private void updateRightFields(NestedNodeConfig config, String sign, Long from) { 
         String rightQuery = "update " + config.getEntityName()+ " "
                 + "set " + config.getRightFieldName() + " = " + config.getRightFieldName() + "+2 "
@@ -165,12 +103,6 @@ public class JpaNestedNodeInserter<T extends NestedNode> implements NestedNodeIn
                 .executeUpdate();
     }
 
-    /**
-     * 
-     * @param config
-     * @param sign
-     * @param from 
-     */
     private void updateLeftFields(NestedNodeConfig config, String sign, Long from) {
         String leftQuery = "update " + config.getEntityName()+ " "
                 + "set " + config.getLeftFieldName() + " = " + config.getLeftFieldName() + "+2 "

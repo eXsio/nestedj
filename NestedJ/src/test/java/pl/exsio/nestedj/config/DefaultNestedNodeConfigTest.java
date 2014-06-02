@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package pl.exsio.nestedj.config;
 
 import org.junit.After;
@@ -39,127 +33,127 @@ public class DefaultNestedNodeConfigTest {
     }
 
     /**
-     * Test of getEntityName method, of class DefaultNestedNodeConfig.
+     * Test of getEntityName method, of class NestedNodeConfigImpl.
      */
     @Test
     public void testGetEntityName() {
         System.out.println("getEntityName");
-        DefaultNestedNodeConfig instance = new DefaultNestedNodeConfig();
+        NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
         String expResult = null;
         String result = instance.getEntityName();
         assertEquals(expResult, result);
     }
 
     /**
-     * Test of setEntityName method, of class DefaultNestedNodeConfig.
+     * Test of setEntityName method, of class NestedNodeConfigImpl.
      */
     @Test
     public void testSetEntityName() {
         System.out.println("setEntityName");
         String entityName = null;
-        DefaultNestedNodeConfig instance = new DefaultNestedNodeConfig();
+        NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
         instance.setEntityName(entityName);
     }
 
     /**
-     * Test of getRightFieldName method, of class DefaultNestedNodeConfig.
+     * Test of getRightFieldName method, of class NestedNodeConfigImpl.
      */
     @Test
     public void testGetRightFieldName() {
         System.out.println("getRightFieldName");
-        DefaultNestedNodeConfig instance = new DefaultNestedNodeConfig();
+        NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
         String expResult = null;
         String result = instance.getRightFieldName();
         assertEquals(expResult, result);
     }
 
     /**
-     * Test of setRightFieldName method, of class DefaultNestedNodeConfig.
+     * Test of setRightFieldName method, of class NestedNodeConfigImpl.
      */
     @Test
     public void testSetRightFieldName() {
         System.out.println("setRightFieldName");
         String rightFieldName = null;
-        DefaultNestedNodeConfig instance = new DefaultNestedNodeConfig();
+        NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
         instance.setRightFieldName(rightFieldName);
     }
 
     /**
-     * Test of getLeftFieldName method, of class DefaultNestedNodeConfig.
+     * Test of getLeftFieldName method, of class NestedNodeConfigImpl.
      */
     @Test
     public void testGetLeftFieldName() {
         System.out.println("getLeftFieldName");
-        DefaultNestedNodeConfig instance = new DefaultNestedNodeConfig();
+        NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
         String expResult = null;
         String result = instance.getLeftFieldName();
         assertEquals(expResult, result);
     }
 
     /**
-     * Test of setLeftFieldName method, of class DefaultNestedNodeConfig.
+     * Test of setLeftFieldName method, of class NestedNodeConfigImpl.
      */
     @Test
     public void testSetLeftFieldName() {
         System.out.println("setLeftFieldName");
         String leftFieldName = null;
-        DefaultNestedNodeConfig instance = new DefaultNestedNodeConfig();
+        NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
         instance.setLeftFieldName(leftFieldName);
     }
 
     /**
-     * Test of getLevelFieldName method, of class DefaultNestedNodeConfig.
+     * Test of getLevelFieldName method, of class NestedNodeConfigImpl.
      */
     @Test
     public void testGetLevelFieldName() {
         System.out.println("getLevelFieldName");
-        DefaultNestedNodeConfig instance = new DefaultNestedNodeConfig();
+        NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
         String expResult = null;
         String result = instance.getLevelFieldName();
         assertEquals(expResult, result);
     }
 
     /**
-     * Test of setLevelFieldName method, of class DefaultNestedNodeConfig.
+     * Test of setLevelFieldName method, of class NestedNodeConfigImpl.
      */
     @Test
     public void testSetLevelFieldName() {
         System.out.println("setLevelFieldName");
         String levelFieldName = null;
-        DefaultNestedNodeConfig instance = new DefaultNestedNodeConfig();
+        NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
         instance.setLevelFieldName(levelFieldName);
     }
 
     /**
-     * Test of getParentFieldName method, of class DefaultNestedNodeConfig.
+     * Test of getParentFieldName method, of class NestedNodeConfigImpl.
      */
     @Test
     public void testGetParentFieldName() {
         System.out.println("getParentFieldName");
-        DefaultNestedNodeConfig instance = new DefaultNestedNodeConfig();
+        NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
         String expResult = null;
         String result = instance.getParentFieldName();
         assertEquals(expResult, result);
     }
 
     /**
-     * Test of setParentFieldName method, of class DefaultNestedNodeConfig.
+     * Test of setParentFieldName method, of class NestedNodeConfigImpl.
      */
     @Test
     public void testSetParentFieldName() {
         System.out.println("setParentFieldName");
         String parentFieldName = null;
-        DefaultNestedNodeConfig instance = new DefaultNestedNodeConfig();
+        NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
         instance.setParentFieldName(parentFieldName);
     }
 
     /**
-     * Test of toString method, of class DefaultNestedNodeConfig.
+     * Test of toString method, of class NestedNodeConfigImpl.
      */
     @Test
     public void testToString() {
         System.out.println("toString");
-        DefaultNestedNodeConfig instance = new DefaultNestedNodeConfig();
+        NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
         String expResult = "[leftFieldName: null, rightFieldName:null, levelFieldName: null, parentFieldName:null]";
         String result = instance.toString();
         assertEquals(expResult, result);
