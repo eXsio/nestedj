@@ -33,7 +33,7 @@ public class NestedNodeInserterImpl<T extends NestedNode> implements NestedNodeI
     @Override
     @Transactional
     public T insert(T node, T parent, int mode) {
-
+        this.em.refresh(parent);
         NestedNodeConfig config = this.util.getNodeConfig(node.getClass());
         Long left = this.getNodeLeft(parent, mode);
         Long right = left + 1;

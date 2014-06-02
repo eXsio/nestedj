@@ -38,7 +38,9 @@ public class NestedNodeMoverImpl implements NestedNodeMover {
     @Override
     @Transactional
     public NestedNode move(NestedNode node, NestedNode parent, int mode) throws InvalidNodesHierarchyException {
-
+        
+        this.em.refresh(node);
+        this.em.refresh(parent);
         if (!this.validateNodesHierarchyBeforeMove(node, parent)) {
             throw new InvalidNodesHierarchyException("You cannot move a parent node to it's child");
         }
