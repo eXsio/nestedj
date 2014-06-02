@@ -51,11 +51,31 @@ public class NestedNodeUtilImpl<T extends NestedNode> implements NestedNodeUtil<
                     config.setParentFieldName(field.getName());
                 }
             }
-
+            
+            config = this.applyNodeSuperclassesToConfig(nodeClass, config);
             this.configs.put(nodeClass, config);
         }
 
         return this.configs.get(nodeClass);
+    }
+
+    private NestedNodeConfigImpl applyNodeSuperclassesToConfig(Class<? extends NestedNode> nodeClass, NestedNodeConfigImpl config) {
+        Class superClass = nodeClass.getSuperclass();
+        if(!superClass.getCanonicalName().equals(Object.class.getCanonicalName())) {
+            for (Field field : superClass.getDeclaredFields()) {
+                if (field.getAnnotation(LeftColumn.class) != null && config.getLeftFieldName() == null) {
+                    config.setLeftFieldName(field.getName());
+                } else if (field.getAnnotation(RightColumn.class) != null && config.getRightFieldName() == null) {
+                    config.setRightFieldName(field.getName());
+                } else if (field.getAnnotation(LevelColumn.class) != null && config.getLevelFieldName() == null) {
+                    config.setLevelFieldName(field.getName());
+                } else if (field.getAnnotation(ParentColumn.class) != null && config.getParentFieldName() == null) {
+                    config.setParentFieldName(field.getName());
+                }
+            }
+            config = this.applyNodeSuperclassesToConfig(superClass, config);
+        }
+        return config;
     }
 
 }

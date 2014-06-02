@@ -6,6 +6,8 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -20,6 +22,7 @@ import pl.exsio.nestedj.annotation.RightColumn;
  */
 @Entity
 @Table(name = "nested_nodes")
+@Inheritance(strategy = InheritanceType.JOINED)
 public class TestNodeImpl implements NestedNode {
            
     /**
@@ -59,7 +62,7 @@ public class TestNodeImpl implements NestedNode {
     /**
      *
      */
-    @ManyToOne(fetch = FetchType.EAGER, targetEntity = TestNodeImpl.class)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "parent_id", nullable = true)
     @ParentColumn
     protected TestNodeImpl parent;

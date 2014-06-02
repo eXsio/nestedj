@@ -37,7 +37,6 @@ public class DefaultNestedNodeConfigTest {
      */
     @Test
     public void testGetEntityName() {
-        System.out.println("getEntityName");
         NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
         String expResult = null;
         String result = instance.getEntityName();
@@ -49,7 +48,6 @@ public class DefaultNestedNodeConfigTest {
      */
     @Test
     public void testSetEntityName() {
-        System.out.println("setEntityName");
         String entityName = null;
         NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
         instance.setEntityName(entityName);
@@ -60,7 +58,6 @@ public class DefaultNestedNodeConfigTest {
      */
     @Test
     public void testGetRightFieldName() {
-        System.out.println("getRightFieldName");
         NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
         String expResult = null;
         String result = instance.getRightFieldName();
@@ -72,7 +69,6 @@ public class DefaultNestedNodeConfigTest {
      */
     @Test
     public void testSetRightFieldName() {
-        System.out.println("setRightFieldName");
         String rightFieldName = null;
         NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
         instance.setRightFieldName(rightFieldName);
@@ -83,7 +79,6 @@ public class DefaultNestedNodeConfigTest {
      */
     @Test
     public void testGetLeftFieldName() {
-        System.out.println("getLeftFieldName");
         NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
         String expResult = null;
         String result = instance.getLeftFieldName();
@@ -95,7 +90,6 @@ public class DefaultNestedNodeConfigTest {
      */
     @Test
     public void testSetLeftFieldName() {
-        System.out.println("setLeftFieldName");
         String leftFieldName = null;
         NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
         instance.setLeftFieldName(leftFieldName);
@@ -106,7 +100,6 @@ public class DefaultNestedNodeConfigTest {
      */
     @Test
     public void testGetLevelFieldName() {
-        System.out.println("getLevelFieldName");
         NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
         String expResult = null;
         String result = instance.getLevelFieldName();
@@ -118,7 +111,6 @@ public class DefaultNestedNodeConfigTest {
      */
     @Test
     public void testSetLevelFieldName() {
-        System.out.println("setLevelFieldName");
         String levelFieldName = null;
         NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
         instance.setLevelFieldName(levelFieldName);
@@ -129,7 +121,6 @@ public class DefaultNestedNodeConfigTest {
      */
     @Test
     public void testGetParentFieldName() {
-        System.out.println("getParentFieldName");
         NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
         String expResult = null;
         String result = instance.getParentFieldName();
@@ -141,7 +132,6 @@ public class DefaultNestedNodeConfigTest {
      */
     @Test
     public void testSetParentFieldName() {
-        System.out.println("setParentFieldName");
         String parentFieldName = null;
         NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
         instance.setParentFieldName(parentFieldName);
@@ -152,7 +142,6 @@ public class DefaultNestedNodeConfigTest {
      */
     @Test
     public void testToString() {
-        System.out.println("toString");
         NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
         String expResult = "[leftFieldName: null, rightFieldName:null, levelFieldName: null, parentFieldName:null]";
         String result = instance.toString();
