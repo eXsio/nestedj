@@ -48,9 +48,10 @@ public class DefaultNestedNodeConfigTest {
      */
     @Test
     public void testSetEntityName() {
-        String entityName = null;
+        String entityName = "entityName";
         NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
         instance.setEntityName(entityName);
+        assertEquals(instance.getEntityName(), entityName);
     }
 
     /**
@@ -69,9 +70,10 @@ public class DefaultNestedNodeConfigTest {
      */
     @Test
     public void testSetRightFieldName() {
-        String rightFieldName = null;
+        String rightFieldName = "rightField";
         NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
         instance.setRightFieldName(rightFieldName);
+        assertEquals(instance.getRightFieldName(), rightFieldName);
     }
     
     /**
@@ -79,9 +81,10 @@ public class DefaultNestedNodeConfigTest {
      */
     @Test
     public void testSetIdFieldName() {
-        String idFieldName = null;
+        String idFieldName = "idField";
         NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
         instance.setIdFieldName(idFieldName);
+        assertEquals(instance.getIdFieldName(), idFieldName);
     }
     
     /**
@@ -111,9 +114,10 @@ public class DefaultNestedNodeConfigTest {
      */
     @Test
     public void testSetLeftFieldName() {
-        String leftFieldName = null;
+        String leftFieldName = "leftField";
         NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
         instance.setLeftFieldName(leftFieldName);
+        assertEquals(instance.getLeftFieldName(), leftFieldName);
     }
 
     /**
@@ -132,9 +136,10 @@ public class DefaultNestedNodeConfigTest {
      */
     @Test
     public void testSetLevelFieldName() {
-        String levelFieldName = null;
+        String levelFieldName = "levelField";
         NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
         instance.setLevelFieldName(levelFieldName);
+        assertEquals(instance.getLevelFieldName(), levelFieldName);
     }
 
     /**
@@ -153,9 +158,10 @@ public class DefaultNestedNodeConfigTest {
      */
     @Test
     public void testSetParentFieldName() {
-        String parentFieldName = null;
+        String parentFieldName = "parentFIeld";
         NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
         instance.setParentFieldName(parentFieldName);
+        assertEquals(instance.getParentFieldName(), parentFieldName);
     }
 
     /**

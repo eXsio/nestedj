@@ -1,6 +1,8 @@
 package pl.exsio.nestedj.repository;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +18,28 @@ import pl.exsio.nestedj.model.Tree;
 @Transactional
 public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
 
+    
+    @Test
+    public void testInitializeTree() {
+        try {
+            
+            this.removeTree();
+            TestNodeImpl x  = this.getTestNode("x");
+            this.em.persist(x);
+            this.em.flush();
+            
+            assertTrue(x.getLeft() == null);
+            assertTrue(x.getRight() == null);
+            
+            this.nodeRepository.rebuildTree(TestNodeImpl.class);
+            
+            assertTrue(x.getLeft() == 1);
+            assertTrue(x.getRight() == 2);
+            
+        } catch (InvalidNodesHierarchyException ex) {
+            fail("something went wrong:" + ex.getMessage());
+        }
+    }
     
     @Test
     public void testRebuildTree() {
@@ -628,6 +652,10 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         this.em.createQuery("update TestNodeImpl set parent = null where id = 3").executeUpdate();
         this.em.createQuery("update TestNodeImpl set lft = 0, rgt = 0, lvl = 0").executeUpdate();
         
+    }
+
+    private void removeTree() {
+        this.em.createQuery("delete from TestNodeImpl").executeUpdate();
     }
 
 }
