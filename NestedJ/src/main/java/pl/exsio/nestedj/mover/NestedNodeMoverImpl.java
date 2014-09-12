@@ -41,8 +41,8 @@ public class NestedNodeMoverImpl implements NestedNodeMover {
         
         this.em.refresh(node);
         this.em.refresh(parent);
-        if (!this.validateNodesHierarchyBeforeMove(node, parent)) {
-            throw new InvalidNodesHierarchyException("You cannot move a parent node to it's child");
+        if (!this.canMoveNodeToSelectedParent(node, parent)) {
+            throw new InvalidNodesHierarchyException("You cannot move a parent node to it's child or move a node to itself");
         }
         NestedNodeConfig config = this.util.getNodeConfig(node.getClass());
         String sign = this.getSign(node, parent, mode);
@@ -114,8 +114,8 @@ public class NestedNodeMoverImpl implements NestedNodeMover {
                 .executeUpdate();
     }
 
-    private boolean validateNodesHierarchyBeforeMove(NestedNode node, NestedNode parent) {
-        return node.getLeft() >= parent.getLeft() || node.getRight() <= parent.getRight();
+    private boolean canMoveNodeToSelectedParent(NestedNode node, NestedNode parent) {
+        return !node.getId().equals(parent.getId()) && (node.getLeft() >= parent.getLeft() || node.getRight() <= parent.getRight());
     }
 
     private NestedNode getNewParent(NestedNode parent, int mode) {
