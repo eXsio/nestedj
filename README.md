@@ -1,4 +1,5 @@
 # NestedJ
+[![Build Status](https://travis-ci.org/eXsio/nestedj.svg?branch=master)](https://travis-ci.org/eXsio/nestedj)
 
 NestedJ is a Java library that implements the NestedSet pattern with the help of JPA.
 
