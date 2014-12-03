@@ -4,7 +4,7 @@
 NestedJ is a Java library that implements the NestedSet pattern with the help of JPA.
 
 ### Capabilities
-NestedJ can automate the insertion/moving/removing tree nodes. It can also retrieve persisted Nodes as a flat or recursive Java structures / collections.
+NestedJ can automate the insertion/moving/removing of tree nodes. It can also retrieve persisted Nodes as a flat or recursive Java structures / collections.
 
 ### Usage
 
