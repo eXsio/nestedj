@@ -68,7 +68,6 @@ public class NestedNodeInserterImpl<T extends NestedNode> implements NestedNodeI
 
     private void insertNodeIntoTable(T node) {
         this.em.persist(node);
-        this.em.flush();
     }
 
     private void insertNodeIntoTree(NestedNodeConfig config, T parent, T node, int mode) {
