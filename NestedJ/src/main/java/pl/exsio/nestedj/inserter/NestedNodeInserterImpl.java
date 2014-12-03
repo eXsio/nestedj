@@ -30,6 +30,7 @@ import pl.exsio.nestedj.NestedNodeInserter;
 import pl.exsio.nestedj.NestedNodeUtil;
 import pl.exsio.nestedj.config.NestedNodeConfig;
 import javax.transaction.Transactional;
+
 /**
  *
  * @author exsio
@@ -58,33 +59,37 @@ public class NestedNodeInserterImpl<T extends NestedNode> implements NestedNodeI
     public T insert(T node, T parent, int mode) {
         this.em.refresh(parent);
         NestedNodeConfig config = this.util.getNodeConfig(node.getClass());
-        Long left = this.getNodeLeft(parent, mode);
-        Long right = left + 1;
-        Long level = this.getNodeLevel(parent, mode);
-        NestedNode nodeParent = this.getNodeParent(parent, mode);
-        this.makeSpaceForNewElement(node.getClass(), parent.getRight(), this.isGte(mode), config);
-        this.em.persist(node);
-        this.em.flush();
-        this.performInsertion(config, nodeParent, left, right, level, node);
+        this.makeSpaceForNewElement(parent.getRight(), this.isGte(mode), config);
+        this.insertNodeIntoTable(node);
+        this.insertNodeIntoTree(config, parent, node, mode);
         this.em.refresh(node);
         return node;
     }
 
-    private void performInsertion(NestedNodeConfig config, NestedNode parent, Long left, Long right, Long level, T node) {
+    private void insertNodeIntoTable(T node) {
+        this.em.persist(node);
+        this.em.flush();
+    }
+
+    private void insertNodeIntoTree(NestedNodeConfig config, T parent, T node, int mode) {
+        Long left = this.getNodeLeft(parent, mode);
+        Long right = left + 1;
+        Long level = this.getNodeLevel(parent, mode);
+        NestedNode nodeParent = this.getNodeParent(parent, mode);
         this.em.createQuery(
-                "update " + config.getEntityName()+ " "
-                        + "set " + config.getParentFieldName() + " = :parent,"
-                        + config.getLeftFieldName() + " = :left,"
-                        + config.getRightFieldName() + " = :right," 
-                        + config.getLevelFieldName() + " = :level "
-                        + "where id = :id").setParameter("parent", parent)
+                "update " + config.getEntityName() + " "
+                + "set " + config.getParentFieldName() + " = :parent,"
+                + config.getLeftFieldName() + " = :left,"
+                + config.getRightFieldName() + " = :right,"
+                + config.getLevelFieldName() + " = :level "
+                + "where id = :id").setParameter("parent", nodeParent)
                 .setParameter("left", left)
                 .setParameter("right", right)
                 .setParameter("level", level)
                 .setParameter("id", node.getId())
                 .executeUpdate();
     }
-    
+
     protected Long getNodeLevel(NestedNode parent, int mode) {
         switch (mode) {
             case MODE_NEXT_SIBLING:
@@ -96,7 +101,7 @@ public class NestedNodeInserterImpl<T extends NestedNode> implements NestedNodeI
                 return parent.getLevel() + 1;
         }
     }
-    
+
     protected NestedNode getNodeParent(NestedNode parent, int mode) {
         switch (mode) {
             case MODE_NEXT_SIBLING:
@@ -135,15 +140,15 @@ public class NestedNodeInserterImpl<T extends NestedNode> implements NestedNodeI
         }
     }
 
-    protected void makeSpaceForNewElement(Class<? extends NestedNode> nodeClass, Long from, boolean gte, NestedNodeConfig config) {
+    protected void makeSpaceForNewElement(Long from, boolean gte, NestedNodeConfig config) {
 
         String sign = gte ? " >= " : " > ";
         this.updateLeftFields(config, sign, from);
         this.updateRightFields(config, sign, from);
     }
 
-    private void updateRightFields(NestedNodeConfig config, String sign, Long from) { 
-        String rightQuery = "update " + config.getEntityName()+ " "
+    private void updateRightFields(NestedNodeConfig config, String sign, Long from) {
+        String rightQuery = "update " + config.getEntityName() + " "
                 + "set " + config.getRightFieldName() + " = " + config.getRightFieldName() + "+2 "
                 + "where " + config.getRightFieldName() + " " + sign + " :from";
         this.em.createQuery(rightQuery)
@@ -152,7 +157,7 @@ public class NestedNodeInserterImpl<T extends NestedNode> implements NestedNodeI
     }
 
     private void updateLeftFields(NestedNodeConfig config, String sign, Long from) {
-        String leftQuery = "update " + config.getEntityName()+ " "
+        String leftQuery = "update " + config.getEntityName() + " "
                 + "set " + config.getLeftFieldName() + " = " + config.getLeftFieldName() + "+2 "
                 + "where " + config.getLeftFieldName() + " " + sign + " :from";
         this.em.createQuery(leftQuery)
