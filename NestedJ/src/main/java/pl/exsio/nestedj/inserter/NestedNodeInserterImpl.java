@@ -54,7 +54,7 @@ public class NestedNodeInserterImpl<T extends NestedNode> implements NestedNodeI
     public T insert(T node, T parent, int mode) {
         this.c = node.getClass();
         this.em.refresh(parent);
-        this.makeSpaceForNewElement(parent.getRight(), this.isGte(mode));
+        this.makeSpaceForNewElement(parent.getRight(), mode);
         this.insertNodeIntoTable(node);
         this.insertNodeIntoTree(parent, node, mode);
         this.em.refresh(node);
@@ -110,18 +110,6 @@ public class NestedNodeInserterImpl<T extends NestedNode> implements NestedNodeI
         }
     }
 
-    protected boolean isGte(int mode) {
-        switch (mode) {
-            case MODE_NEXT_SIBLING:
-            case MODE_FIRST_CHILD:
-                return false;
-            case MODE_PREV_SIBLING:
-            case MODE_LAST_CHILD:
-            default:
-                return true;
-        }
-    }
-
     protected Long getNodeLeft(NestedNode parent, int mode) {
         switch (mode) {
             case MODE_NEXT_SIBLING:
@@ -136,27 +124,37 @@ public class NestedNodeInserterImpl<T extends NestedNode> implements NestedNodeI
         }
     }
 
-    protected void makeSpaceForNewElement(Long from, boolean gte) {
+    protected void makeSpaceForNewElement(Long from, int mode) {
 
-        String sign = gte ? " >= " : " > ";
+        String sign = this.isGte(mode) ? " >= " : " > ";
         this.updateLeftFields(sign, from);
         this.updateRightFields(sign, from);
     }
 
+    protected boolean isGte(int mode) {
+        switch (mode) {
+            case MODE_NEXT_SIBLING:
+            case MODE_FIRST_CHILD:
+                return false;
+            case MODE_PREV_SIBLING:
+            case MODE_LAST_CHILD:
+            default:
+                return true;
+        }
+    }
+
     protected void updateRightFields(String sign, Long from) {
-        String rightQuery = "update " + entity(c) + " "
+        this.em.createQuery("update " + entity(c) + " "
                 + "set " + right(c) + " = " + right(c) + "+2 "
-                + "where " + right(c) + " " + sign + " :from";
-        this.em.createQuery(rightQuery)
+                + "where " + right(c) + " " + sign + " :from")
                 .setParameter("from", from)
                 .executeUpdate();
     }
 
     protected void updateLeftFields(String sign, Long from) {
-        String leftQuery = "update " + entity(c) + " "
+        this.em.createQuery("update " + entity(c) + " "
                 + "set " + left(c) + " = " + left(c) + "+2 "
-                + "where " + left(c) + " " + sign + " :from";
-        this.em.createQuery(leftQuery)
+                + "where " + left(c) + " " + sign + " :from")
                 .setParameter("from", from)
                 .executeUpdate();
     }

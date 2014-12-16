@@ -91,7 +91,8 @@ public class NestedNodeMoverImpl implements NestedNodeMover {
     protected void updateParentField(NestedNode newParent, NestedNode node) {
         this.em.createQuery("update " + entity(c) + " "
                 + "set " + parent(c) + " = :parent "
-                + "where " + id(c) + " = :id").setParameter("parent", newParent)
+                + "where " + id(c) + " = :id")
+                .setParameter("parent", newParent)
                 .setParameter("id", node.getId())
                 .executeUpdate();
     }

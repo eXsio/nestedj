@@ -83,17 +83,19 @@ public class NestedNodeRemoverImpl implements NestedNodeRemover {
     }
 
     protected void updateRightFieldsBeforeSingleNodeRemoval(Long from) {
-        String rightQuery = "update " + entity(c) + " "
+        this.em.createQuery("update " + entity(c) + " "
                 + "set " + right(c) + " = " + right(c) + "-2 "
-                + "where " + right(c) + " > :from";
-        this.em.createQuery(rightQuery).setParameter("from", from).executeUpdate();
+                + "where " + right(c) + " > :from")
+                .setParameter("from", from)
+                .executeUpdate();
     }
 
     protected void updateLeftFieldsBeforeSingleNodeRemoval(Long from) {
-        String leftQuery = "update " + entity(c) + " "
+        this.em.createQuery("update " + entity(c) + " "
                 + "set " + left(c) + " = " + left(c) + "-2 "
-                + "where " + left(c) + " > :from";
-        this.em.createQuery(leftQuery).setParameter("from", from).executeUpdate();
+                + "where " + left(c) + " > :from")
+                .setParameter("from", from)
+                .executeUpdate();
     }
 
     protected void updateNodesParent(NestedNode node, NestedNode parent) {
@@ -138,17 +140,21 @@ public class NestedNodeRemoverImpl implements NestedNodeRemover {
     }
 
     protected void updateRightFieldsAfterSubtreeRemoval(Long from, Long delta) {
-        String rightQuery = "update " + entity(c) + " "
+        this.em.createQuery("update " + entity(c) + " "
                 + "set " + right(c) + " = " + right(c) + "-:delta "
-                + "where " + right(c) + " > :from";
-        this.em.createQuery(rightQuery).setParameter("from", from).setParameter("delta", delta).executeUpdate();
+                + "where " + right(c) + " > :from")
+                .setParameter("from", from)
+                .setParameter("delta", delta)
+                .executeUpdate();
     }
 
     protected void updateLeftFieldsAfterSubtreeRemoval(Long from, Long delta) {
-        String leftQuery = "update " + entity(c) + " "
+        this.em.createQuery("update " + entity(c) + " "
                 + "set " + left(c) + " = " + left(c) + "-:delta "
-                + "where " + left(c) + " > :from";
-        this.em.createQuery(leftQuery).setParameter("from", from).setParameter("delta", delta).executeUpdate();
+                + "where " + left(c) + " > :from")
+                .setParameter("from", from)
+                .setParameter("delta", delta)
+                .executeUpdate();
     }
 
     protected void performBatchDeletion(NestedNode node) {
