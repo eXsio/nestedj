@@ -28,8 +28,7 @@ import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import pl.exsio.nestedj.model.NestedNode;
 import pl.exsio.nestedj.NestedNodeRemover;
-import pl.exsio.nestedj.config.NestedNodeConfig;
-import pl.exsio.nestedj.util.NestedNodeUtil;
+import static pl.exsio.nestedj.util.NestedNodeUtil.*;
 
 /**
  *
@@ -39,6 +38,8 @@ public class NestedNodeRemoverImpl implements NestedNodeRemover {
 
     @PersistenceContext
     protected EntityManager em;
+
+    protected Class<? extends NestedNode> c;
 
     public NestedNodeRemoverImpl() {
     }
@@ -50,57 +51,57 @@ public class NestedNodeRemoverImpl implements NestedNodeRemover {
     @Override
     @Transactional
     public void removeSingle(NestedNode node) {
+        this.c = node.getClass();
 
-        NestedNodeConfig config = NestedNodeUtil.getNodeConfig(node.getClass());
         Long from = node.getRight();
         NestedNode parent = null;
-        parent = this.findNodeParent(node, parent, config);
-        this.updateNodesParent(config, node, parent);
-        this.prepareTreeForSingleNodeRemoval(config, from);
-        this.updateDeletedNodeChildren(config, node);
+        parent = this.findNodeParent(node, parent);
+        this.updateNodesParent(node, parent);
+        this.prepareTreeForSingleNodeRemoval(from);
+        this.updateDeletedNodeChildren(node);
         this.em.remove(node);
         this.em.flush();
         this.em.clear();
 
     }
 
-    protected void prepareTreeForSingleNodeRemoval(NestedNodeConfig config, Long from) {
-        this.updateLeftFieldsBeforeSingleNodeRemoval(config, from);
-        this.updateRightFieldsBeforeSingleNodeRemoval(config, from);
+    protected void prepareTreeForSingleNodeRemoval(Long from) {
+        this.updateLeftFieldsBeforeSingleNodeRemoval(from);
+        this.updateRightFieldsBeforeSingleNodeRemoval(from);
     }
 
-    protected void updateDeletedNodeChildren(NestedNodeConfig config, NestedNode node) {
-        this.em.createQuery("update " + config.getEntityName() + " "
-                + "set " + config.getRightFieldName() + " = " + config.getRightFieldName() + "-1, "
-                + config.getLeftFieldName() + " = " + config.getLeftFieldName() + "-1, "
-                + config.getLevelFieldName() + " = " + config.getLevelFieldName() + "-1 "
-                + "where " + config.getLeftFieldName() + " > :lft "
-                + "and " + config.getRightFieldName() + " < :rgt")
+    protected void updateDeletedNodeChildren(NestedNode node) {
+        this.em.createQuery("update " + entity(c) + " "
+                + "set " + right(c) + " = " + right(c) + "-1, "
+                + left(c) + " = " + left(c) + "-1, "
+                + level(c) + " = " + level(c) + "-1 "
+                + "where " + left(c) + " > :lft "
+                + "and " + right(c) + " < :rgt")
                 .setParameter("lft", node.getLeft())
                 .setParameter("rgt", node.getRight())
                 .executeUpdate();
     }
 
-    protected void updateRightFieldsBeforeSingleNodeRemoval(NestedNodeConfig config, Long from) {
-        String rightQuery = "update " + config.getEntityName() + " "
-                + "set " + config.getRightFieldName() + " = " + config.getRightFieldName() + "-2 "
-                + "where " + config.getRightFieldName() + " > :from";
+    protected void updateRightFieldsBeforeSingleNodeRemoval(Long from) {
+        String rightQuery = "update " + entity(c) + " "
+                + "set " + right(c) + " = " + right(c) + "-2 "
+                + "where " + right(c) + " > :from";
         this.em.createQuery(rightQuery).setParameter("from", from).executeUpdate();
     }
 
-    protected void updateLeftFieldsBeforeSingleNodeRemoval(NestedNodeConfig config, Long from) {
-        String leftQuery = "update " + config.getEntityName() + " "
-                + "set " + config.getLeftFieldName() + " = " + config.getLeftFieldName() + "-2 "
-                + "where " + config.getLeftFieldName() + " > :from";
+    protected void updateLeftFieldsBeforeSingleNodeRemoval(Long from) {
+        String leftQuery = "update " + entity(c) + " "
+                + "set " + left(c) + " = " + left(c) + "-2 "
+                + "where " + left(c) + " > :from";
         this.em.createQuery(leftQuery).setParameter("from", from).executeUpdate();
     }
 
-    protected void updateNodesParent(NestedNodeConfig config, NestedNode node, NestedNode parent) {
-        this.em.createQuery("update " + config.getEntityName() + " "
+    protected void updateNodesParent(NestedNode node, NestedNode parent) {
+        this.em.createQuery("update " + entity(c) + " "
                 + "set parent = :parent "
-                + "where " + config.getLeftFieldName() + ">=:lft "
-                + "and " + config.getRightFieldName() + " <=:rgt "
-                + "and " + config.getLevelFieldName() + " = :lvl")
+                + "where " + left(c) + ">=:lft "
+                + "and " + right(c) + " <=:rgt "
+                + "and " + level(c) + " = :lvl")
                 .setParameter("lft", node.getLeft())
                 .setParameter("rgt", node.getRight())
                 .setParameter("lvl", node.getLevel() + 1)
@@ -108,12 +109,12 @@ public class NestedNodeRemoverImpl implements NestedNodeRemover {
                 .executeUpdate();
     }
 
-    protected NestedNode findNodeParent(NestedNode node, NestedNode parent, NestedNodeConfig config) {
+    protected NestedNode findNodeParent(NestedNode node, NestedNode parent) {
         if (node.getLevel() > 0) {
-            parent = (NestedNode) this.em.createQuery("from " + config.getEntityName() + " "
-                    + "where " + config.getLeftFieldName() + "<:lft "
-                    + "and " + config.getRightFieldName() + ">:rgt "
-                    + "and " + config.getLevelFieldName() + " = :lvl")
+            parent = (NestedNode) this.em.createQuery("from " + entity(c) + " "
+                    + "where " + left(c) + "<:lft "
+                    + "and " + right(c) + ">:rgt "
+                    + "and " + level(c) + " = :lvl")
                     .setParameter("lft", node.getLeft())
                     .setParameter("rgt", node.getRight())
                     .setParameter("lvl", node.getLevel() - 1)
@@ -126,34 +127,34 @@ public class NestedNodeRemoverImpl implements NestedNodeRemover {
     @Transactional
     public void removeSubtree(NestedNode node) {
 
-        NestedNodeConfig config = NestedNodeUtil.getNodeConfig(node.getClass());
+        this.c = node.getClass();
         Long delta = node.getRight() - node.getLeft() + 1;
         Long from = node.getRight();
-        this.performBatchDeletion(config, node);
-        this.updateLeftFieldsAfterSubtreeRemoval(config, from, delta);
-        this.updateRightFieldsAfterSubtreeRemoval(config, from, delta);
+        this.performBatchDeletion(node);
+        this.updateLeftFieldsAfterSubtreeRemoval(from, delta);
+        this.updateRightFieldsAfterSubtreeRemoval(from, delta);
         this.em.clear();
 
     }
 
-    protected void updateRightFieldsAfterSubtreeRemoval(NestedNodeConfig config, Long from, Long delta) {
-        String rightQuery = "update " + config.getEntityName() + " "
-                + "set " + config.getRightFieldName() + " = " + config.getRightFieldName() + "-:delta "
-                + "where " + config.getRightFieldName() + " > :from";
+    protected void updateRightFieldsAfterSubtreeRemoval(Long from, Long delta) {
+        String rightQuery = "update " + entity(c) + " "
+                + "set " + right(c) + " = " + right(c) + "-:delta "
+                + "where " + right(c) + " > :from";
         this.em.createQuery(rightQuery).setParameter("from", from).setParameter("delta", delta).executeUpdate();
     }
 
-    protected void updateLeftFieldsAfterSubtreeRemoval(NestedNodeConfig config, Long from, Long delta) {
-        String leftQuery = "update " + config.getEntityName() + " "
-                + "set " + config.getLeftFieldName() + " = " + config.getLeftFieldName() + "-:delta "
-                + "where " + config.getLeftFieldName() + " > :from";
+    protected void updateLeftFieldsAfterSubtreeRemoval(Long from, Long delta) {
+        String leftQuery = "update " + entity(c) + " "
+                + "set " + left(c) + " = " + left(c) + "-:delta "
+                + "where " + left(c) + " > :from";
         this.em.createQuery(leftQuery).setParameter("from", from).setParameter("delta", delta).executeUpdate();
     }
 
-    protected void performBatchDeletion(NestedNodeConfig config, NestedNode node) {
-        this.em.createQuery("delete from " + config.getEntityName() + " "
-                + "where " + config.getLeftFieldName() + " >= :lft "
-                + "and " + config.getRightFieldName() + " <= :rgt")
+    protected void performBatchDeletion(NestedNode node) {
+        this.em.createQuery("delete from " + entity(c) + " "
+                + "where " + left(c) + " >= :lft "
+                + "and " + right(c) + " <= :rgt")
                 .setParameter("lft", node.getLeft())
                 .setParameter("rgt", node.getRight())
                 .executeUpdate();

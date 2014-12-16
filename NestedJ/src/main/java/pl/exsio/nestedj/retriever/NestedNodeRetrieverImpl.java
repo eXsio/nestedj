@@ -27,11 +27,10 @@ import java.util.ArrayList;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import pl.exsio.nestedj.NestedNodeRetriever;
-import pl.exsio.nestedj.config.NestedNodeConfig;
 import pl.exsio.nestedj.model.NestedNode;
 import pl.exsio.nestedj.model.TreeImpl;
 import pl.exsio.nestedj.model.Tree;
-import pl.exsio.nestedj.util.NestedNodeUtil;
+import static pl.exsio.nestedj.util.NestedNodeUtil.*;
 
 /**
  *
@@ -62,31 +61,24 @@ public class NestedNodeRetrieverImpl<T extends NestedNode> implements NestedNode
 
     @Override
     public Iterable<T> getTreeAsList(T node) {
-
-        NestedNodeConfig config = NestedNodeUtil.getNodeConfig(node.getClass());
-        if (node instanceof NestedNode) {
-            return this.em.createQuery("from " + config.getEntityName() + " "
-                    + "where " + config.getLeftFieldName() + ">=:lft "
-                    + "and " + config.getRightFieldName() + " <=:rgt "
-                    + "order by " + config.getLeftFieldName() + " asc")
-                    .setParameter("lft", node.getLeft())
-                    .setParameter("rgt", node.getRight())
-                    .getResultList();
-        } else {
-            return this.em.createQuery("from " + config.getEntityName() + " "
-                    + "order by " + config.getLeftFieldName() + " asc")
-                    .getResultList();
-        }
+        Class<? extends NestedNode> c = node.getClass();
+        return this.em.createQuery("from " + entity(c) + " "
+                + "where " + left(c) + ">=:lft "
+                + "and " + right(c) + " <=:rgt "
+                + "order by " + left(c) + " asc")
+                .setParameter("lft", node.getLeft())
+                .setParameter("rgt", node.getRight())
+                .getResultList();
     }
 
     @Override
     public Iterable<T> getChildren(T node) {
-        NestedNodeConfig config = NestedNodeUtil.getNodeConfig(node.getClass());
-        return this.em.createQuery("from " + config.getEntityName() + " "
-                + "where " + config.getLeftFieldName() + ">=:lft "
-                + "and " + config.getRightFieldName() + " <=:rgt "
-                + "and " + config.getLevelFieldName() + " = :lvl "
-                + "order by " + config.getLeftFieldName() + " asc")
+        Class<? extends NestedNode> c = node.getClass();
+        return this.em.createQuery("from " + entity(c) + " "
+                + "where " + left(c) + ">=:lft "
+                + "and " + right(c) + " <=:rgt "
+                + "and " + level(c) + " = :lvl "
+                + "order by " + left(c) + " asc")
                 .setParameter("lft", node.getLeft())
                 .setParameter("rgt", node.getRight())
                 .setParameter("lvl", node.getLevel() + 1)
@@ -96,11 +88,11 @@ public class NestedNodeRetrieverImpl<T extends NestedNode> implements NestedNode
     @Override
     public T getParent(T node) {
         if (node.getLevel() > 0) {
-            NestedNodeConfig config = NestedNodeUtil.getNodeConfig(node.getClass());
-            return (T) this.em.createQuery("from " + config.getEntityName() + " "
-                    + "where " + config.getLeftFieldName() + "<:lft "
-                    + "and " + config.getRightFieldName() + ">:rgt "
-                    + "and " + config.getLevelFieldName() + " = :lvl")
+            Class<? extends NestedNode> c = node.getClass();
+            return (T) this.em.createQuery("from " + entity(c) + " "
+                    + "where " + left(c) + "<:lft "
+                    + "and " + right(c) + ">:rgt "
+                    + "and " + level(c) + " = :lvl")
                     .setParameter("lft", node.getLeft())
                     .setParameter("rgt", node.getRight())
                     .setParameter("lvl", node.getLevel() - 1)
@@ -113,11 +105,11 @@ public class NestedNodeRetrieverImpl<T extends NestedNode> implements NestedNode
     @Override
     public Iterable<T> getParents(T node) {
         if (node.getLevel() > 0) {
-            NestedNodeConfig config = NestedNodeUtil.getNodeConfig(node.getClass());
-            return this.em.createQuery("from " + config.getEntityName() + " "
-                    + "where " + config.getLeftFieldName() + "<:lft "
-                    + "and " + config.getRightFieldName() + ">:rgt "
-                    + "order by " + config.getLevelFieldName() + " desc")
+            Class<? extends NestedNode> c = node.getClass();
+            return this.em.createQuery("from " + entity(c) + " "
+                    + "where " + left(c) + "<:lft "
+                    + "and " + right(c) + ">:rgt "
+                    + "order by " + level(c) + " desc")
                     .setParameter("lft", node.getLeft())
                     .setParameter("rgt", node.getRight())
                     .getResultList();

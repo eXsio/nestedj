@@ -31,7 +31,7 @@ import pl.exsio.nestedj.model.NestedNode;
  * @author exsio
  * @param <T>
  */
-public interface NestedNodeRebuilder<T extends NestedNode> {
-     
+public interface NestedNodeRebuilder {
+
     void rebuildTree(Class<? extends NestedNode> nodeClass) throws InvalidNodesHierarchyException;
 }

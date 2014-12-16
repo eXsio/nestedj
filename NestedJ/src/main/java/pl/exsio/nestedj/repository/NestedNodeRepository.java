@@ -50,7 +50,7 @@ public class NestedNodeRepository<T extends NestedNode> implements NestedNodeDao
 
     protected NestedNodeRetriever<T> retriever;
 
-    protected NestedNodeRebuilder<T> rebuilder;
+    protected NestedNodeRebuilder rebuilder;
 
     public void setInserter(NestedNodeInserter<T> inserter) {
         this.inserter = inserter;
@@ -68,7 +68,7 @@ public class NestedNodeRepository<T extends NestedNode> implements NestedNodeDao
         this.retriever = retriever;
     }
 
-    public void setRebuilder(NestedNodeRebuilder<T> rebuilder) {
+    public void setRebuilder(NestedNodeRebuilder rebuilder) {
         this.rebuilder = rebuilder;
     }
 

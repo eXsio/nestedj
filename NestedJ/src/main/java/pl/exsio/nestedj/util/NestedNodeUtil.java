@@ -88,4 +88,28 @@ public class NestedNodeUtil {
         return config;
     }
 
+    public static String left(Class<? extends NestedNode> nodeClass) {
+        return getNodeConfig(nodeClass).getLeftFieldName();
+    }
+
+    public static String right(Class<? extends NestedNode> nodeClass) {
+        return getNodeConfig(nodeClass).getRightFieldName();
+    }
+
+    public static String level(Class<? extends NestedNode> nodeClass) {
+        return getNodeConfig(nodeClass).getLevelFieldName();
+    }
+
+    public static String parent(Class<? extends NestedNode> nodeClass) {
+        return getNodeConfig(nodeClass).getParentFieldName();
+    }
+
+    public static String id(Class<? extends NestedNode> nodeClass) {
+        return getNodeConfig(nodeClass).getIdFieldName();
+    }
+
+    public static String entity(Class<? extends NestedNode> nodeClass) {
+        return getNodeConfig(nodeClass).getEntityName();
+    }
+
 }

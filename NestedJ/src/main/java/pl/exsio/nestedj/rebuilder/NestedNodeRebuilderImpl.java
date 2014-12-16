@@ -29,22 +29,23 @@ import javax.transaction.Transactional;
 import pl.exsio.nestedj.NestedNodeInserter;
 import pl.exsio.nestedj.NestedNodeMover;
 import pl.exsio.nestedj.NestedNodeRebuilder;
-import pl.exsio.nestedj.config.NestedNodeConfig;
 import pl.exsio.nestedj.ex.InvalidNodesHierarchyException;
 import pl.exsio.nestedj.model.NestedNode;
-import pl.exsio.nestedj.util.NestedNodeUtil;
+import static pl.exsio.nestedj.util.NestedNodeUtil.*;
 
 /**
  *
  * @author exsio
  * @param <T>
  */
-public class NestedNodeRebuilderImpl<T extends NestedNode> implements NestedNodeRebuilder {
+public class NestedNodeRebuilderImpl implements NestedNodeRebuilder {
 
     @PersistenceContext
     protected EntityManager em;
 
     protected NestedNodeInserter inserter;
+
+    protected Class<? extends NestedNode> c;
 
     public NestedNodeRebuilderImpl() {
     }
@@ -68,63 +69,62 @@ public class NestedNodeRebuilderImpl<T extends NestedNode> implements NestedNode
 
     @Override
     @Transactional
-    public void rebuildTree(Class nodeClass) throws InvalidNodesHierarchyException {
-        NestedNodeConfig config = NestedNodeUtil.getNodeConfig(nodeClass);
-
-        NestedNode first = this.findFirstNestedNode(config);
-
-        this.resetFirst(first, config);
-        this.restoreSiblings(first, config);
-        this.rebuildRecursively(first, config);
-        for (NestedNode node : this.getSiblings(first, config)) {
-            this.rebuildRecursively(node, config);
+    public void rebuildTree(Class<? extends NestedNode> nodeClass) throws InvalidNodesHierarchyException {
+        this.c = nodeClass;
+        NestedNode first = this.findFirstNestedNode();
+        this.resetFirst(first);
+        this.restoreSiblings(first);
+        this.rebuildRecursively(first);
+        for (NestedNode node : this.getSiblings(first)) {
+            this.rebuildRecursively(node);
         }
         this.em.refresh(first);
     }
 
-    protected void rebuildRecursively(NestedNode parent, NestedNodeConfig config) throws InvalidNodesHierarchyException {
-        for (NestedNode child : this.getChildren(parent, config)) {
+    protected void rebuildRecursively(NestedNode parent) throws InvalidNodesHierarchyException {
+        for (NestedNode child : this.getChildren(parent)) {
             this.inserter.insert(child, parent, NestedNodeMover.MODE_LAST_CHILD);
-            this.rebuildRecursively(child, config);
+            this.rebuildRecursively(child);
         }
     }
 
-    protected NestedNode findFirstNestedNode(NestedNodeConfig config) {
+    protected NestedNode findFirstNestedNode() {
 
-        NestedNode first = (NestedNode) this.em.createQuery("from " + config.getEntityName() + " "
-                + "where " + config.getParentFieldName() + " is null")
+        NestedNode first = (NestedNode) this.em.createQuery("from " + entity(c) + " "
+                + "where " + parent(c) + " is null")
                 .setMaxResults(1)
                 .getSingleResult();
         return first;
     }
 
-    protected void resetFirst(NestedNode first, NestedNodeConfig config) {
-        this.em.createQuery("update  " + config.getEntityName() + " "
-                + "set " + config.getLeftFieldName() + " = 1, "
-                + "" + config.getRightFieldName() + " = 2 where " + config.getIdFieldName() + " = :id")
+    protected void resetFirst(NestedNode first) {
+        this.em.createQuery("update  " + entity(c) + " "
+                + "set " + left(c) + " = 1, "
+                + right(c) + " = 2 "
+                + "where " + id(c) + " = :id")
                 .setParameter("id", first.getId())
                 .executeUpdate();
     }
 
-    protected Iterable<NestedNode> getSiblings(NestedNode first, NestedNodeConfig config) {
-        return this.em.createQuery("from " + config.getEntityName() + " "
-                + "where " + config.getParentFieldName() + " is null "
-                + "and " + config.getIdFieldName() + " != :id "
-                + "order by " + config.getIdFieldName() + " desc")
+    protected Iterable<NestedNode> getSiblings(NestedNode first) {
+        return this.em.createQuery("from " + entity(c) + " "
+                + "where " + parent(c) + " is null "
+                + "and " + id(c) + " != :id "
+                + "order by " + id(c) + " desc")
                 .setParameter("id", first.getId())
                 .getResultList();
     }
 
-    protected void restoreSiblings(NestedNode first, NestedNodeConfig config) throws InvalidNodesHierarchyException {
-        for (NestedNode node : this.getSiblings(first, config)) {
+    protected void restoreSiblings(NestedNode first) throws InvalidNodesHierarchyException {
+        for (NestedNode node : this.getSiblings(first)) {
             this.inserter.insert(node, first, NestedNodeMover.MODE_NEXT_SIBLING);
         }
     }
 
-    protected Iterable<NestedNode> getChildren(NestedNode parent, NestedNodeConfig config) {
-        return this.em.createQuery("from " + config.getEntityName() + " "
-                + "where " + config.getParentFieldName() + " = :parent "
-                + "order by " + config.getIdFieldName() + " desc")
+    protected Iterable<NestedNode> getChildren(NestedNode parent) {
+        return this.em.createQuery("from " + entity(c) + " "
+                + "where " + parent(c) + " = :parent "
+                + "order by " + id(c) + " desc")
                 .setParameter("parent", parent)
                 .getResultList();
     }
