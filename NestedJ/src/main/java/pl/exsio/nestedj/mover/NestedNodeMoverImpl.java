@@ -82,12 +82,12 @@ public class NestedNodeMoverImpl implements NestedNodeMover {
         return node;
     }
 
-    private void makeSpaceForMovedElement(NestedNodeConfig config, String sign, Long delta, Long start, Long stop) {
+    protected void makeSpaceForMovedElement(NestedNodeConfig config, String sign, Long delta, Long start, Long stop) {
         this.updateLeftFields(config, sign, delta, start, stop);
         this.updateRightFields(config, sign, delta, start, stop);
     }
 
-    private void updateParentField(NestedNodeConfig config, NestedNode newParent, NestedNode node) {
+    protected void updateParentField(NestedNodeConfig config, NestedNode newParent, NestedNode node) {
         this.em.createQuery("update " + config.getEntityName() + " "
                 + "set " + config.getParentFieldName() + " = :parent "
                 + "where id = :id").setParameter("parent", newParent)
@@ -95,7 +95,7 @@ public class NestedNodeMoverImpl implements NestedNodeMover {
                 .executeUpdate();
     }
 
-    private void performMove(NestedNodeConfig config, String nodeSign, Long nodeDelta, List nodeIds, Long levelModificator) {
+    protected void performMove(NestedNodeConfig config, String nodeSign, Long nodeDelta, List nodeIds, Long levelModificator) {
         if (!nodeIds.isEmpty()) {
             this.em.createQuery("update " + config.getEntityName() + " "
                     + "set " + config.getLevelFieldName() + " = " + config.getLevelFieldName() + " + :levelModificator, "
@@ -109,7 +109,7 @@ public class NestedNodeMoverImpl implements NestedNodeMover {
         }
     }
 
-    private void updateRightFields(NestedNodeConfig config, String sign, Long delta, Long start, Long stop) {
+    protected void updateRightFields(NestedNodeConfig config, String sign, Long delta, Long start, Long stop) {
         this.em.createQuery("update " + config.getEntityName() + " "
                 + "set " + config.getRightFieldName() + " = " + config.getRightFieldName() + " " + sign + ":delta "
                 + "where " + config.getRightFieldName() + " > :start "
@@ -120,7 +120,7 @@ public class NestedNodeMoverImpl implements NestedNodeMover {
                 .executeUpdate();
     }
 
-    private void updateLeftFields(NestedNodeConfig config, String sign, Long delta, Long start, Long stop) {
+    protected void updateLeftFields(NestedNodeConfig config, String sign, Long delta, Long start, Long stop) {
         this.em.createQuery("update " + config.getEntityName() + " "
                 + "set " + config.getLeftFieldName() + " = " + config.getLeftFieldName() + " " + sign + ":delta where "
                 + config.getLeftFieldName() + " > :start "
@@ -131,11 +131,11 @@ public class NestedNodeMoverImpl implements NestedNodeMover {
                 .executeUpdate();
     }
 
-    private boolean canMoveNodeToSelectedParent(NestedNode node, NestedNode parent) {
+    protected boolean canMoveNodeToSelectedParent(NestedNode node, NestedNode parent) {
         return !node.getId().equals(parent.getId()) && (node.getLeft() >= parent.getLeft() || node.getRight() <= parent.getRight());
     }
 
-    private NestedNode getNewParent(NestedNode parent, int mode) {
+    protected NestedNode getNewParent(NestedNode parent, int mode) {
         switch (mode) {
             case MODE_NEXT_SIBLING:
             case MODE_PREV_SIBLING:
@@ -147,7 +147,7 @@ public class NestedNodeMoverImpl implements NestedNodeMover {
         }
     }
 
-    private Long getLevelModificator(NestedNode node, NestedNode parent, int mode) {
+    protected Long getLevelModificator(NestedNode node, NestedNode parent, int mode) {
         switch (mode) {
             case MODE_NEXT_SIBLING:
             case MODE_PREV_SIBLING:
@@ -159,7 +159,7 @@ public class NestedNodeMoverImpl implements NestedNodeMover {
         }
     }
 
-    private List<Long> getNodeIds(NestedNode node, NestedNodeConfig config) {
+    protected List<Long> getNodeIds(NestedNode node, NestedNodeConfig config) {
         List result = this.em.createQuery("select id from " + config.getEntityName() + " "
                 + "where " + config.getLeftFieldName() + ">=:lft "
                 + "and " + config.getRightFieldName() + " <=:rgt ")
@@ -169,19 +169,19 @@ public class NestedNodeMoverImpl implements NestedNodeMover {
         return result;
     }
 
-    private Long getNodeDelta(Long start, Long stop) {
+    protected Long getNodeDelta(Long start, Long stop) {
         return stop - start - 1;
     }
 
-    private Long getDelta(List<Long> nodeIds) {
+    protected Long getDelta(List<Long> nodeIds) {
         return new Long(nodeIds.size() * 2);
     }
 
-    private String getNodeSign(String sign) {
+    protected String getNodeSign(String sign) {
         return (sign.equals(SIGN_PLUS)) ? SIGN_MINUS : SIGN_PLUS;
     }
 
-    private String getSign(NestedNode node, NestedNode parent, int mode) {
+    protected String getSign(NestedNode node, NestedNode parent, int mode) {
         switch (mode) {
             case MODE_PREV_SIBLING:
             case MODE_FIRST_CHILD:
@@ -193,7 +193,7 @@ public class NestedNodeMoverImpl implements NestedNodeMover {
         }
     }
 
-    private Long getStart(NestedNode node, NestedNode parent, int mode, String sign) {
+    protected Long getStart(NestedNode node, NestedNode parent, int mode, String sign) {
         switch (mode) {
             case MODE_PREV_SIBLING:
                 return sign.equals(SIGN_PLUS) ? parent.getLeft() - 1 : node.getRight();
@@ -208,7 +208,7 @@ public class NestedNodeMoverImpl implements NestedNodeMover {
         }
     }
 
-    private Long getStop(NestedNode node, NestedNode parent, int mode, String sign) {
+    protected Long getStop(NestedNode node, NestedNode parent, int mode, String sign) {
         switch (mode) {
             case MODE_PREV_SIBLING:
                 return sign.equals(SIGN_PLUS) ? node.getLeft() : parent.getLeft();

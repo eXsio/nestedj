@@ -60,12 +60,12 @@ public class NestedNodeInserterImpl<T extends NestedNode> implements NestedNodeI
         return node;
     }
 
-    private void insertNodeIntoTable(T node) {
+    protected void insertNodeIntoTable(T node) {
         this.em.persist(node);
         this.em.flush();
     }
 
-    private void insertNodeIntoTree(NestedNodeConfig config, T parent, T node, int mode) {
+    protected void insertNodeIntoTree(NestedNodeConfig config, T parent, T node, int mode) {
         Long left = this.getNodeLeft(parent, mode);
         Long right = left + 1;
         Long level = this.getNodeLevel(parent, mode);
@@ -141,7 +141,7 @@ public class NestedNodeInserterImpl<T extends NestedNode> implements NestedNodeI
         this.updateRightFields(config, sign, from);
     }
 
-    private void updateRightFields(NestedNodeConfig config, String sign, Long from) {
+    protected void updateRightFields(NestedNodeConfig config, String sign, Long from) {
         String rightQuery = "update " + config.getEntityName() + " "
                 + "set " + config.getRightFieldName() + " = " + config.getRightFieldName() + "+2 "
                 + "where " + config.getRightFieldName() + " " + sign + " :from";
@@ -150,7 +150,7 @@ public class NestedNodeInserterImpl<T extends NestedNode> implements NestedNodeI
                 .executeUpdate();
     }
 
-    private void updateLeftFields(NestedNodeConfig config, String sign, Long from) {
+    protected void updateLeftFields(NestedNodeConfig config, String sign, Long from) {
         String leftQuery = "update " + config.getEntityName() + " "
                 + "set " + config.getLeftFieldName() + " = " + config.getLeftFieldName() + "+2 "
                 + "where " + config.getLeftFieldName() + " " + sign + " :from";

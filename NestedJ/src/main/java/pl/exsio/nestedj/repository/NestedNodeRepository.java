@@ -42,15 +42,15 @@ import pl.exsio.nestedj.util.NestedNodeUtil;
  */
 public class NestedNodeRepository<T extends NestedNode> implements NestedNodeDao<T> {
 
-    private NestedNodeInserter<T> inserter;
+    protected NestedNodeInserter<T> inserter;
 
-    private NestedNodeMover<T> mover;
+    protected NestedNodeMover<T> mover;
 
-    private NestedNodeRemover<T> remover;
+    protected NestedNodeRemover<T> remover;
 
-    private NestedNodeRetriever<T> retriever;
+    protected NestedNodeRetriever<T> retriever;
 
-    private NestedNodeRebuilder<T> rebuilder;
+    protected NestedNodeRebuilder<T> rebuilder;
 
     public void setInserter(NestedNodeInserter<T> inserter) {
         this.inserter = inserter;
