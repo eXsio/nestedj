@@ -27,9 +27,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import pl.exsio.nestedj.model.NestedNode;
-import pl.exsio.nestedj.NestedNodeUtil;
 import pl.exsio.nestedj.NestedNodeRemover;
 import pl.exsio.nestedj.config.NestedNodeConfig;
+import pl.exsio.nestedj.util.NestedNodeUtil;
 
 /**
  *
@@ -40,8 +40,6 @@ public class NestedNodeRemoverImpl implements NestedNodeRemover {
     @PersistenceContext
     protected EntityManager em;
 
-    protected NestedNodeUtil util;
-
     public NestedNodeRemoverImpl() {
     }
 
@@ -49,15 +47,11 @@ public class NestedNodeRemoverImpl implements NestedNodeRemover {
         this.em = em;
     }
 
-    public void setNestedNodeUtil(NestedNodeUtil util) {
-        this.util = util;
-    }
-
     @Override
     @Transactional
     public void removeSingle(NestedNode node) {
 
-        NestedNodeConfig config = this.util.getNodeConfig(node.getClass());
+        NestedNodeConfig config = NestedNodeUtil.getNodeConfig(node.getClass());
         Long from = node.getRight();
         NestedNode parent = null;
         parent = this.findNodeParent(node, parent, config);
@@ -132,7 +126,7 @@ public class NestedNodeRemoverImpl implements NestedNodeRemover {
     @Transactional
     public void removeSubtree(NestedNode node) {
 
-        NestedNodeConfig config = this.util.getNodeConfig(node.getClass());
+        NestedNodeConfig config = NestedNodeUtil.getNodeConfig(node.getClass());
         Long delta = node.getRight() - node.getLeft() + 1;
         Long from = node.getRight();
         this.performBatchDeletion(config, node);

@@ -46,39 +46,23 @@
         <property name="entityManagerFactory" ref="entityManagerFactory" />
     </bean>
     
-    
-    <bean id="NestedNodeUtil" class="pl.exsio.nestedj.util.NestedNodeUtilImpl">
-    </bean>
-    
     <bean id="NestedNodeRepository" class="pl.exsio.nestedj.repository.NestedNodeRepository">
-        <property name="nestedNodeUtil" ref="NestedNodeUtil" />
         <property name="inserter">
-            <bean class="pl.exsio.nestedj.inserter.NestedNodeInserterImpl">
-                <property name="nestedNodeUtil" ref="NestedNodeUtil"/>
-            </bean>
+            <bean class="pl.exsio.nestedj.inserter.NestedNodeInserterImpl"/>
         </property>
         <property name="mover">
-            <bean class="pl.exsio.nestedj.mover.NestedNodeMoverImpl">
-                <property name="nestedNodeUtil" ref="NestedNodeUtil"/>
-            </bean>
+            <bean class="pl.exsio.nestedj.mover.NestedNodeMoverImpl"/>
         </property>
         <property name="remover">
-            <bean class="pl.exsio.nestedj.remover.NestedNodeRemoverImpl">
-                <property name="nestedNodeUtil" ref="NestedNodeUtil"/>
-            </bean>
+            <bean class="pl.exsio.nestedj.remover.NestedNodeRemoverImpl"/>
         </property>
         <property name="retriever">
-            <bean class="pl.exsio.nestedj.retriever.NestedNodeRetrieverImpl">
-                <property name="nestedNodeUtil" ref="NestedNodeUtil"/>
-            </bean>
+            <bean class="pl.exsio.nestedj.retriever.NestedNodeRetrieverImpl"/>
         </property>
         <property name="rebuilder">
             <bean class="pl.exsio.nestedj.rebuilder.NestedNodeRebuilderImpl">
-                <property name="nestedNodeUtil" ref="NestedNodeUtil"/>
                 <property name="inserter">
-                    <bean class="pl.exsio.nestedj.inserter.NestedNodeInserterImpl">
-                        <property name="nestedNodeUtil" ref="NestedNodeUtil"/>
-                    </bean>
+                    <bean class="pl.exsio.nestedj.inserter.NestedNodeInserterImpl"/>
                 </property>
             </bean>
         </property>

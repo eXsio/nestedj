@@ -28,10 +28,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import pl.exsio.nestedj.model.NestedNode;
-import pl.exsio.nestedj.NestedNodeUtil;
 import pl.exsio.nestedj.NestedNodeMover;
 import pl.exsio.nestedj.config.NestedNodeConfig;
 import pl.exsio.nestedj.ex.InvalidNodesHierarchyException;
+import pl.exsio.nestedj.util.NestedNodeUtil;
 
 /**
  *
@@ -45,8 +45,6 @@ public class NestedNodeMoverImpl implements NestedNodeMover {
     @PersistenceContext
     protected EntityManager em;
 
-    protected NestedNodeUtil util;
-
     public NestedNodeMoverImpl() {
     }
 
@@ -54,9 +52,6 @@ public class NestedNodeMoverImpl implements NestedNodeMover {
         this.em = em;
     }
 
-    public void setNestedNodeUtil(NestedNodeUtil util) {
-        this.util = util;
-    }
 
     @Override
     @Transactional
@@ -67,7 +62,7 @@ public class NestedNodeMoverImpl implements NestedNodeMover {
         if (!this.canMoveNodeToSelectedParent(node, parent)) {
             throw new InvalidNodesHierarchyException("You cannot move a parent node to it's child or move a node to itself");
         }
-        NestedNodeConfig config = this.util.getNodeConfig(node.getClass());
+        NestedNodeConfig config = NestedNodeUtil.getNodeConfig(node.getClass());
         String sign = this.getSign(node, parent, mode);
         Long start = this.getStart(node, parent, mode, sign);
         Long stop = this.getStop(node, parent, mode, sign);

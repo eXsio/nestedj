@@ -27,9 +27,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import pl.exsio.nestedj.model.NestedNode;
 import pl.exsio.nestedj.NestedNodeInserter;
-import pl.exsio.nestedj.NestedNodeUtil;
 import pl.exsio.nestedj.config.NestedNodeConfig;
 import javax.transaction.Transactional;
+import pl.exsio.nestedj.util.NestedNodeUtil;
 
 /**
  *
@@ -41,8 +41,6 @@ public class NestedNodeInserterImpl<T extends NestedNode> implements NestedNodeI
     @PersistenceContext
     protected EntityManager em;
 
-    protected NestedNodeUtil<T> util;
-
     public NestedNodeInserterImpl() {
     }
 
@@ -50,15 +48,11 @@ public class NestedNodeInserterImpl<T extends NestedNode> implements NestedNodeI
         this.em = em;
     }
 
-    public void setNestedNodeUtil(NestedNodeUtil<T> util) {
-        this.util = util;
-    }
-
     @Override
     @Transactional
     public T insert(T node, T parent, int mode) {
         this.em.refresh(parent);
-        NestedNodeConfig config = this.util.getNodeConfig(node.getClass());
+        NestedNodeConfig config = NestedNodeUtil.getNodeConfig(node.getClass());
         this.makeSpaceForNewElement(parent.getRight(), this.isGte(mode), config);
         this.insertNodeIntoTable(node);
         this.insertNodeIntoTree(config, parent, node, mode);

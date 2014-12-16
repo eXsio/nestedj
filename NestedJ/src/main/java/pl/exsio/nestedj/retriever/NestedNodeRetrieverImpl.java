@@ -26,12 +26,12 @@ package pl.exsio.nestedj.retriever;
 import java.util.ArrayList;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import pl.exsio.nestedj.NestedNodeUtil;
 import pl.exsio.nestedj.NestedNodeRetriever;
 import pl.exsio.nestedj.config.NestedNodeConfig;
 import pl.exsio.nestedj.model.NestedNode;
 import pl.exsio.nestedj.model.TreeImpl;
 import pl.exsio.nestedj.model.Tree;
+import pl.exsio.nestedj.util.NestedNodeUtil;
 
 /**
  *
@@ -43,17 +43,11 @@ public class NestedNodeRetrieverImpl<T extends NestedNode> implements NestedNode
     @PersistenceContext
     protected EntityManager em;
 
-    protected NestedNodeUtil<T> util;
-
     public NestedNodeRetrieverImpl() {
     }
 
     public NestedNodeRetrieverImpl(EntityManager em) {
         this.em = em;
-    }
-
-    public void setNestedNodeUtil(NestedNodeUtil util) {
-        this.util = util;
     }
 
     @Override
@@ -69,9 +63,9 @@ public class NestedNodeRetrieverImpl<T extends NestedNode> implements NestedNode
     @Override
     public Iterable<T> getTreeAsList(T node) {
 
-        NestedNodeConfig config = this.util.getNodeConfig(node.getClass());
+        NestedNodeConfig config = NestedNodeUtil.getNodeConfig(node.getClass());
         if (node instanceof NestedNode) {
-            return this.em.createQuery("from " + config.getEntityName() +" "
+            return this.em.createQuery("from " + config.getEntityName() + " "
                     + "where " + config.getLeftFieldName() + ">=:lft "
                     + "and " + config.getRightFieldName() + " <=:rgt "
                     + "order by " + config.getLeftFieldName() + " asc")
@@ -87,7 +81,7 @@ public class NestedNodeRetrieverImpl<T extends NestedNode> implements NestedNode
 
     @Override
     public Iterable<T> getChildren(T node) {
-        NestedNodeConfig config = this.util.getNodeConfig(node.getClass());
+        NestedNodeConfig config = NestedNodeUtil.getNodeConfig(node.getClass());
         return this.em.createQuery("from " + config.getEntityName() + " "
                 + "where " + config.getLeftFieldName() + ">=:lft "
                 + "and " + config.getRightFieldName() + " <=:rgt "
@@ -102,7 +96,7 @@ public class NestedNodeRetrieverImpl<T extends NestedNode> implements NestedNode
     @Override
     public T getParent(T node) {
         if (node.getLevel() > 0) {
-            NestedNodeConfig config = this.util.getNodeConfig(node.getClass());
+            NestedNodeConfig config = NestedNodeUtil.getNodeConfig(node.getClass());
             return (T) this.em.createQuery("from " + config.getEntityName() + " "
                     + "where " + config.getLeftFieldName() + "<:lft "
                     + "and " + config.getRightFieldName() + ">:rgt "
@@ -119,7 +113,7 @@ public class NestedNodeRetrieverImpl<T extends NestedNode> implements NestedNode
     @Override
     public Iterable<T> getParents(T node) {
         if (node.getLevel() > 0) {
-            NestedNodeConfig config = this.util.getNodeConfig(node.getClass());
+            NestedNodeConfig config = NestedNodeUtil.getNodeConfig(node.getClass());
             return this.em.createQuery("from " + config.getEntityName() + " "
                     + "where " + config.getLeftFieldName() + "<:lft "
                     + "and " + config.getRightFieldName() + ">:rgt "

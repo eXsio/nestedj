@@ -27,7 +27,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import pl.exsio.nestedj.NestedNodeInserter;
 import pl.exsio.nestedj.model.NestedNode;
-import pl.exsio.nestedj.NestedNodeUtil;
 import pl.exsio.nestedj.NestedNodeHierarchyManipulator;
 import pl.exsio.nestedj.NestedNodeMover;
 import pl.exsio.nestedj.NestedNodeRebuilder;
@@ -36,6 +35,7 @@ import pl.exsio.nestedj.NestedNodeRetriever;
 import pl.exsio.nestedj.dao.NestedNodeDao;
 import pl.exsio.nestedj.ex.InvalidNodesHierarchyException;
 import pl.exsio.nestedj.model.Tree;
+import pl.exsio.nestedj.util.NestedNodeUtil;
 
 /**
  *
@@ -46,8 +46,6 @@ public class NestedNodeRepository<T extends NestedNode> implements NestedNodeDao
 
     @PersistenceContext
     private EntityManager em;
-
-    private NestedNodeUtil<T> util;
 
     private NestedNodeInserter<T> inserter;
 
@@ -64,10 +62,6 @@ public class NestedNodeRepository<T extends NestedNode> implements NestedNodeDao
 
     public NestedNodeRepository(EntityManager em) {
         this.em = em;
-    }
-
-    public void setNestedNodeUtil(NestedNodeUtil<T> util) {
-        this.util = util;
     }
 
     public void setInserter(NestedNodeInserter<T> inserter) {
@@ -111,7 +105,7 @@ public class NestedNodeRepository<T extends NestedNode> implements NestedNodeDao
     }
 
     private T insertOrMove(T node, T parent, int mode) throws InvalidNodesHierarchyException {
-        if (this.util.isNodeNew(node)) {
+        if (NestedNodeUtil.isNodeNew(node)) {
             return this.inserter.insert(node, parent, mode);
         } else {
             return this.mover.move(node, parent, mode);
