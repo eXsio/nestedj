@@ -70,26 +70,12 @@ The Entity inheritance is permitted. NestedJ will begin searching for it's annot
 In order to use NestedJ, You have to configure it. Here's the full code:
 
 
-    NestedNodeUtil util = new NestedNodeUtilImpl();
-    NestedNodeInserterImpl inserter = new NestedNodeInserterImpl();
-    inserter.setNestedNodeUtil(util);
-    NestedNodeMoverImpl mover = new NestedNodeMoverImpl();
-    mover.setNestedNodeUtil(util);
-    NestedNodeRetrieverImpl retriever = new NestedNodeRetrieverImpl();
-    retriever.setNestedNodeUtil(util);
-    NestedNodeRemoverImpl remover = new NestedNodeRemoverImpl();
-    remover.setNestedNodeUtil(util);
-    NestedNodeRebuilderImpl rebuilder = new NestedNodeRebuilderImpl();
-    rebuilder.setInserter(inserter);
-    rebuilder.setNestedNodeUtil(util);
-    
     NestedNodeRepository repository = new NestedNodeRepository();
-    repository.setInserter(inserter);
-    repository.setMover(mover);
-    repository.setNestedNodeUtil(util);
-    repository.setRebuilder(rebuilder);
-    repository.setRemover(remover);
-    repository.setRetriever(retriever);
+    repository.setInserter(new NestedNodeInserterImpl());
+    repository.setMover(new NestedNodeMoverImpl());
+    repository.setRebuilder(new NestedNodeRebuilderImpl(new NestedNodeInserterImpl()));
+    repository.setRemover(new NestedNodeRemoverImpl());
+    repository.setRetriever(new NestedNodeRetrieverImpl());
  
 
 NestedNodeRepository is a default, provided implementation of ```NestedNodeDao```. If You need or want, You can implement your own inserter/mover/retriever/remover/rebuilder that fits to Your needs.
