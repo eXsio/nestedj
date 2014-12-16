@@ -23,8 +23,6 @@
  */
 package pl.exsio.nestedj.repository;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import pl.exsio.nestedj.NestedNodeInserter;
 import pl.exsio.nestedj.model.NestedNode;
 import pl.exsio.nestedj.NestedNodeHierarchyManipulator;
@@ -44,9 +42,6 @@ import pl.exsio.nestedj.util.NestedNodeUtil;
  */
 public class NestedNodeRepository<T extends NestedNode> implements NestedNodeDao<T> {
 
-    @PersistenceContext
-    private EntityManager em;
-
     private NestedNodeInserter<T> inserter;
 
     private NestedNodeMover<T> mover;
@@ -56,13 +51,6 @@ public class NestedNodeRepository<T extends NestedNode> implements NestedNodeDao
     private NestedNodeRetriever<T> retriever;
 
     private NestedNodeRebuilder<T> rebuilder;
-
-    public NestedNodeRepository() {
-    }
-
-    public NestedNodeRepository(EntityManager em) {
-        this.em = em;
-    }
 
     public void setInserter(NestedNodeInserter<T> inserter) {
         this.inserter = inserter;

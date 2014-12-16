@@ -129,4 +129,8 @@ public class NestedNodeRebuilderImpl<T extends NestedNode> implements NestedNode
                 .getResultList();
     }
 
+    public void setEntityManager(EntityManager em) {
+        this.em = em;
+    }
+
 }

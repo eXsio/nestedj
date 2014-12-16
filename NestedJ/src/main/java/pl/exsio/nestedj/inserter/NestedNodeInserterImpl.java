@@ -159,4 +159,8 @@ public class NestedNodeInserterImpl<T extends NestedNode> implements NestedNodeI
                 .executeUpdate();
     }
 
+    public void setEntityManager(EntityManager em) {
+        this.em = em;
+    }
+
 }

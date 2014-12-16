@@ -126,4 +126,8 @@ public class NestedNodeRetrieverImpl<T extends NestedNode> implements NestedNode
         }
     }
 
+    public void setEntityManager(EntityManager em) {
+        this.em = em;
+    }
+
 }
