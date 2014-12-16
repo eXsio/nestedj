@@ -43,7 +43,7 @@ import pl.exsio.nestedj.model.NestedNode;
  */
 public class NestedNodeUtil {
 
-    protected static Map<Class<? extends NestedNode>, NestedNodeConfig> configs;
+    protected static final Map<Class<? extends NestedNode>, NestedNodeConfig> configs;
 
     static {
         configs = new HashMap<Class<? extends NestedNode>, NestedNodeConfig>();
