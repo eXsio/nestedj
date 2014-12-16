@@ -49,6 +49,15 @@ public class NestedNodeRebuilderImpl<T extends NestedNode> implements NestedNode
     public NestedNodeRebuilderImpl() {
     }
 
+    public NestedNodeRebuilderImpl(NestedNodeInserter inserter) {
+        this.inserter = inserter;
+    }
+
+    public NestedNodeRebuilderImpl(EntityManager em, NestedNodeInserter inserter) {
+        this.em = em;
+        this.inserter = inserter;
+    }
+
     public NestedNodeRebuilderImpl(EntityManager em) {
         this.em = em;
     }
