@@ -67,7 +67,7 @@ public class NestedNodeUtil {
         return configs.get(nodeClass);
     }
 
-    private static NestedNodeConfigImpl getConfigForClass(Class<? extends NestedNode> nodeClass, NestedNodeConfigImpl config) {
+    private static NestedNodeConfigImpl getConfigForClass(Class nodeClass, NestedNodeConfigImpl config) {
 
         if (!nodeClass.getCanonicalName().equals(Object.class.getCanonicalName())) {
             for (Field field : nodeClass.getDeclaredFields()) {
@@ -83,7 +83,7 @@ public class NestedNodeUtil {
                     config.setIdFieldName(field.getName());
                 }
             }
-            config = getConfigForClass((Class<? extends NestedNode>) nodeClass.getSuperclass(), config);
+            config = getConfigForClass(nodeClass.getSuperclass(), config);
         }
         return config;
     }

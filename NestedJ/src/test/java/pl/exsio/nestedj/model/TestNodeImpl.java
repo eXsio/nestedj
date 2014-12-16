@@ -23,7 +23,7 @@ import pl.exsio.nestedj.annotation.RightColumn;
 @Entity
 @Table(name = "nested_nodes")
 @Inheritance(strategy = InheritanceType.JOINED)
-public class TestNodeImpl implements NestedNode {
+public class TestNodeImpl extends DummyObject implements NestedNode {
            
     /**
      *
