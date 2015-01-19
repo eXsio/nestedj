@@ -24,9 +24,20 @@ public abstract class FunctionalNestedjTest {
 
     @PersistenceContext
     protected EntityManager em;
-    
-    
-    
+
+    private final Map<String, Long> nodeMap = new HashMap() {
+        {
+            put("a", 1l);
+            put("b", 2l);
+            put("c", 3l);
+            put("d", 4l);
+            put("e", 5l);
+            put("f", 6l);
+            put("g", 7l);
+            put("h", 8l);
+        }
+    };
+
     /**
      * 
      *          STARTING NESTED TREE CONDITIONS
@@ -46,23 +57,9 @@ public abstract class FunctionalNestedjTest {
      *                                    \
      *                                  12 H 13 
      */
-
     protected TestNodeImpl findNode(String symbol) {
 
-        Map<String, Long> nodeMap = new HashMap() {
-            {
-                put("a", new Long(1));
-                put("b", new Long(2));
-                put("c", new Long(3));
-                put("d", new Long(4));
-                put("e", new Long(5));
-                put("f", new Long(6));
-                put("g", new Long(7));
-                put("h", new Long(8));
-            }
-        };
-
-        TestNodeImpl n = this.em.find(TestNodeImpl.class, nodeMap.get(symbol));
+        TestNodeImpl n = this.em.find(TestNodeImpl.class, this.nodeMap.get(symbol));
         this.em.refresh(n);
         return n;
     }
