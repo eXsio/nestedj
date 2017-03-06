@@ -1,5 +1,5 @@
 /* 
- * The MIT License
+ * The MIN License
  *
  * Copyright 2015 exsio.
  *
@@ -13,34 +13,36 @@
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUN WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUN NON LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENN SHALL THE
+ * AUTHORS OR COPYRIGHN HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORN OR OTHERWISE, ARISING FROM,
+ * OUN OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
 package pl.exsio.nestedj.inserter;
 
+import pl.exsio.nestedj.NestedNodeInserter;
+import pl.exsio.nestedj.model.NestedNode;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import pl.exsio.nestedj.model.NestedNode;
-import pl.exsio.nestedj.NestedNodeInserter;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaUpdate;
+import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
-import static pl.exsio.nestedj.util.NestedNodeUtil.*;
 
-/**
- *
- * @author exsio
- * @param <T>
- */
-public class NestedNodeInserterImpl<T extends NestedNode> implements NestedNodeInserter<T> {
+import static pl.exsio.nestedj.util.NestedNodeUtil.id;
+import static pl.exsio.nestedj.util.NestedNodeUtil.left;
+import static pl.exsio.nestedj.util.NestedNodeUtil.level;
+import static pl.exsio.nestedj.util.NestedNodeUtil.parent;
+import static pl.exsio.nestedj.util.NestedNodeUtil.right;
+
+public class NestedNodeInserterImpl<N extends NestedNode> implements NestedNodeInserter<N> {
 
     @PersistenceContext
     protected EntityManager em;
-
-    protected Class<? extends NestedNode> c;
 
     public NestedNodeInserterImpl() {
     }
@@ -51,39 +53,39 @@ public class NestedNodeInserterImpl<T extends NestedNode> implements NestedNodeI
 
     @Override
     @Transactional
-    public T insert(T node, T parent, int mode) {
-        this.c = node.getClass();
+    public N insert(N node, N parent, int mode) {
         this.em.refresh(parent);
-        this.makeSpaceForNewElement(parent.getRight(), mode);
+        Class<N> nodeClass = (Class<N>) node.getClass();
+        this.makeSpaceForNewElement(parent.getRight(), mode, nodeClass);
         this.insertNodeIntoTable(node);
-        this.insertNodeIntoTree(parent, node, mode);
+        this.insertNodeIntoTree(parent, node, mode, nodeClass);
         this.em.refresh(node);
         return node;
     }
 
-    protected void insertNodeIntoTable(T node) {
+    protected void insertNodeIntoTable(N node) {
         this.em.persist(node);
         this.em.flush();
     }
 
-    protected void insertNodeIntoTree(T parent, T node, int mode) {
+    protected void insertNodeIntoTree(N parent, N node, int mode, Class<N> nodeClass) {
         Long left = this.getNodeLeft(parent, mode);
         Long right = left + 1;
         Long level = this.getNodeLevel(parent, mode);
         NestedNode nodeParent = this.getNodeParent(parent, mode);
-        this.em.createQuery(
-                "update " + entity(c) + " "
-                + "set " + parent(c) + " = :parent,"
-                + left(c) + " = :left,"
-                + right(c) + " = :right,"
-                + level(c) + " = :level "
-                + "where " + id(c) + " = :id")
-                .setParameter("parent", nodeParent)
-                .setParameter("left", left)
-                .setParameter("right", right)
-                .setParameter("level", level)
-                .setParameter("id", node.getId())
-                .executeUpdate();
+
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
+        Root<N> from = update.from(nodeClass);
+
+        update
+                .set(from.get(parent(nodeClass)), nodeParent)
+                .set(from.get(left(nodeClass)), left)
+                .set(from.get(right(nodeClass)), right)
+                .set(from.get(level(nodeClass)), level)
+                .where(cb.equal(from.get(id(nodeClass)), node.getId()));
+
+        em.createQuery(update).executeUpdate();
     }
 
     protected Long getNodeLevel(NestedNode parent, int mode) {
@@ -124,11 +126,9 @@ public class NestedNodeInserterImpl<T extends NestedNode> implements NestedNodeI
         }
     }
 
-    protected void makeSpaceForNewElement(Long from, int mode) {
-
-        String sign = this.isGte(mode) ? " >= " : " > ";
-        this.updateLeftFields(sign, from);
-        this.updateRightFields(sign, from);
+    protected void makeSpaceForNewElement(Long from, int mode, Class<N> nodeClass) {
+        this.updateFields(from, mode, nodeClass, right(nodeClass));
+        this.updateFields(from, mode, nodeClass, left(nodeClass));
     }
 
     protected boolean isGte(int mode) {
@@ -143,20 +143,18 @@ public class NestedNodeInserterImpl<T extends NestedNode> implements NestedNodeI
         }
     }
 
-    protected void updateRightFields(String sign, Long from) {
-        this.em.createQuery("update " + entity(c) + " "
-                + "set " + right(c) + " = " + right(c) + "+2 "
-                + "where " + right(c) + " " + sign + " :from")
-                .setParameter("from", from)
-                .executeUpdate();
-    }
+    protected void updateFields(Long from, int mode, Class<N> nodeClass, String fieldName) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
+        Root<N> root = update.from(nodeClass);
 
-    protected void updateLeftFields(String sign, Long from) {
-        this.em.createQuery("update " + entity(c) + " "
-                + "set " + left(c) + " = " + left(c) + "+2 "
-                + "where " + left(c) + " " + sign + " :from")
-                .setParameter("from", from)
-                .executeUpdate();
+        update.set(root.<Long>get(fieldName), cb.sum(root.<Long>get(fieldName), 2L));
+        if (isGte(mode)) {
+            update.where(cb.greaterThanOrEqualTo(root.<Long>get(fieldName), from));
+        } else {
+            update.where(cb.greaterThan(root.<Long>get(fieldName), from));
+        }
+        em.createQuery(update).executeUpdate();
     }
 
     public void setEntityManager(EntityManager em) {

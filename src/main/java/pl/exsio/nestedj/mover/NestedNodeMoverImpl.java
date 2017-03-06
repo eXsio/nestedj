@@ -23,28 +23,35 @@
  */
 package pl.exsio.nestedj.mover;
 
-import java.util.List;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.transaction.Transactional;
-import pl.exsio.nestedj.model.NestedNode;
 import pl.exsio.nestedj.NestedNodeMover;
 import pl.exsio.nestedj.ex.InvalidNodesHierarchyException;
-import static pl.exsio.nestedj.util.NestedNodeUtil.*;
+import pl.exsio.nestedj.model.NestedNode;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.CriteriaUpdate;
+import javax.persistence.criteria.Root;
+import javax.transaction.Transactional;
+import java.util.List;
+
+import static pl.exsio.nestedj.util.NestedNodeUtil.id;
+import static pl.exsio.nestedj.util.NestedNodeUtil.left;
+import static pl.exsio.nestedj.util.NestedNodeUtil.level;
+import static pl.exsio.nestedj.util.NestedNodeUtil.parent;
+import static pl.exsio.nestedj.util.NestedNodeUtil.right;
 
 /**
- *
  * @author exsio
  */
-public class NestedNodeMoverImpl implements NestedNodeMover {
+public class NestedNodeMoverImpl<N extends NestedNode> implements NestedNodeMover<N> {
 
     private final static String SIGN_PLUS = "+";
     private final static String SIGN_MINUS = "-";
 
     @PersistenceContext
     protected EntityManager em;
-
-    protected Class<? extends NestedNode> c;
 
     public NestedNodeMoverImpl() {
     }
@@ -55,9 +62,8 @@ public class NestedNodeMoverImpl implements NestedNodeMover {
 
     @Override
     @Transactional
-    public NestedNode move(NestedNode node, NestedNode parent, int mode) throws InvalidNodesHierarchyException {
-
-        this.c = node.getClass();
+    public N move(N node, N parent, int mode) throws InvalidNodesHierarchyException {
+        Class<N> nodeClass = (Class<N>) node.getClass();
         this.em.refresh(node);
         this.em.refresh(parent);
         if (!this.canMoveNodeToSelectedParent(node, parent)) {
@@ -66,16 +72,16 @@ public class NestedNodeMoverImpl implements NestedNodeMover {
         String sign = this.getSign(node, parent, mode);
         Long start = this.getStart(node, parent, mode, sign);
         Long stop = this.getStop(node, parent, mode, sign);
-        List nodeIds = this.getNodeIds(node);
+        List<Long> nodeIds = this.getNodeIds(node, nodeClass);
         Long delta = this.getDelta(nodeIds);
         Long nodeDelta = this.getNodeDelta(start, stop);
         String nodeSign = this.getNodeSign(sign);
         Long levelModificator = this.getLevelModificator(node, parent, mode);
-        NestedNode newParent = this.getNewParent(parent, mode);
+        N newParent = this.getNewParent(parent, mode);
 
-        this.makeSpaceForMovedElement(sign, delta, start, stop);
-        this.performMove(nodeSign, nodeDelta, nodeIds, levelModificator);
-        this.updateParentField(newParent, node);
+        this.makeSpaceForMovedElement(sign, delta, start, stop, nodeClass);
+        this.performMove(nodeSign, nodeDelta, nodeIds, levelModificator, nodeClass);
+        this.updateParentField(newParent, node, nodeClass);
 
         this.em.refresh(parent);
         this.em.refresh(node);
@@ -83,65 +89,69 @@ public class NestedNodeMoverImpl implements NestedNodeMover {
         return node;
     }
 
-    protected void makeSpaceForMovedElement(String sign, Long delta, Long start, Long stop) {
-        this.updateLeftFields(sign, delta, start, stop);
-        this.updateRightFields(sign, delta, start, stop);
+    protected void makeSpaceForMovedElement(String sign, Long delta, Long start, Long stop, Class<N> nodeClass) {
+        this.updateFields(sign, delta, start, stop, nodeClass, right(nodeClass));
+        this.updateFields(sign, delta, start, stop, nodeClass, left(nodeClass));
     }
 
-    protected void updateParentField(NestedNode newParent, NestedNode node) {
-        this.em.createQuery("update " + entity(c) + " "
-                + "set " + parent(c) + " = :parent "
-                + "where " + id(c) + " = :id")
-                .setParameter("parent", newParent)
-                .setParameter("id", node.getId())
-                .executeUpdate();
+    protected void updateParentField(NestedNode newParent, NestedNode node, Class<N> nodeClass) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
+        Root<N> root = update.from(nodeClass);
+
+        update.set(root.get(parent(nodeClass)), newParent)
+                .where(cb.equal(root.get(id(nodeClass)), node.getId()));
+
+        em.createQuery(update).executeUpdate();
     }
 
-    protected void performMove(String nodeSign, Long nodeDelta, List nodeIds, Long levelModificator) {
+    protected void performMove(String nodeSign, Long nodeDelta, List nodeIds, Long levelModificator, Class<N> nodeClass) {
         if (!nodeIds.isEmpty()) {
-            this.em.createQuery("update " + entity(c) + " "
-                    + "set " + level(c) + " = " + level(c) + " + :levelModificator, "
-                    + right(c) + " = " + right(c) + " " + nodeSign + ":nodeDelta, "
-                    + left(c) + " = " + left(c) + " " + nodeSign + ":nodeDelta "
-                    + "where " + id(c) + " in :ids")
-                    .setParameter("nodeDelta", nodeDelta)
-                    .setParameter("ids", nodeIds)
-                    .setParameter("levelModificator", levelModificator)
-                    .executeUpdate();
+            CriteriaBuilder cb = em.getCriteriaBuilder();
+            CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
+            Root<N> root = update.from(nodeClass);
+
+            update.set(root.<Long>get(level(nodeClass)), cb.sum(root.<Long>get(level(nodeClass)), levelModificator));
+            if (SIGN_MINUS.equals(nodeSign)) {
+                update.set(root.<Long>get(right(nodeClass)), cb.diff(root.<Long>get(right(nodeClass)), nodeDelta));
+                update.set(root.<Long>get(left(nodeClass)), cb.diff(root.<Long>get(left(nodeClass)), nodeDelta));
+            } else if (SIGN_PLUS.equals(nodeSign)) {
+                update.set(root.<Long>get(right(nodeClass)), cb.sum(root.<Long>get(right(nodeClass)), nodeDelta));
+                update.set(root.<Long>get(left(nodeClass)), cb.sum(root.<Long>get(left(nodeClass)), nodeDelta));
+            }
+            update.where(root.get(id(nodeClass)).in(nodeIds));
+
+            em.createQuery(update).executeUpdate();
         }
     }
 
-    protected void updateRightFields(String sign, Long delta, Long start, Long stop) {
-        this.em.createQuery("update " + entity(c) + " "
-                + "set " + right(c) + " = " + right(c) + " " + sign + ":delta "
-                + "where " + right(c) + " > :start "
-                + "and " + right(c) + " < :stop")
-                .setParameter("delta", delta)
-                .setParameter("start", start)
-                .setParameter("stop", stop)
-                .executeUpdate();
+    protected void updateFields(String sign, Long delta, Long start, Long stop, Class<N> nodeClass, String field) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
+        Root<N> root = update.from(nodeClass);
+
+        if (SIGN_MINUS.equals(sign)) {
+            update.set(root.<Long>get(field), cb.diff(root.<Long>get(field), delta));
+        } else if (SIGN_PLUS.equals(sign)) {
+            update.set(root.<Long>get(field), cb.sum(root.<Long>get(field), delta));
+        }
+        update.where(
+                cb.greaterThan(root.<Long>get(field), start),
+                cb.lessThan(root.<Long>get(field), stop)
+        );
+
+        em.createQuery(update).executeUpdate();
     }
 
-    protected void updateLeftFields(String sign, Long delta, Long start, Long stop) {
-        this.em.createQuery("update " + entity(c) + " "
-                + "set " + left(c) + " = " + left(c) + " " + sign + ":delta where "
-                + left(c) + " > :start "
-                + "and " + left(c) + " < :stop")
-                .setParameter("delta", delta)
-                .setParameter("start", start)
-                .setParameter("stop", stop)
-                .executeUpdate();
-    }
-
-    protected boolean canMoveNodeToSelectedParent(NestedNode node, NestedNode parent) {
+    protected boolean canMoveNodeToSelectedParent(N node, NestedNode parent) {
         return !node.getId().equals(parent.getId()) && (node.getLeft() >= parent.getLeft() || node.getRight() <= parent.getRight());
     }
 
-    protected NestedNode getNewParent(NestedNode parent, int mode) {
+    protected N getNewParent(N parent, int mode) {
         switch (mode) {
             case MODE_NEXT_SIBLING:
             case MODE_PREV_SIBLING:
-                return parent.getParent();
+                return (N) parent.getParent();
             case MODE_FIRST_CHILD:
             case MODE_LAST_CHILD:
             default:
@@ -149,7 +159,7 @@ public class NestedNodeMoverImpl implements NestedNodeMover {
         }
     }
 
-    protected Long getLevelModificator(NestedNode node, NestedNode parent, int mode) {
+    protected Long getLevelModificator(N node, N parent, int mode) {
         switch (mode) {
             case MODE_NEXT_SIBLING:
             case MODE_PREV_SIBLING:
@@ -161,14 +171,15 @@ public class NestedNodeMoverImpl implements NestedNodeMover {
         }
     }
 
-    protected List<Long> getNodeIds(NestedNode node) {
-        List result = this.em.createQuery("select id from " + entity(c) + " "
-                + "where " + left(c) + ">=:lft "
-                + "and " + right(c) + " <=:rgt ")
-                .setParameter("lft", node.getLeft())
-                .setParameter("rgt", node.getRight())
-                .getResultList();
-        return result;
+    protected List<Long> getNodeIds(N node, Class<N> nodeClass) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Long> select = cb.createQuery(Long.class);
+        Root<N> root = select.from(nodeClass);
+        select.select(root.<Long>get(id(nodeClass))).where(
+                cb.greaterThanOrEqualTo(root.<Long>get(left(nodeClass)), node.getLeft()),
+                cb.lessThanOrEqualTo(root.<Long>get(right(nodeClass)), node.getRight())
+        );
+        return em.createQuery(select).getResultList();
     }
 
     protected Long getNodeDelta(Long start, Long stop) {
@@ -183,7 +194,7 @@ public class NestedNodeMoverImpl implements NestedNodeMover {
         return (sign.equals(SIGN_PLUS)) ? SIGN_MINUS : SIGN_PLUS;
     }
 
-    protected String getSign(NestedNode node, NestedNode parent, int mode) {
+    protected String getSign(N node, N parent, int mode) {
         switch (mode) {
             case MODE_PREV_SIBLING:
             case MODE_FIRST_CHILD:
@@ -195,7 +206,7 @@ public class NestedNodeMoverImpl implements NestedNodeMover {
         }
     }
 
-    protected Long getStart(NestedNode node, NestedNode parent, int mode, String sign) {
+    protected Long getStart(N node, N parent, int mode, String sign) {
         switch (mode) {
             case MODE_PREV_SIBLING:
                 return sign.equals(SIGN_PLUS) ? parent.getLeft() - 1 : node.getRight();
@@ -210,7 +221,7 @@ public class NestedNodeMoverImpl implements NestedNodeMover {
         }
     }
 
-    protected Long getStop(NestedNode node, NestedNode parent, int mode, String sign) {
+    protected Long getStop(N node, N parent, int mode, String sign) {
         switch (mode) {
             case MODE_PREV_SIBLING:
                 return sign.equals(SIGN_PLUS) ? node.getLeft() : parent.getLeft();

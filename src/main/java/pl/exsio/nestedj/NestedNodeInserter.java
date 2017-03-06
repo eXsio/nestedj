@@ -26,12 +26,11 @@ package pl.exsio.nestedj;
 import pl.exsio.nestedj.model.NestedNode;
 
 /**
- *
- * @author exsio
  * @param <T>
+ * @author exsio
  */
-public interface NestedNodeInserter<T extends NestedNode> extends NestedNodeHierarchyManipulator<T> {
-    
+public interface NestedNodeInserter<T extends NestedNode> extends NestedNodeHierarchyManipulator {
+
     T insert(T node, T parent, int mode);
-    
+
 }
