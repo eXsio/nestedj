@@ -23,17 +23,19 @@
  */
 package pl.exsio.nestedj.repository;
 
-import java.util.List;
 import org.junit.Test;
-import static org.junit.Assert.*;
 import org.springframework.transaction.annotation.Transactional;
 import pl.exsio.nestedj.FunctionalNestedjTest;
 import pl.exsio.nestedj.ex.InvalidNodesHierarchyException;
 import pl.exsio.nestedj.model.TestNodeImpl;
 import pl.exsio.nestedj.model.Tree;
 
+import java.util.List;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
- *
  * @author exsio
  */
 @Transactional
@@ -44,7 +46,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         try {
 
             this.removeTree();
-            TestNodeImpl x = this.getTestNode("x");
+            TestNodeImpl x = this.createTestNode("x");
             this.em.persist(x);
             this.em.flush();
 
@@ -269,7 +271,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         } catch (InvalidNodesHierarchyException ex) {
         }
     }
-    
+
     @Test
     public void testInsertAsLastChildSameNode() {
         TestNodeImpl b = this.findNode("b");
@@ -279,7 +281,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         } catch (InvalidNodesHierarchyException ex) {
         }
     }
-    
+
     @Test
     public void testInsertAsPrevSiblingSameNode() {
         TestNodeImpl c = this.findNode("c");
@@ -289,7 +291,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         } catch (InvalidNodesHierarchyException ex) {
         }
     }
-    
+
     @Test
     public void testInsertAsFirstChildSameNode() {
         TestNodeImpl d = this.findNode("d");
@@ -614,7 +616,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
     @Test
     public void testInsertAsFirstChildOfInsert() throws InvalidNodesHierarchyException {
 
-        TestNodeImpl i = this.getTestNode("i");
+        TestNodeImpl i = this.createTestNode("i");
         TestNodeImpl e = this.findNode("e");
         i = this.nodeRepository.insertAsFirstChildOf(i, e);
         TestNodeImpl a = this.findNode("a");
@@ -633,7 +635,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
     @Test
     public void testInsertAsLastChildOfInsert() throws InvalidNodesHierarchyException {
 
-        TestNodeImpl j = this.getTestNode("j");
+        TestNodeImpl j = this.createTestNode("j");
         TestNodeImpl b = this.findNode("b");
         j = this.nodeRepository.insertAsLastChildOf(j, b);
         TestNodeImpl a = this.findNode("a");
@@ -652,7 +654,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
     @Test
     public void testInsertAsPrevSiblingOfInsert() throws InvalidNodesHierarchyException {
 
-        TestNodeImpl k = this.getTestNode("k");
+        TestNodeImpl k = this.createTestNode("k");
         TestNodeImpl e = this.findNode("e");
         k = this.nodeRepository.insertAsPrevSiblingOf(k, e);
         TestNodeImpl a = this.findNode("a");
@@ -672,7 +674,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
     @Test
     public void testInsertAsNextSiblingOfInsert() throws InvalidNodesHierarchyException {
 
-        TestNodeImpl m = this.getTestNode("m");
+        TestNodeImpl m = this.createTestNode("m");
         TestNodeImpl h = this.findNode("h");
         m = this.nodeRepository.insertAsNextSiblingOf(m, h);
         TestNodeImpl a = this.findNode("a");
@@ -688,21 +690,177 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         assertTrue(m.getParent().equals(h.getParent()));
     }
 
-    private TestNodeImpl getTestNode(String symbol) {
+    @Test
+    public void testInsertAsNextSiblingOfMoveEdge() throws InvalidNodesHierarchyException {
+        TestNodeImpl h = this.findNode("h");
+        TestNodeImpl c = this.findNode("c");
+        h = this.nodeRepository.insertAsLastChildOf(h, c);
 
-        TestNodeImpl n = new TestNodeImpl();
-        n.setName(symbol);
-        return n;
+        TestNodeImpl a = this.findNode("a");
+        TestNodeImpl b = this.findNode("b");
+        c = this.findNode("c");
+        TestNodeImpl d = this.findNode("d");
+        TestNodeImpl e = this.findNode("e");
+        TestNodeImpl g = this.findNode("g");
+        TestNodeImpl f = this.findNode("f");
+        h = this.findNode("h");
+
+        assertTrue(a.getLeft() == 1);
+        assertTrue(a.getRight() == 16);
+        assertTrue(b.getLeft() == 2);
+        assertTrue(b.getRight() == 7);
+        assertTrue(c.getLeft() == 8);
+        assertTrue(c.getRight() == 15);
+        assertTrue(d.getLeft() == 3);
+        assertTrue(d.getRight() == 4);
+        assertTrue(e.getLeft() == 5);
+        assertTrue(e.getRight() == 6);
+        assertTrue(f.getLeft() == 9);
+        assertTrue(f.getRight() == 10);
+        assertTrue(g.getLeft() == 11);
+        assertTrue(g.getRight() == 12);
+        assertTrue(h.getLeft() == 13);
+        assertTrue(h.getRight() == 14);
+        assertTrue(this.getParent(h) == c);
     }
 
-    private TestNodeImpl getParent(TestNodeImpl f) {
-        this.em.refresh(f);
-        TestNodeImpl parent = this.nodeRepository.getParent(f);
-        if (parent instanceof TestNodeImpl) {
-            this.em.refresh(parent);
-        }
-        return parent;
+    @Test
+    public void testInsertAsNextSiblingOfMoveSecondRoot() throws InvalidNodesHierarchyException {
+
+        TestNodeImpl c = this.findNode("c");
+        TestNodeImpl a = this.findNode("a");
+        c = this.nodeRepository.insertAsNextSiblingOf(c, a);
+
+        a = this.findNode("a");
+        TestNodeImpl b = this.findNode("b");
+        c = this.findNode("c");
+        TestNodeImpl d = this.findNode("d");
+        TestNodeImpl e = this.findNode("e");
+        TestNodeImpl g = this.findNode("g");
+        TestNodeImpl f = this.findNode("f");
+        TestNodeImpl h = this.findNode("h");
+
+        assertTrue(a.getLeft() == 1);
+        assertTrue(a.getRight() == 8);
+        assertTrue(b.getLeft() == 2);
+        assertTrue(b.getRight() == 7);
+        assertTrue(c.getLeft() == 9);
+        assertTrue(c.getRight() == 16);
+        assertTrue(d.getLeft() == 3);
+        assertTrue(d.getRight() == 4);
+        assertTrue(e.getLeft() == 5);
+        assertTrue(e.getRight() == 6);
+        assertTrue(f.getLeft() == 10);
+        assertTrue(f.getRight() == 11);
+        assertTrue(g.getLeft() == 12);
+        assertTrue(g.getRight() == 15);
+        assertTrue(h.getLeft() == 13);
+        assertTrue(h.getRight() == 14);
+        assertTrue(this.getParent(c) == null);
     }
+
+    @Test
+    public void testInsertAsNextSiblingOfInsertSecondRoot() throws InvalidNodesHierarchyException {
+
+        TestNodeImpl i = this.createTestNode("i");
+        TestNodeImpl j = this.createTestNode("j");
+        TestNodeImpl k = this.createTestNode("k");
+        TestNodeImpl a = this.findNode("a");
+        i = this.nodeRepository.insertAsNextSiblingOf(i, a);
+        j = this.nodeRepository.insertAsLastChildOf(j, i);
+        k = this.nodeRepository.insertAsLastChildOf(k, i);
+
+        a = this.findNode("a");
+        TestNodeImpl b = this.findNode("b");
+        TestNodeImpl c = this.findNode("c");
+        TestNodeImpl d = this.findNode("d");
+        TestNodeImpl e = this.findNode("e");
+        TestNodeImpl g = this.findNode("g");
+        TestNodeImpl f = this.findNode("f");
+        TestNodeImpl h = this.findNode("h");
+
+        em.refresh(i);
+        em.refresh(j);
+        em.refresh(k);
+        printNode("i", i);
+        printNode("j", j);
+        printNode("k", k);
+
+        assertTrue(a.getLeft() == 1);
+        assertTrue(a.getRight() == 16);
+        assertTrue(b.getLeft() == 2);
+        assertTrue(b.getRight() == 7);
+        assertTrue(c.getLeft() == 8);
+        assertTrue(c.getRight() == 15);
+        assertTrue(d.getLeft() == 3);
+        assertTrue(d.getRight() == 4);
+        assertTrue(e.getLeft() == 5);
+        assertTrue(e.getRight() == 6);
+        assertTrue(f.getLeft() == 9);
+        assertTrue(f.getRight() == 10);
+        assertTrue(g.getLeft() == 11);
+        assertTrue(g.getRight() == 14);
+        assertTrue(h.getLeft() == 12);
+        assertTrue(h.getRight() == 13);
+
+        assertTrue(i.getLeft() == 17);
+        assertTrue(i.getRight() == 22);
+        assertTrue(j.getLeft() == 18);
+        assertTrue(j.getRight() == 19);
+        assertTrue(k.getLeft() == 20);
+        assertTrue(k.getRight() == 21);
+
+        assertTrue(this.getParent(i) == null);
+        assertTrue(this.getParent(j) == i);
+        assertTrue(this.getParent(k) == i);
+    }
+
+    @Test
+    public void testRebuildWithSecondRoot() throws InvalidNodesHierarchyException {
+
+        TestNodeImpl i = this.createTestNode("i");
+        TestNodeImpl j = this.createTestNode("j");
+        TestNodeImpl k = this.createTestNode("k");
+        TestNodeImpl a = this.findNode("a");
+        i = this.nodeRepository.insertAsNextSiblingOf(i, a);
+        j = this.nodeRepository.insertAsLastChildOf(j, i);
+        k = this.nodeRepository.insertAsLastChildOf(k, i);
+
+        this.em.createQuery("update TestNodeImpl set lft = 0, rgt = 0, lvl = 0").executeUpdate();
+        em.flush();
+        em.clear();
+        this.nodeRepository.rebuildTree(TestNodeImpl.class);
+
+        a = this.findNode("a");
+        TestNodeImpl b = this.findNode("b");
+        TestNodeImpl c = this.findNode("c");
+        TestNodeImpl d = this.findNode("d");
+        TestNodeImpl e = this.findNode("e");
+        TestNodeImpl g = this.findNode("g");
+        TestNodeImpl f = this.findNode("f");
+        TestNodeImpl h = this.findNode("h");
+
+        i = em.find(TestNodeImpl.class, i.getId());
+        j = em.find(TestNodeImpl.class, j.getId());
+        k = em.find(TestNodeImpl.class, k.getId());
+
+        printNode("i", i);
+        printNode("j", j);
+        printNode("k", k);
+
+        assertTrue(this.getParent(a) == null);
+        assertTrue(this.getParent(b) == a);
+        assertTrue(this.getParent(c) == a);
+        assertTrue(this.getParent(d) == b);
+        assertTrue(this.getParent(e) == b);
+        assertTrue(this.getParent(f) == c);
+        assertTrue(this.getParent(g) == c);
+        assertTrue(this.getParent(h) == g);
+        assertTrue(this.getParent(i) == null);
+        assertTrue(this.getParent(j) == i);
+        assertTrue(this.getParent(k) == i);
+    }
+
 
     private void breakTree() {
 

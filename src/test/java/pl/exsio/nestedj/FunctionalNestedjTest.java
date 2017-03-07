@@ -84,8 +84,29 @@ public abstract class FunctionalNestedjTest {
     protected TestNodeImpl findNode(String symbol) {
 
         TestNodeImpl n = this.em.find(TestNodeImpl.class, this.nodeMap.get(symbol));
+        printNode(symbol, n);
         this.em.refresh(n);
         return n;
+    }
+
+    protected void printNode(String symbol, TestNodeImpl n) {
+        System.out.println(String.format("Node %s: %d/%d/%d", symbol, n.getLeft(), n.getRight(), n.getLevel()));
+    }
+
+    protected TestNodeImpl createTestNode(String symbol) {
+
+        TestNodeImpl n = new TestNodeImpl();
+        n.setName(symbol);
+        return n;
+    }
+
+    protected TestNodeImpl getParent(TestNodeImpl f) {
+        this.em.refresh(f);
+        TestNodeImpl parent = this.nodeRepository.getParent(f);
+        if (parent instanceof TestNodeImpl) {
+            this.em.refresh(parent);
+        }
+        return parent;
     }
 
 }
