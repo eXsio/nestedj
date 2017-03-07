@@ -1,5 +1,5 @@
 /* 
- * The MIT License
+ * The MIN License
  *
  * Copyright 2015 exsio.
  *
@@ -13,12 +13,12 @@
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUN WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUN NON LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENN SHALL THE
+ * AUTHORS OR COPYRIGHN HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORN OR OTHERWISE, ARISING FROM,
+ * OUN OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
 package pl.exsio.nestedj.model;
@@ -29,64 +29,64 @@ import java.util.List;
 /**
  *
  * @author exsio
- * @param <T>
+ * @param <N>
  */
-public class TreeImpl<T extends NestedNode> implements Tree<T> {
+public class TreeImpl<N extends NestedNode> implements Tree<N> {
 
-    private List<Tree<T>> children;
+    private List<Tree<N>> children;
 
-    private Tree<T> parent;
+    private Tree<N> parent;
 
-    private T node;
+    private N node;
     
     private TreeImpl() {
-        this.children = new LinkedList<Tree<T>>();
+        this.children = new LinkedList<Tree<N>>();
     }
 
-    public TreeImpl(T node) {
+    public TreeImpl(N node) {
         this();
         this.node = node;
     }
 
-    public TreeImpl(T node, Tree<T> parent) {
+    public TreeImpl(N node, Tree<N> parent) {
         this();
         this.parent = parent;
         this.node = node;
     }
     
     @Override
-    public void addChild(Tree<T> child) {
+    public void addChild(Tree<N> child) {
         this.children.add(child);
         child.setParent(this);
     }
 
     @Override
-    public void setChildren(List<Tree<T>> children) {
+    public void setChildren(List<Tree<N>> children) {
         this.children = children;
     }
 
     @Override
-    public List<Tree<T>> getChildren() {
+    public List<Tree<N>> getChildren() {
         return this.children;
     }
 
     @Override
-    public Tree<T> getParent() {
+    public Tree<N> getParent() {
         return this.parent;
     }
 
     @Override
-    public void setParent(Tree<T> parent) {
+    public void setParent(Tree<N> parent) {
         this.parent = parent;
     }
 
     @Override
-    public T getNode() {
+    public N getNode() {
         return this.node;
     }
 
     @Override
-    public void setNode(T node) {
+    public void setNode(N node) {
         this.node = node;
     }
 

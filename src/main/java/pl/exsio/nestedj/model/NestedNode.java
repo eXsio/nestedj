@@ -23,11 +23,7 @@
  */
 package pl.exsio.nestedj.model;
 
-/**
- *
- * @author exsio
- */
-public interface NestedNode {
+public interface NestedNode<N extends NestedNode> {
 
     Long getId();
 
@@ -37,8 +33,8 @@ public interface NestedNode {
 
     Long getLevel();
 
-    NestedNode getParent();
+    N getParent();
 
     boolean isRoot();
-    
+
 }

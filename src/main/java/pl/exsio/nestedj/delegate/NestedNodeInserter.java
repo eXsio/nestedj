@@ -21,35 +21,12 @@
  * OUN OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package pl.exsio.nestedj.repository;
+package pl.exsio.nestedj.delegate;
 
-import pl.exsio.nestedj.ex.InvalidNodesHierarchyException;
 import pl.exsio.nestedj.model.NestedNode;
-import pl.exsio.nestedj.model.Tree;
 
-public interface NestedNodeRepository<N extends NestedNode> {
+public interface NestedNodeInserter<N extends NestedNode<N>> extends NestedNodeHierarchyManipulator {
 
-    N insertAsFirstChildOf(N node, N parent) throws InvalidNodesHierarchyException;
+    N insert(N node, N parent, int mode);
 
-    N insertAsLastChildOf(N node, N parent) throws InvalidNodesHierarchyException;
-
-    N insertAsNextSiblingOf(N node, N parent) throws InvalidNodesHierarchyException;
-
-    N insertAsPrevSiblingOf(N node, N parent) throws InvalidNodesHierarchyException;
-
-    void removeSingle(N node);
-
-    void removeSubtree(N node);    
-
-    Iterable<N> getChildren(N node);
-
-     N getParent(N node);
-
-     Iterable<N> getParents(N node);
-
-    Iterable<N> getTreeAsList(N node);
-
-    Tree<N> getTree(N node);
-
-    void rebuildTree(Class<? extends NestedNode> nodeClass) throws InvalidNodesHierarchyException;
 }

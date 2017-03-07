@@ -21,9 +21,9 @@
  * OUN OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package pl.exsio.nestedj.inserter;
+package pl.exsio.nestedj.delegate;
 
-import pl.exsio.nestedj.NestedNodeInserter;
+import pl.exsio.nestedj.discriminator.TreeDiscriminator;
 import pl.exsio.nestedj.model.NestedNode;
 
 import javax.persistence.EntityManager;
@@ -39,15 +39,17 @@ import static pl.exsio.nestedj.util.NestedNodeUtil.level;
 import static pl.exsio.nestedj.util.NestedNodeUtil.parent;
 import static pl.exsio.nestedj.util.NestedNodeUtil.right;
 
-public class NestedNodeInserterImpl<N extends NestedNode> implements NestedNodeInserter<N> {
+public class NestedNodeInserterImpl<N extends NestedNode<N>> extends NestedNodeDelegate<N> implements NestedNodeInserter<N> {
 
     @PersistenceContext
-    protected EntityManager em;
+    private EntityManager em;
 
-    public NestedNodeInserterImpl() {
+    public NestedNodeInserterImpl(TreeDiscriminator<N> treeDiscriminator) {
+        super(treeDiscriminator);
     }
 
-    public NestedNodeInserterImpl(EntityManager em) {
+    public NestedNodeInserterImpl(EntityManager em, TreeDiscriminator<N> treeDiscriminator) {
+        super(treeDiscriminator);
         this.em = em;
     }
 
@@ -55,7 +57,7 @@ public class NestedNodeInserterImpl<N extends NestedNode> implements NestedNodeI
     @Transactional
     public N insert(N node, N parent, int mode) {
         this.em.refresh(parent);
-        Class<N> nodeClass = (Class<N>) node.getClass();
+        Class<N> nodeClass = getNodeClass(node);
         this.makeSpaceForNewElement(parent.getRight(), mode, nodeClass);
         this.insertNodeIntoTable(node);
         this.insertNodeIntoTree(parent, node, mode, nodeClass);
@@ -63,12 +65,12 @@ public class NestedNodeInserterImpl<N extends NestedNode> implements NestedNodeI
         return node;
     }
 
-    protected void insertNodeIntoTable(N node) {
+    private void insertNodeIntoTable(N node) {
         this.em.persist(node);
         this.em.flush();
     }
 
-    protected void insertNodeIntoTree(N parent, N node, int mode, Class<N> nodeClass) {
+    private void insertNodeIntoTree(N parent, N node, int mode, Class<N> nodeClass) {
         Long left = this.getNodeLeft(parent, mode);
         Long right = left + 1;
         Long level = this.getNodeLevel(parent, mode);
@@ -76,19 +78,38 @@ public class NestedNodeInserterImpl<N extends NestedNode> implements NestedNodeI
 
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
-        Root<N> from = update.from(nodeClass);
+        Root<N> root = update.from(nodeClass);
 
         update
-                .set(from.get(parent(nodeClass)), nodeParent)
-                .set(from.get(left(nodeClass)), left)
-                .set(from.get(right(nodeClass)), right)
-                .set(from.get(level(nodeClass)), level)
-                .where(cb.equal(from.get(id(nodeClass)), node.getId()));
+                .set(root.get(parent(nodeClass)), nodeParent)
+                .set(root.get(left(nodeClass)), left)
+                .set(root.get(right(nodeClass)), right)
+                .set(root.get(level(nodeClass)), level)
+                .where(getPredicates(cb, root, cb.equal(root.get(id(nodeClass)), node.getId())));
 
         em.createQuery(update).executeUpdate();
     }
 
-    protected Long getNodeLevel(NestedNode parent, int mode) {
+    private void makeSpaceForNewElement(Long from, int mode, Class<N> nodeClass) {
+        this.updateFields(from, mode, nodeClass, right(nodeClass));
+        this.updateFields(from, mode, nodeClass, left(nodeClass));
+    }
+
+    private void updateFields(Long from, int mode, Class<N> nodeClass, String fieldName) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
+        Root<N> root = update.from(nodeClass);
+
+        update.set(root.<Long>get(fieldName), cb.sum(root.<Long>get(fieldName), 2L));
+        if (isGte(mode)) {
+            update.where(getPredicates(cb, root, cb.greaterThanOrEqualTo(root.<Long>get(fieldName), from)));
+        } else {
+            update.where(getPredicates(cb, root, cb.greaterThan(root.<Long>get(fieldName), from)));
+        }
+        em.createQuery(update).executeUpdate();
+    }
+
+    private Long getNodeLevel(N parent, int mode) {
         switch (mode) {
             case MODE_NEXT_SIBLING:
             case MODE_PREV_SIBLING:
@@ -100,7 +121,7 @@ public class NestedNodeInserterImpl<N extends NestedNode> implements NestedNodeI
         }
     }
 
-    protected NestedNode getNodeParent(NestedNode parent, int mode) {
+    private N getNodeParent(N parent, int mode) {
         switch (mode) {
             case MODE_NEXT_SIBLING:
             case MODE_PREV_SIBLING:
@@ -112,7 +133,7 @@ public class NestedNodeInserterImpl<N extends NestedNode> implements NestedNodeI
         }
     }
 
-    protected Long getNodeLeft(NestedNode parent, int mode) {
+    private Long getNodeLeft(N parent, int mode) {
         switch (mode) {
             case MODE_NEXT_SIBLING:
                 return parent.getRight() + 1;
@@ -126,12 +147,7 @@ public class NestedNodeInserterImpl<N extends NestedNode> implements NestedNodeI
         }
     }
 
-    protected void makeSpaceForNewElement(Long from, int mode, Class<N> nodeClass) {
-        this.updateFields(from, mode, nodeClass, right(nodeClass));
-        this.updateFields(from, mode, nodeClass, left(nodeClass));
-    }
-
-    protected boolean isGte(int mode) {
+    private boolean isGte(int mode) {
         switch (mode) {
             case MODE_NEXT_SIBLING:
             case MODE_FIRST_CHILD:
@@ -141,20 +157,6 @@ public class NestedNodeInserterImpl<N extends NestedNode> implements NestedNodeI
             default:
                 return true;
         }
-    }
-
-    protected void updateFields(Long from, int mode, Class<N> nodeClass, String fieldName) {
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
-        Root<N> root = update.from(nodeClass);
-
-        update.set(root.<Long>get(fieldName), cb.sum(root.<Long>get(fieldName), 2L));
-        if (isGte(mode)) {
-            update.where(cb.greaterThanOrEqualTo(root.<Long>get(fieldName), from));
-        } else {
-            update.where(cb.greaterThan(root.<Long>get(fieldName), from));
-        }
-        em.createQuery(update).executeUpdate();
     }
 
     public void setEntityManager(EntityManager em) {

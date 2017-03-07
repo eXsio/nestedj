@@ -23,6 +23,11 @@
  */
 package pl.exsio.nestedj.model;
 
+import pl.exsio.nestedj.annotation.LeftColumn;
+import pl.exsio.nestedj.annotation.LevelColumn;
+import pl.exsio.nestedj.annotation.ParentColumn;
+import pl.exsio.nestedj.annotation.RightColumn;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -34,10 +39,6 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import pl.exsio.nestedj.annotation.LeftColumn;
-import pl.exsio.nestedj.annotation.LevelColumn;
-import pl.exsio.nestedj.annotation.ParentColumn;
-import pl.exsio.nestedj.annotation.RightColumn;
 
 /**
  *
@@ -46,7 +47,7 @@ import pl.exsio.nestedj.annotation.RightColumn;
 @Entity
 @Table(name = "nested_nodes")
 @Inheritance(strategy = InheritanceType.JOINED)
-public class TestNodeImpl extends DummyObject implements NestedNode {
+public class TestNodeImpl extends DummyObject implements NestedNode<TestNodeImpl> {
            
     /**
      *

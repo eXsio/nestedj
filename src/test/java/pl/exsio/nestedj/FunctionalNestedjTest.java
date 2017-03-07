@@ -23,16 +23,17 @@
  */
 package pl.exsio.nestedj;
 
-import java.util.HashMap;
-import java.util.Map;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import pl.exsio.nestedj.model.TestNodeImpl;
-import pl.exsio.nestedj.repository.NestedNodeRepository;
+import pl.exsio.nestedj.repository.NestedNodeRepositoryImpl;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -43,7 +44,7 @@ import pl.exsio.nestedj.repository.NestedNodeRepository;
 public abstract class FunctionalNestedjTest {
 
     @Autowired
-    protected NestedNodeRepository<TestNodeImpl> nodeRepository;
+    protected NestedNodeRepositoryImpl<TestNodeImpl> nodeRepository;
 
     @PersistenceContext
     protected EntityManager em;

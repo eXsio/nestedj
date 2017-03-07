@@ -21,11 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package pl.exsio.nestedj.rebuilder;
+package pl.exsio.nestedj.delegate;
 
-import pl.exsio.nestedj.NestedNodeInserter;
-import pl.exsio.nestedj.NestedNodeMover;
-import pl.exsio.nestedj.NestedNodeRebuilder;
+import pl.exsio.nestedj.discriminator.TreeDiscriminator;
 import pl.exsio.nestedj.ex.InvalidNodesHierarchyException;
 import pl.exsio.nestedj.model.NestedNode;
 
@@ -43,26 +41,30 @@ import static pl.exsio.nestedj.util.NestedNodeUtil.left;
 import static pl.exsio.nestedj.util.NestedNodeUtil.parent;
 import static pl.exsio.nestedj.util.NestedNodeUtil.right;
 
-public class NestedNodeRebuilderImpl<N extends NestedNode> implements NestedNodeRebuilder<N> {
+public class NestedNodeRebuilderImpl<N extends NestedNode<N>> extends NestedNodeDelegate<N> implements NestedNodeRebuilder<N> {
 
     @PersistenceContext
-    protected EntityManager em;
+    private EntityManager em;
 
-    protected NestedNodeInserter<N> inserter;
+    private NestedNodeInserter<N> inserter;
 
-    public NestedNodeRebuilderImpl() {
+    public NestedNodeRebuilderImpl(TreeDiscriminator<N> treeDiscriminator) {
+        super(treeDiscriminator);
     }
 
-    public NestedNodeRebuilderImpl(NestedNodeInserter<N> inserter) {
+    public NestedNodeRebuilderImpl(TreeDiscriminator<N> treeDiscriminator, NestedNodeInserter<N> inserter) {
+        super(treeDiscriminator);
         this.inserter = inserter;
     }
 
-    public NestedNodeRebuilderImpl(EntityManager em, NestedNodeInserter<N> inserter) {
+    public NestedNodeRebuilderImpl(EntityManager em, TreeDiscriminator<N> treeDiscriminator, NestedNodeInserter<N> inserter) {
+        super(treeDiscriminator);
         this.em = em;
         this.inserter = inserter;
     }
 
-    public NestedNodeRebuilderImpl(EntityManager em) {
+    public NestedNodeRebuilderImpl(EntityManager em, TreeDiscriminator<N> treeDiscriminator) {
+        super(treeDiscriminator);
         this.em = em;
     }
 
@@ -83,52 +85,52 @@ public class NestedNodeRebuilderImpl<N extends NestedNode> implements NestedNode
         this.em.refresh(first);
     }
 
-    protected void rebuildRecursively(N parent, Class<N> nodeClass) throws InvalidNodesHierarchyException {
+    private void rebuildRecursively(N parent, Class<N> nodeClass) throws InvalidNodesHierarchyException {
         for (N child : this.getChildren(parent, nodeClass)) {
             this.inserter.insert(child, parent, NestedNodeMover.MODE_LAST_CHILD);
             this.rebuildRecursively(child, nodeClass);
         }
     }
 
-    protected N findFirstNestedNode(Class<N> nodeClass) {
+    private N findFirstNestedNode(Class<N> nodeClass) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<N> select = cb.createQuery(nodeClass);
-        Root<N> from = select.from(nodeClass);
-        select.where(cb.isNull(from.get(parent(nodeClass))));
+        Root<N> root = select.from(nodeClass);
+        select.where(getPredicates(cb, root, cb.isNull(root.get(parent(nodeClass)))));
         return em.createQuery(select).setMaxResults(1).getSingleResult();
     }
 
-    protected void resetFirst(N first, Class<N> nodeClass) {
+    private void resetFirst(N first, Class<N> nodeClass) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
-        Root<N> from = update.from(nodeClass);
-        update.set(from.get(left(nodeClass)), 1).set(from.get(right(nodeClass)), 2)
-                .where(cb.equal(update.getRoot().get(id(nodeClass)), first.getId()));
+        Root<N> root = update.from(nodeClass);
+        update.set(root.get(left(nodeClass)), 1).set(root.get(right(nodeClass)), 2)
+                .where(getPredicates(cb, root, cb.equal(update.getRoot().get(id(nodeClass)), first.getId())));
         em.createQuery(update).executeUpdate();
     }
 
-    protected List<N> getSiblings(N first, Class<N> nodeClass) {
+    private List<N> getSiblings(N first, Class<N> nodeClass) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<N> select = cb.createQuery(nodeClass);
-        Root<N> from = select.from(nodeClass);
-        select.where(
-                cb.isNull(from.get(parent(nodeClass))),
-                cb.notEqual(from.get(id(nodeClass)), first.getId())
-        ).orderBy(cb.desc(from.get(id(nodeClass))));
+        Root<N> root = select.from(nodeClass);
+        select.where(getPredicates(cb, root,
+                cb.isNull(root.get(parent(nodeClass))),
+                cb.notEqual(root.get(id(nodeClass)), first.getId())
+        )).orderBy(cb.desc(root.get(id(nodeClass))));
         return em.createQuery(select).getResultList();
     }
 
-    protected void restoreSiblings(N first, Class<N> nodeClass) throws InvalidNodesHierarchyException {
+    private void restoreSiblings(N first, Class<N> nodeClass) throws InvalidNodesHierarchyException {
         for (N node : this.getSiblings(first, nodeClass)) {
             this.inserter.insert(node, first, NestedNodeMover.MODE_NEXT_SIBLING);
         }
     }
 
-    protected List<N> getChildren(N parent, Class<N> nodeClass) {
+    private List<N> getChildren(N parent, Class<N> nodeClass) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<N> select = cb.createQuery(nodeClass);
-        Root<N> from = select.from(nodeClass);
-        select.where(cb.equal(from.get(parent(nodeClass)), parent)).orderBy(cb.desc(from.get(id(nodeClass))));
+        Root<N> root = select.from(nodeClass);
+        select.where(getPredicates(cb, root, cb.equal(root.get(parent(nodeClass)), parent))).orderBy(cb.desc(root.get(id(nodeClass))));
         return em.createQuery(select).getResultList();
     }
 
