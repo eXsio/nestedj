@@ -87,7 +87,7 @@ public class NestedNodeRebuilderImpl<N extends NestedNode<N>> extends NestedNode
 
     private void rebuildRecursively(N parent, Class<N> nodeClass) throws InvalidNodesHierarchyException {
         for (N child : this.getChildren(parent, nodeClass)) {
-            this.inserter.insert(child, parent, NestedNodeMover.MODE_LAST_CHILD);
+            this.inserter.insert(child, parent, NestedNodeMover.Mode.LAST_CHILD);
             this.rebuildRecursively(child, nodeClass);
         }
     }
@@ -122,7 +122,7 @@ public class NestedNodeRebuilderImpl<N extends NestedNode<N>> extends NestedNode
 
     private void restoreSiblings(N first, Class<N> nodeClass) throws InvalidNodesHierarchyException {
         for (N node : this.getSiblings(first, nodeClass)) {
-            this.inserter.insert(node, first, NestedNodeMover.MODE_NEXT_SIBLING);
+            this.inserter.insert(node, first, NestedNodeMover.Mode.NEXT_SIBLING);
         }
     }
 

@@ -28,11 +28,7 @@ package pl.exsio.nestedj.config;
  * @author exsio
  */
 public interface NestedNodeConfig {
-    
-    String getEntityName();
-    
-    void setEntityName(String name);
-    
+
     String getRightFieldName();
     
     void setRightFieldName(String name);

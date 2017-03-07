@@ -24,12 +24,9 @@
 package pl.exsio.nestedj.config;
 
 /**
- *
  * @author exsio
  */
 public class NestedNodeConfigImpl implements NestedNodeConfig {
-
-    protected String entityName;
 
     protected String rightFieldName;
 
@@ -40,16 +37,6 @@ public class NestedNodeConfigImpl implements NestedNodeConfig {
     protected String parentFieldName;
 
     protected String idFieldName;
-
-    @Override
-    public String getEntityName() {
-        return entityName;
-    }
-
-    @Override
-    public void setEntityName(String entityName) {
-        this.entityName = entityName;
-    }
 
     @Override
     public String getRightFieldName() {

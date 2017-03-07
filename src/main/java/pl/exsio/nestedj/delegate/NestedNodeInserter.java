@@ -27,6 +27,6 @@ import pl.exsio.nestedj.model.NestedNode;
 
 public interface NestedNodeInserter<N extends NestedNode<N>> extends NestedNodeHierarchyManipulator {
 
-    N insert(N node, N parent, int mode);
+    N insert(N node, N parent, Mode mode);
 
 }

@@ -28,12 +28,10 @@ package pl.exsio.nestedj.delegate;
  */
 public interface NestedNodeHierarchyManipulator {
 
-    int MODE_FIRST_CHILD = 0;
-
-    int MODE_LAST_CHILD = 1;
-
-    int MODE_NEXT_SIBLING = 2;
-
-    int MODE_PREV_SIBLING = 3;
-
+    enum Mode {
+        FIRST_CHILD,
+        LAST_CHILD,
+        NEXT_SIBLING,
+        PREV_SIBLING
+    }
 }

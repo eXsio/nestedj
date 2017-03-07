@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class TreeDiscriminatorImpl<N extends NestedNode<N>> implements TreeDiscriminator<N> {
 
-    private final Map<String, ValueProvider> valueProviders;
+    private Map<String, ValueProvider> valueProviders;
 
     public TreeDiscriminatorImpl(Map<String, ValueProvider> valueProviders) {
         this.valueProviders = valueProviders;
@@ -20,6 +20,10 @@ public class TreeDiscriminatorImpl<N extends NestedNode<N>> implements TreeDiscr
 
     public TreeDiscriminatorImpl() {
         this.valueProviders = new HashMap<>();
+    }
+
+    public void setValueProviders(Map<String, ValueProvider> valueProviders) {
+        this.valueProviders = valueProviders;
     }
 
     @Override

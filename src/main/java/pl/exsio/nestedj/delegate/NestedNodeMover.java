@@ -28,5 +28,5 @@ import pl.exsio.nestedj.model.NestedNode;
 
 public interface NestedNodeMover<N extends NestedNode<N>> extends NestedNodeHierarchyManipulator {
 
-    N move(N node, N parent, int mode) throws InvalidNodesHierarchyException;
+    N move(N node, N parent, Mode mode) throws InvalidNodesHierarchyException;
 }

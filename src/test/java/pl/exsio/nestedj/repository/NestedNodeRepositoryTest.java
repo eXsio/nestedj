@@ -61,6 +61,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         } catch (InvalidNodesHierarchyException ex) {
             fail("something went wrong:" + ex.getMessage());
         }
+        assertSecondTreeIntact();
     }
 
     @Test
@@ -106,6 +107,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         } catch (InvalidNodesHierarchyException ex) {
             fail("something went wrong:" + ex.getMessage());
         }
+        assertSecondTreeIntact();
     }
 
     @Test
@@ -117,6 +119,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
             fail("this action should have triggered an exception");
         } catch (InvalidNodesHierarchyException ex) {
         }
+        assertSecondTreeIntact();
     }
 
     @Test
@@ -128,6 +131,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
             fail("this action should have triggered an exception");
         } catch (InvalidNodesHierarchyException ex) {
         }
+        assertSecondTreeIntact();
     }
 
     @Test
@@ -138,6 +142,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         assertTrue(parents.get(0).getName().equals("g"));
         assertTrue(parents.get(1).getName().equals("c"));
         assertTrue(parents.get(2).getName().equals("a"));
+        assertSecondTreeIntact();
     }
 
     @Test
@@ -151,12 +156,14 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         assertTrue(tree.getChildren().get(1).getChildren().get(1).getChildren().size() == 1);
         assertTrue(tree.getChildren().get(1).getChildren().get(0).getChildren().isEmpty());
         assertTrue(tree.getChildren().get(0).getChildren().get(0).getChildren().isEmpty());
+        assertSecondTreeIntact();
     }
 
     @Test
     public void testGetTreeAsList() {
         List<TestNodeImpl> list = (List<TestNodeImpl>) this.nodeRepository.getTreeAsList(this.findNode("a"));
         assertTrue(list.size() == 8);
+        assertSecondTreeIntact();
     }
 
     @Test
@@ -165,6 +172,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         TestNodeImpl parent = this.nodeRepository.getParent(b);
         assertTrue(parent instanceof TestNodeImpl);
         assertTrue(parent.getName().equals("a"));
+        assertSecondTreeIntact();
     }
 
     @Test
@@ -190,6 +198,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         assertTrue(c.getRight() == 13);
         assertTrue(g.getLeft() == 9);
         assertTrue(g.getRight() == 12);
+        assertSecondTreeIntact();
 
     }
 
@@ -211,6 +220,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         assertTrue(c.getRight() == 9);
         assertTrue(g.getLeft() == 5);
         assertTrue(g.getRight() == 8);
+        assertSecondTreeIntact();
 
     }
 
@@ -240,6 +250,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         assertTrue(g.getRight() == 12);
         assertTrue(d.getLevel() == 1);
         assertTrue(e.getLevel() == 1);
+        assertSecondTreeIntact();
     }
 
     @Test
@@ -259,6 +270,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         assertTrue(c.getRight() == 13);
         assertTrue(g.getLeft() == 9);
         assertTrue(g.getRight() == 12);
+        assertSecondTreeIntact();
 
     }
 
@@ -270,6 +282,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
             fail("this action should have triggered an exception");
         } catch (InvalidNodesHierarchyException ex) {
         }
+        assertSecondTreeIntact();
     }
 
     @Test
@@ -280,6 +293,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
             fail("this action should have triggered an exception");
         } catch (InvalidNodesHierarchyException ex) {
         }
+        assertSecondTreeIntact();
     }
 
     @Test
@@ -290,6 +304,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
             fail("this action should have triggered an exception");
         } catch (InvalidNodesHierarchyException ex) {
         }
+        assertSecondTreeIntact();
     }
 
     @Test
@@ -300,6 +315,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
             fail("this action should have triggered an exception");
         } catch (InvalidNodesHierarchyException ex) {
         }
+        assertSecondTreeIntact();
     }
 
     @Test
@@ -322,6 +338,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         assertTrue(b.getLevel() == 1);
         assertTrue(d.getLevel() == 2);
         assertTrue(this.getParent(b) == a);
+        assertSecondTreeIntact();
     }
 
     @Test
@@ -344,6 +361,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         assertTrue(g.getLevel() == 2);
         assertTrue(c.getLevel() == 1);
         assertTrue(this.getParent(c) == a);
+        assertSecondTreeIntact();
     }
 
     @Test
@@ -367,6 +385,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         assertTrue(d.getLevel() == 1);
         assertTrue(e.getLevel() == 1);
         assertTrue(this.getParent(b) == null);
+        assertSecondTreeIntact();
     }
 
     @Test
@@ -392,6 +411,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         assertTrue(g.getLevel() == 1);
         assertTrue(h.getLevel() == 2);
         assertTrue(this.getParent(c) == null);
+        assertSecondTreeIntact();
     }
 
     @Test
@@ -422,6 +442,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         assertTrue(d.getLevel() == 2);
 
         assertTrue(this.getParent(d) == c);
+        assertSecondTreeIntact();
     }
 
     @Test
@@ -447,6 +468,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         assertTrue(g.getLevel() == 2);
         assertTrue(h.getLevel() == 3);
         assertTrue(this.getParent(g) == b);
+        assertSecondTreeIntact();
     }
 
     @Test
@@ -476,6 +498,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         assertTrue(a.getRight() == 16);
         assertTrue(d.getLevel() == 2);
         assertTrue(this.getParent(d) == c);
+        assertSecondTreeIntact();
     }
 
     @Test
@@ -502,6 +525,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         assertTrue(g.getLevel() == 2);
         assertTrue(h.getLevel() == 3);
         assertTrue(this.getParent(g) == b);
+        assertSecondTreeIntact();
     }
 
     @Test
@@ -528,6 +552,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         assertTrue(g.getLevel() == 2);
         assertTrue(h.getLevel() == 3);
         assertTrue(this.getParent(g) == b);
+        assertSecondTreeIntact();
     }
 
     @Test
@@ -555,6 +580,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         assertTrue(a.getRight() == 16);
         assertTrue(d.getLevel() == 3);
         assertTrue(this.getParent(d) == g);
+        assertSecondTreeIntact();
     }
 
     @Test
@@ -582,6 +608,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         assertTrue(a.getRight() == 16);
         assertTrue(d.getLevel() == 3);
         assertTrue(this.getParent(d) == g);
+        assertSecondTreeIntact();
     }
 
     @Test
@@ -604,6 +631,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         assertTrue(g.getLevel() == 2);
         assertTrue(h.getLevel() == 3);
         assertTrue(this.getParent(g) == b);
+        assertSecondTreeIntact();
     }
 
     @Test
@@ -611,6 +639,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
 
         List result = (List) this.nodeRepository.getChildren(this.findNode("a"));
         assertTrue(result.size() == 2);
+        assertSecondTreeIntact();
     }
 
     @Test
@@ -630,6 +659,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         assertTrue(h.getLeft() == 14);
         assertTrue(h.getRight() == 15);
         assertTrue(i.getLevel().equals(e.getLevel() + 1));
+        assertSecondTreeIntact();
     }
 
     @Test
@@ -649,6 +679,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         assertTrue(h.getRight() == 15);
         assertTrue(c.getLeft() == 10);
         assertTrue(j.getLevel().equals(b.getLevel() + 1));
+        assertSecondTreeIntact();
     }
 
     @Test
@@ -669,6 +700,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         assertTrue(c.getLeft() == 10);
         assertTrue(k.getLevel().equals(e.getLevel()));
         assertTrue(k.getParent().equals(e.getParent()));
+        assertSecondTreeIntact();
     }
 
     @Test
@@ -688,6 +720,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         assertTrue(c.getRight() == 17);
         assertTrue(m.getLevel().equals(h.getLevel()));
         assertTrue(m.getParent().equals(h.getParent()));
+        assertSecondTreeIntact();
     }
 
     @Test
@@ -722,6 +755,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         assertTrue(h.getLeft() == 13);
         assertTrue(h.getRight() == 14);
         assertTrue(this.getParent(h) == c);
+        assertSecondTreeIntact();
     }
 
     @Test
@@ -757,6 +791,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         assertTrue(h.getLeft() == 13);
         assertTrue(h.getRight() == 14);
         assertTrue(this.getParent(c) == null);
+        assertSecondTreeIntact();
     }
 
     @Test
@@ -813,6 +848,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         assertTrue(this.getParent(i) == null);
         assertTrue(this.getParent(j) == i);
         assertTrue(this.getParent(k) == i);
+        assertSecondTreeIntact();
     }
 
     @Test
@@ -826,7 +862,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         j = this.nodeRepository.insertAsLastChildOf(j, i);
         k = this.nodeRepository.insertAsLastChildOf(k, i);
 
-        this.em.createQuery("update TestNodeImpl set lft = 0, rgt = 0, lvl = 0").executeUpdate();
+        this.em.createQuery("update TestNodeImpl set lft = 0, rgt = 0, lvl = 0 where discriminator = 'tree_1'").executeUpdate();
         em.flush();
         em.clear();
         this.nodeRepository.rebuildTree(TestNodeImpl.class);
@@ -859,18 +895,57 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         assertTrue(this.getParent(i) == null);
         assertTrue(this.getParent(j) == i);
         assertTrue(this.getParent(k) == i);
+
+        assertSecondTreeIntact();
     }
 
+    private void assertSecondTreeIntact() {
+        TestNodeImpl a2 = this.findNode("a2");
+        TestNodeImpl b2 = this.findNode("b2");
+        TestNodeImpl c2 = this.findNode("c2");
+        TestNodeImpl d2 = this.findNode("d2");
+        TestNodeImpl e2 = this.findNode("e2");
+        TestNodeImpl g2 = this.findNode("g2");
+        TestNodeImpl f2 = this.findNode("f2");
+        TestNodeImpl h2 = this.findNode("h2");
+
+        assertTrue(a2.getLeft() == 1);
+        assertTrue(a2.getRight() == 16);
+        assertTrue(b2.getLeft() == 2);
+        assertTrue(b2.getRight() == 7);
+        assertTrue(c2.getLeft() == 8);
+        assertTrue(c2.getRight() == 15);
+        assertTrue(d2.getLeft() == 3);
+        assertTrue(d2.getRight() == 4);
+        assertTrue(e2.getLeft() == 5);
+        assertTrue(e2.getRight() == 6);
+        assertTrue(f2.getLeft() == 9);
+        assertTrue(f2.getRight() == 10);
+        assertTrue(g2.getLeft() == 11);
+        assertTrue(g2.getRight() == 14);
+        assertTrue(h2.getLeft() == 12);
+        assertTrue(h2.getRight() == 13);
+
+        assertTrue(this.getParent(a2) == null);
+        assertTrue(this.getParent(b2) == a2);
+        assertTrue(this.getParent(c2) == a2);
+        assertTrue(this.getParent(d2) == b2);
+        assertTrue(this.getParent(e2) == b2);
+        assertTrue(this.getParent(f2) == c2);
+        assertTrue(this.getParent(g2) == c2);
+        assertTrue(this.getParent(h2) == g2);
+
+    }
 
     private void breakTree() {
 
-        this.em.createQuery("update TestNodeImpl set parent = null where id = 3").executeUpdate();
-        this.em.createQuery("update TestNodeImpl set lft = 0, rgt = 0, lvl = 0").executeUpdate();
+        this.em.createQuery("update TestNodeImpl set parent = null where id = 3 and discriminator = 'tree_1'").executeUpdate();
+        this.em.createQuery("update TestNodeImpl set lft = 0, rgt = 0, lvl = 0 where discriminator = 'tree_1'").executeUpdate();
 
     }
 
     private void removeTree() {
-        this.em.createQuery("delete from TestNodeImpl").executeUpdate();
+        this.em.createQuery("delete from TestNodeImpl where discriminator = 'tree_1'").executeUpdate();
     }
 
 }

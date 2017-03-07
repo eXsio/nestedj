@@ -55,27 +55,6 @@ public class DefaultNestedNodeConfigTest {
     public void tearDown() {
     }
 
-    /**
-     * Test of getEntityName method, of class NestedNodeConfigImpl.
-     */
-    @Test
-    public void testGetEntityName() {
-        NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
-        String expResult = null;
-        String result = instance.getEntityName();
-        assertEquals(expResult, result);
-    }
-
-    /**
-     * Test of setEntityName method, of class NestedNodeConfigImpl.
-     */
-    @Test
-    public void testSetEntityName() {
-        String entityName = "entityName";
-        NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
-        instance.setEntityName(entityName);
-        assertEquals(instance.getEntityName(), entityName);
-    }
 
     /**
      * Test of getRightFieldName method, of class NestedNodeConfigImpl.

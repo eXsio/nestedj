@@ -41,146 +41,100 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
- *
  * @author exsio
  */
 @Entity
 @Table(name = "nested_nodes")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class TestNodeImpl extends DummyObject implements NestedNode<TestNodeImpl> {
-           
-    /**
-     *
-     */
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     protected Long id;
-    
-    /**
-     *
-     */
+
     @Column(name = "node_name", nullable = false)
     protected String name;
 
-    /**
-     *
-     */
     @LeftColumn
     @Column(name = "tree_left", nullable = true)
     protected Long lft;
 
-    /**
-     *
-     */
     @RightColumn
     @Column(name = "tree_right", nullable = true)
     protected Long rgt;
 
-    /**
-     *
-     */
     @LevelColumn
     @Column(name = "tree_level", nullable = true)
     protected Long lvl;
- 
-    /**
-     *
-     */
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "parent_id", nullable = true)
     @ParentColumn
     protected TestNodeImpl parent;
 
-    /**
-     *
-     */
+    @Column(name = "discriminator", nullable = false)
+    protected String discriminator;
+
     public TestNodeImpl() {
         super();
     }
-    
-    /**
-     *
-     * @return
-     */
+
     @Override
     public Long getId() {
         return id;
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public Long getLeft() {
         return lft;
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public Long getRight() {
         return rgt;
     }
 
-
-    /**
-     *
-     * @return
-     */
     @Override
     public Long getLevel() {
         return lvl;
     }
 
-    /**
-     *
-     * @return
-     */
+    public String getDiscriminator() {
+        return discriminator;
+    }
+
     public String getName() {
         return name;
     }
 
-    /**
-     *
-     * @param name
-     * @return
-     */
     public TestNodeImpl setName(String name) {
         this.name = name;
         return this;
     }
 
-    /**
-     *
-     * @return
-     */
+    public void setDiscriminator(String discriminator) {
+        this.discriminator = discriminator;
+    }
+
     @Override
     public TestNodeImpl getParent() {
         return parent;
     }
-    
 
-    /**
-     *
-     * @return
-     */
     @Override
     public String toString() {
-        return "[TestNode id " + this.getId() + ": " + this.getName() +"; left: "+this.getLeft()+", right: "+this.getRight()+", level: "+this.getLevel()+"]";
+        return "[TestNode id " + this.getId() + ": " + this.getName() + "; left: " + this.getLeft() + ", right: " + this.getRight() + ", level: " + this.getLevel() + "]";
     }
-    
+
     @Override
     public boolean equals(Object o) {
-        if(o instanceof TestNodeImpl) {
+        if (o instanceof TestNodeImpl) {
             return (this.hashCode() == o.hashCode());
         } else {
             return false;
         }
     }
-    
+
     @Override
     public int hashCode() {
         return this.getId().intValue();

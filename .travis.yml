@@ -1,2 +1,16 @@
 language: java
 script: mvn test -f pom.xml
+sudo: false
+
+addons:
+  coverity_scan:
+    project:
+      name: "eXsio/nestedj"
+      description: "Build submitted via Travis CI"
+    notification_email: noneedto@notify.me
+    build_command_prepend: "mvn clean"
+    build_command:   "mvn -DskipTests=true compile"
+    branch_pattern: master
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)

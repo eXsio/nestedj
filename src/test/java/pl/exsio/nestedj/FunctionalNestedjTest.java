@@ -36,7 +36,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *
  * @author exsio
  */
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -51,35 +50,43 @@ public abstract class FunctionalNestedjTest {
 
     private final Map<String, Long> nodeMap = new HashMap() {
         {
-            put("a", 1l);
-            put("b", 2l);
-            put("c", 3l);
-            put("d", 4l);
-            put("e", 5l);
-            put("f", 6l);
-            put("g", 7l);
-            put("h", 8l);
+            put("a", 1L);
+            put("b", 2L);
+            put("c", 3L);
+            put("d", 4L);
+            put("e", 5L);
+            put("f", 6L);
+            put("g", 7L);
+            put("h", 8L);
+
+            put("a2", 9L);
+            put("b2", 10L);
+            put("c2", 11L);
+            put("d2", 12L);
+            put("e2", 13L);
+            put("f2", 14L);
+            put("g2", 15L);
+            put("h2", 16L);
         }
     };
 
     /**
-     * 
-     *          STARTING NESTED TREE CONDITIONS
-     * 
-     *                      1 A 16
-     *                       / \                    IDS:
-     *                      /   \                   A: 1
-     *                     /     \                  B: 2
-     *                  2 B 7   8 C 15              C: 3
-     *                   /         \                D: 4
-     *                  /\         /\               E: 5
-     *                 /  \       /  \              F: 6
-     *                /    \     /    \             G: 7
-     *               /   5 E 6  9 F 10 \            H: 8
-     *             3 D 4             11 G 14
-     *                                   \
-     *                                    \
-     *                                  12 H 13 
+     * STARTING NESTED TREE CONDITIONS
+     * <p/>
+     * 1 A 16
+     * / \                    IDS:
+     * /   \                   A: 1
+     * /     \                  B: 2
+     * 2 B 7   8 C 15              C: 3
+     * /         \                D: 4
+     * /\         /\               E: 5
+     * /  \       /  \              F: 6
+     * /    \     /    \             G: 7
+     * /   5 E 6  9 F 10 \            H: 8
+     * 3 D 4             11 G 14
+     * \
+     * \
+     * 12 H 13
      */
     protected TestNodeImpl findNode(String symbol) {
 
@@ -97,15 +104,17 @@ public abstract class FunctionalNestedjTest {
 
         TestNodeImpl n = new TestNodeImpl();
         n.setName(symbol);
+        n.setDiscriminator("tree_1");
         return n;
     }
 
     protected TestNodeImpl getParent(TestNodeImpl f) {
         this.em.refresh(f);
-        TestNodeImpl parent = this.nodeRepository.getParent(f);
-        if (parent instanceof TestNodeImpl) {
+        TestNodeImpl parent = f.getParent();
+        if (parent != null) {
             this.em.refresh(parent);
         }
+        System.out.println(String.format("Parent of %s is %s", f.getName(), parent != null ? parent.getName() : "null"));
         return parent;
     }
 

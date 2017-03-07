@@ -23,11 +23,6 @@
  */
 package pl.exsio.nestedj.util;
 
-import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
-import javax.persistence.Entity;
-import javax.persistence.Id;
 import pl.exsio.nestedj.annotation.LeftColumn;
 import pl.exsio.nestedj.annotation.LevelColumn;
 import pl.exsio.nestedj.annotation.ParentColumn;
@@ -36,17 +31,19 @@ import pl.exsio.nestedj.config.NestedNodeConfig;
 import pl.exsio.nestedj.config.NestedNodeConfigImpl;
 import pl.exsio.nestedj.model.NestedNode;
 
-/**
- *
- * @author exsio
- * @param <T>
- */
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
+
+
 public class NestedNodeUtil {
 
     protected static final Map<Class<? extends NestedNode>, NestedNodeConfig> configs;
 
     static {
-        configs = new HashMap<Class<? extends NestedNode>, NestedNodeConfig>();
+        configs = new HashMap<>();
     }
 
     public static boolean isNodeNew(NestedNode node) {
@@ -56,14 +53,10 @@ public class NestedNodeUtil {
     public static NestedNodeConfig getNodeConfig(Class<? extends NestedNode> nodeClass) {
         if (!configs.containsKey(nodeClass)) {
             NestedNodeConfigImpl config = new NestedNodeConfigImpl();
-
             Entity entity = nodeClass.getAnnotation(Entity.class);
-            String name = entity.name();
-            config.setEntityName((name != null && name.length() > 0) ? name : nodeClass.getSimpleName());
             config = getConfigForClass(nodeClass, config);
             configs.put(nodeClass, config);
         }
-
         return configs.get(nodeClass);
     }
 
@@ -107,9 +100,4 @@ public class NestedNodeUtil {
     public static String id(Class<? extends NestedNode> nodeClass) {
         return getNodeConfig(nodeClass).getIdFieldName();
     }
-
-    public static String entity(Class<? extends NestedNode> nodeClass) {
-        return getNodeConfig(nodeClass).getEntityName();
-    }
-
 }

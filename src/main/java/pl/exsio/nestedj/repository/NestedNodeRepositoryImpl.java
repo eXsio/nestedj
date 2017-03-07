@@ -68,25 +68,25 @@ public class NestedNodeRepositoryImpl<N extends NestedNode<N>> implements Nested
 
     @Override
     public N insertAsFirstChildOf(N node, N parent) throws InvalidNodesHierarchyException {
-        return this.insertOrMove(node, parent, NestedNodeHierarchyManipulator.MODE_FIRST_CHILD);
+        return this.insertOrMove(node, parent, NestedNodeHierarchyManipulator.Mode.FIRST_CHILD);
     }
 
     @Override
     public N insertAsLastChildOf(N node, N parent) throws InvalidNodesHierarchyException {
-        return this.insertOrMove(node, parent, NestedNodeHierarchyManipulator.MODE_LAST_CHILD);
+        return this.insertOrMove(node, parent, NestedNodeHierarchyManipulator.Mode.LAST_CHILD);
     }
 
     @Override
     public N insertAsNextSiblingOf(N node, N parent) throws InvalidNodesHierarchyException {
-        return this.insertOrMove(node, parent, NestedNodeHierarchyManipulator.MODE_NEXT_SIBLING);
+        return this.insertOrMove(node, parent, NestedNodeHierarchyManipulator.Mode.NEXT_SIBLING);
     }
 
     @Override
     public N insertAsPrevSiblingOf(N node, N parent) throws InvalidNodesHierarchyException {
-        return this.insertOrMove(node, parent, NestedNodeHierarchyManipulator.MODE_PREV_SIBLING);
+        return this.insertOrMove(node, parent, NestedNodeHierarchyManipulator.Mode.PREV_SIBLING);
     }
 
-    private N insertOrMove(N node, N parent, int mode) throws InvalidNodesHierarchyException {
+    private N insertOrMove(N node, N parent, NestedNodeHierarchyManipulator.Mode mode) throws InvalidNodesHierarchyException {
         if (NestedNodeUtil.isNodeNew(node)) {
             return this.inserter.insert(node, parent, mode);
         } else {
