@@ -56,15 +56,15 @@ public class TestNodeImpl extends DummyObject implements NestedNode<TestNodeImpl
     protected String name;
 
     @LeftColumn
-    @Column(name = "tree_left", nullable = true)
+    @Column(name = "tree_left", nullable = false)
     protected Long lft;
 
     @RightColumn
-    @Column(name = "tree_right", nullable = true)
+    @Column(name = "tree_right", nullable = false)
     protected Long rgt;
 
     @LevelColumn
-    @Column(name = "tree_level", nullable = true)
+    @Column(name = "tree_level", nullable = false)
     protected Long lvl;
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -99,6 +99,8 @@ public class TestNodeImpl extends DummyObject implements NestedNode<TestNodeImpl
         return lvl;
     }
 
+
+
     public String getDiscriminator() {
         return discriminator;
     }
@@ -119,6 +121,26 @@ public class TestNodeImpl extends DummyObject implements NestedNode<TestNodeImpl
     @Override
     public TestNodeImpl getParent() {
         return parent;
+    }
+
+    @Override
+    public void setLeft(Long left) {
+        this.lft = left;
+    }
+
+    @Override
+    public void setRight(Long right) {
+        this.rgt = right;
+    }
+
+    @Override
+    public void setLevel(Long level) {
+        this.lvl = level;
+    }
+
+    @Override
+    public void setParent(TestNodeImpl parent) {
+        this.parent = parent;
     }
 
     @Override

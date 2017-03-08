@@ -73,20 +73,20 @@ public abstract class FunctionalNestedjTest {
     /**
      * STARTING NESTED TREE CONDITIONS
      * <p/>
-     * 1 A 16
-     * / \                    IDS:
-     * /   \                   A: 1
-     * /     \                  B: 2
-     * 2 B 7   8 C 15              C: 3
-     * /         \                D: 4
-     * /\         /\               E: 5
-     * /  \       /  \              F: 6
-     * /    \     /    \             G: 7
-     * /   5 E 6  9 F 10 \            H: 8
-     * 3 D 4             11 G 14
-     * \
-     * \
-     * 12 H 13
+     *                  1 A 16
+     *                   / \                    IDS:
+     *                  /   \                   A: 1
+     *                 /     \                  B: 2
+     *              2 B 7   8 C 15              C: 3
+     *               /         \                D: 4
+     *              /\         /\               E: 5
+     *             /  \       /  \              F: 6
+     *            /    \     /    \             G: 7
+     *           /   5 E 6  9 F 10 \            H: 8
+     *        3 D 4             11 G 14
+     *                              \
+     *                               \
+     *                             12 H 13
      */
     protected TestNodeImpl findNode(String symbol) {
 

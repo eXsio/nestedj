@@ -65,7 +65,6 @@ public class NestedNodeMoverImpl<N extends NestedNode<N>> extends NestedNodeDele
     @Override
     public N move(N node, N parent, Mode mode) throws InvalidNodesHierarchyException {
         Class<N> nodeClass = getNodeClass(node);
-        refreshNodes(node, parent);
         if (!this.canMoveNodeToSelectedParent(node, parent)) {
             throw new InvalidNodesHierarchyException("You cannot move a parent node to it's child or move a node to itself");
         }
@@ -83,18 +82,7 @@ public class NestedNodeMoverImpl<N extends NestedNode<N>> extends NestedNodeDele
         this.performMove(nodeSign, nodeDelta, nodeIds, levelModificator, nodeClass);
         this.updateParentField(newParent, node, nodeClass);
 
-        refreshNodes(node, parent);
-
         return node;
-    }
-
-    private void refreshNodes(N node, N parent) {
-        if(em.contains(node)) {
-            this.em.refresh(node);
-        }
-        if(em.contains(parent)) {
-            this.em.refresh(parent);
-        }
     }
 
     private void makeSpaceForMovedElement(Sign sign, Long delta, Long start, Long stop, Class<N> nodeClass) {

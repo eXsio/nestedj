@@ -35,6 +35,14 @@ public interface NestedNode<N extends NestedNode> {
 
     N getParent();
 
+    void setLeft(Long left);
+
+    void setRight(Long right);
+
+    void setLevel(Long level);
+
+    void setParent(N parent);
+
     boolean isRoot();
 
 }

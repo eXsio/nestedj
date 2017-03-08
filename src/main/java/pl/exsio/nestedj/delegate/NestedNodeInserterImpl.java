@@ -32,10 +32,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
 
-import static pl.exsio.nestedj.util.NestedNodeUtil.id;
 import static pl.exsio.nestedj.util.NestedNodeUtil.left;
-import static pl.exsio.nestedj.util.NestedNodeUtil.level;
-import static pl.exsio.nestedj.util.NestedNodeUtil.parent;
 import static pl.exsio.nestedj.util.NestedNodeUtil.right;
 
 public class NestedNodeInserterImpl<N extends NestedNode<N>> extends NestedNodeDelegate<N> implements NestedNodeInserter<N> {
@@ -54,42 +51,24 @@ public class NestedNodeInserterImpl<N extends NestedNode<N>> extends NestedNodeD
 
     @Override
     public N insert(N node, N parent, Mode mode) {
-        if (em.contains(parent)) {
-            this.em.refresh(parent);
-        }
         Class<N> nodeClass = getNodeClass(node);
-        this.makeSpaceForNewElement(parent.getRight(), mode, nodeClass);
-        this.insertNodeIntoTable(node);
+        this.makeSpaceForNewElement(getMoveFrom(parent, mode), mode, nodeClass);
         this.insertNodeIntoTree(parent, node, mode, nodeClass);
-        if (em.contains(node)) {
-            this.em.refresh(node);
-        }
         return node;
-    }
-
-    private void insertNodeIntoTable(N node) {
-        this.em.persist(node);
-        this.em.flush();
     }
 
     private void insertNodeIntoTree(N parent, N node, Mode mode, Class<N> nodeClass) {
         Long left = this.getNodeLeft(parent, mode);
         Long right = left + 1;
         Long level = this.getNodeLevel(parent, mode);
-        NestedNode nodeParent = this.getNodeParent(parent, mode);
+        N nodeParent = this.getNodeParent(parent, mode);
 
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
-        Root<N> root = update.from(nodeClass);
+        node.setLeft(left);
+        node.setRight(right);
+        node.setLevel(level);
+        node.setParent(nodeParent);
 
-        update
-                .set(root.get(parent(nodeClass)), nodeParent)
-                .set(root.get(left(nodeClass)), left)
-                .set(root.get(right(nodeClass)), right)
-                .set(root.get(level(nodeClass)), level)
-                .where(getPredicates(cb, root, cb.equal(root.get(id(nodeClass)), node.getId())));
-
-        em.createQuery(update).executeUpdate();
+        em.persist(node);
     }
 
     private void makeSpaceForNewElement(Long from, Mode mode, Class<N> nodeClass) {
@@ -109,6 +88,18 @@ public class NestedNodeInserterImpl<N extends NestedNode<N>> extends NestedNodeD
             update.where(getPredicates(cb, root, cb.greaterThan(root.<Long>get(fieldName), from)));
         }
         em.createQuery(update).executeUpdate();
+    }
+
+    private Long getMoveFrom(N parent, Mode mode) {
+        switch (mode) {
+            case PREV_SIBLING:
+            case FIRST_CHILD:
+                return parent.getLeft();
+            case NEXT_SIBLING:
+            case LAST_CHILD:
+            default:
+                return parent.getRight();
+        }
     }
 
     private Long getNodeLevel(N parent, Mode mode) {
