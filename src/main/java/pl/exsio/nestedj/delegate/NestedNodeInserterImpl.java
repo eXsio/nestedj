@@ -54,12 +54,16 @@ public class NestedNodeInserterImpl<N extends NestedNode<N>> extends NestedNodeD
 
     @Override
     public N insert(N node, N parent, Mode mode) {
-        this.em.refresh(parent);
+        if (em.contains(parent)) {
+            this.em.refresh(parent);
+        }
         Class<N> nodeClass = getNodeClass(node);
         this.makeSpaceForNewElement(parent.getRight(), mode, nodeClass);
         this.insertNodeIntoTable(node);
         this.insertNodeIntoTree(parent, node, mode, nodeClass);
-        this.em.refresh(node);
+        if (em.contains(node)) {
+            this.em.refresh(node);
+        }
         return node;
     }
 
