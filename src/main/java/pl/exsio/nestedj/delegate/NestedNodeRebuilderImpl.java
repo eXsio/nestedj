@@ -33,7 +33,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
-import javax.transaction.Transactional;
 import java.util.List;
 
 import static pl.exsio.nestedj.util.NestedNodeUtil.id;
@@ -73,7 +72,6 @@ public class NestedNodeRebuilderImpl<N extends NestedNode<N>> extends NestedNode
     }
 
     @Override
-    @Transactional
     public void rebuildTree(Class<N> nodeClass) throws InvalidNodesHierarchyException {
         N first = this.findFirstNestedNode(nodeClass);
         this.resetFirst(first, nodeClass);

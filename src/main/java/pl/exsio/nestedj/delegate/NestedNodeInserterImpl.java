@@ -31,7 +31,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
-import javax.transaction.Transactional;
 
 import static pl.exsio.nestedj.util.NestedNodeUtil.id;
 import static pl.exsio.nestedj.util.NestedNodeUtil.left;
@@ -54,7 +53,6 @@ public class NestedNodeInserterImpl<N extends NestedNode<N>> extends NestedNodeD
     }
 
     @Override
-    @Transactional
     public N insert(N node, N parent, Mode mode) {
         this.em.refresh(parent);
         Class<N> nodeClass = getNodeClass(node);

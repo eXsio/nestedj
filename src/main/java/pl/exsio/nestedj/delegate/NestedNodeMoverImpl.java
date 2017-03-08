@@ -33,7 +33,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
-import javax.transaction.Transactional;
 import java.util.List;
 
 import static pl.exsio.nestedj.util.NestedNodeUtil.id;
@@ -64,7 +63,6 @@ public class NestedNodeMoverImpl<N extends NestedNode<N>> extends NestedNodeDele
     }
 
     @Override
-    @Transactional
     public N move(N node, N parent, Mode mode) throws InvalidNodesHierarchyException {
         Class<N> nodeClass = getNodeClass(node);
         this.em.refresh(node);

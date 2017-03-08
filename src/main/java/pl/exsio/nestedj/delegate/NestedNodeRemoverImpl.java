@@ -33,7 +33,6 @@ import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
-import javax.transaction.Transactional;
 
 import static pl.exsio.nestedj.util.NestedNodeUtil.left;
 import static pl.exsio.nestedj.util.NestedNodeUtil.level;
@@ -58,7 +57,6 @@ public class NestedNodeRemoverImpl<N extends NestedNode<N>> extends NestedNodeDe
     }
 
     @Override
-    @Transactional
     public void removeSingle(N node) {
         Class<N> nodeClass = getNodeClass(node);
         Long from = node.getRight();
@@ -134,7 +132,6 @@ public class NestedNodeRemoverImpl<N extends NestedNode<N>> extends NestedNodeDe
     }
 
     @Override
-    @Transactional
     public void removeSubtree(N node) {
         Class<N> nodeClass = getNodeClass(node);
         Long delta = node.getRight() - node.getLeft() + 1;
