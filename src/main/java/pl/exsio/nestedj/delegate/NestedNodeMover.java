@@ -23,11 +23,10 @@
  */
 package pl.exsio.nestedj.delegate;
 
-import pl.exsio.nestedj.ex.InvalidNodesHierarchyException;
 import pl.exsio.nestedj.model.NestedNode;
 import pl.exsio.nestedj.model.NestedNodeInfo;
 
 public interface NestedNodeMover<N extends NestedNode<N>> extends NestedNodeHierarchyManipulator {
 
-    void move(NestedNodeInfo<N> nodeInfo, NestedNodeInfo<N> parentInfo, Mode mode) throws InvalidNodesHierarchyException;
+    void move(NestedNodeInfo<N> nodeInfo, NestedNodeInfo<N> parentInfo, Mode mode);
 }

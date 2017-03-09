@@ -39,9 +39,6 @@ import static pl.exsio.nestedj.util.NestedNodeUtil.level;
 import static pl.exsio.nestedj.util.NestedNodeUtil.parent;
 import static pl.exsio.nestedj.util.NestedNodeUtil.right;
 
-/**
- * @author exsio
- */
 public class NestedNodeRemoverImpl<N extends NestedNode<N>> extends NestedNodeDelegate<N> implements NestedNodeRemover<N> {
 
     @PersistenceContext
@@ -61,17 +58,15 @@ public class NestedNodeRemoverImpl<N extends NestedNode<N>> extends NestedNodeDe
         Class<N> nodeClass = getNodeClass(node);
         Long from = node.getRight();
         N parent = this.findNodeParent(node, nodeClass);
-        this.updateNodesParent(node, parent, nodeClass);
-        this.prepareTreeForSingleNodeRemoval(from, nodeClass);
-        this.updateDeletedNodeChildren(node, nodeClass);
-        this.em.remove(node);
-        this.em.flush();
-        this.em.clear();
+        updateNodesParent(node, parent, nodeClass);
+        prepareTreeForSingleNodeRemoval(from, nodeClass);
+        updateDeletedNodeChildren(node, nodeClass);
+        em.remove(node);
     }
 
     private void prepareTreeForSingleNodeRemoval(Long from, Class<N> nodeClass) {
-        this.updateFieldsBeforeSingleNodeRemoval(from, nodeClass, right(nodeClass));
-        this.updateFieldsBeforeSingleNodeRemoval(from, nodeClass, left(nodeClass));
+        updateFieldsBeforeSingleNodeRemoval(from, nodeClass, right(nodeClass));
+        updateFieldsBeforeSingleNodeRemoval(from, nodeClass, left(nodeClass));
     }
 
     private void updateDeletedNodeChildren(N node, Class<N> nodeClass) {
@@ -136,10 +131,9 @@ public class NestedNodeRemoverImpl<N extends NestedNode<N>> extends NestedNodeDe
         Class<N> nodeClass = getNodeClass(node);
         Long delta = node.getRight() - node.getLeft() + 1;
         Long from = node.getRight();
-        this.performBatchDeletion(node, nodeClass);
-        this.updateFieldsAfterSubtreeRemoval(from, delta, nodeClass, right(nodeClass));
-        this.updateFieldsAfterSubtreeRemoval(from, delta, nodeClass, left(nodeClass));
-        this.em.clear();
+        performBatchDeletion(node, nodeClass);
+        updateFieldsAfterSubtreeRemoval(from, delta, nodeClass, right(nodeClass));
+        updateFieldsAfterSubtreeRemoval(from, delta, nodeClass, left(nodeClass));
     }
 
     private void updateFieldsAfterSubtreeRemoval(Long from, Long delta, Class<N> nodeClass, String field) {

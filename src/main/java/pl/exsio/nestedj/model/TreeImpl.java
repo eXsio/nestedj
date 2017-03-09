@@ -23,14 +23,10 @@
  */
 package pl.exsio.nestedj.model;
 
-import java.util.LinkedList;
+import com.google.common.collect.Lists;
+
 import java.util.List;
 
-/**
- *
- * @author exsio
- * @param <N>
- */
 public class TreeImpl<N extends NestedNode> implements Tree<N> {
 
     private List<Tree<N>> children;
@@ -38,9 +34,9 @@ public class TreeImpl<N extends NestedNode> implements Tree<N> {
     private Tree<N> parent;
 
     private N node;
-    
+
     private TreeImpl() {
-        this.children = new LinkedList<Tree<N>>();
+        this.children = Lists.newLinkedList();
     }
 
     public TreeImpl(N node) {
@@ -53,7 +49,7 @@ public class TreeImpl<N extends NestedNode> implements Tree<N> {
         this.parent = parent;
         this.node = node;
     }
-    
+
     @Override
     public void addChild(Tree<N> child) {
         this.children.add(child);

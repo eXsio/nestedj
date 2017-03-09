@@ -63,7 +63,7 @@ public class NestedNodeRetrieverImpl<N extends NestedNode<N>> extends NestedNode
     @Override
     public Tree<N> getTree(N node) {
         Tree<N> tree = new TreeImpl<>(node);
-        for (N n : this.getChildren(node)) {
+        for (N n : getChildren(node)) {
             Tree<N> subtree = this.getTree(n);
             tree.addChild(subtree);
         }

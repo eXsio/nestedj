@@ -40,15 +40,15 @@ import java.util.Optional;
 
 public class NestedNodeRepositoryImpl<N extends NestedNode<N>> implements NestedNodeRepository<N> {
 
-    protected NestedNodeInserter<N> inserter;
+    private NestedNodeInserter<N> inserter;
 
-    protected NestedNodeMover<N> mover;
+    private NestedNodeMover<N> mover;
 
-    protected NestedNodeRemover<N> remover;
+    private NestedNodeRemover<N> remover;
 
-    protected NestedNodeRetriever<N> retriever;
+    private NestedNodeRetriever<N> retriever;
 
-    protected NestedNodeRebuilder rebuilder;
+    private NestedNodeRebuilder rebuilder;
 
     private boolean allowNullableTreeFields = false;
 

@@ -169,9 +169,4 @@ public class TestNodeImpl extends DummyObject implements NestedNode<TestNodeImpl
     public int hashCode() {
         return this.getId().intValue();
     }
-
-    @Override
-    public boolean isRoot() {
-        return this.parent == null;
-    }
 }

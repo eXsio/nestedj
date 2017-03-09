@@ -23,10 +23,6 @@
  */
 package pl.exsio.nestedj.ex;
 
-/**
- *
- * @author exsio
- */
 public class InvalidNodeException extends RuntimeException {
 
     public InvalidNodeException(String msg) {

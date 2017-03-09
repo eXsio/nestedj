@@ -23,9 +23,8 @@
  */
 package pl.exsio.nestedj.config;
 
-/**
- * @author exsio
- */
+import com.google.common.base.MoreObjects;
+
 public class NestedNodeConfigImpl implements NestedNodeConfig {
 
     protected String rightFieldName;
@@ -88,8 +87,12 @@ public class NestedNodeConfigImpl implements NestedNodeConfig {
 
     @Override
     public String toString() {
-        return "[leftFieldName: " + this.leftFieldName + ", rightFieldName:" + this.rightFieldName
-                + ", levelFieldName: " + this.levelFieldName + ", parentFieldName:" + this.parentFieldName + "]";
+        return MoreObjects.toStringHelper(this)
+                .add("rightFieldName", rightFieldName)
+                .add("leftFieldName", leftFieldName)
+                .add("levelFieldName", levelFieldName)
+                .add("parentFieldName", parentFieldName)
+                .add("idFieldName", idFieldName)
+                .toString();
     }
-
 }

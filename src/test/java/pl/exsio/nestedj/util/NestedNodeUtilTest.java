@@ -31,22 +31,9 @@ import pl.exsio.nestedj.model.TestNodeImpl;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- *
- * @author exsio
- */
 public class NestedNodeUtilTest extends FunctionalNestedjTest {
 
     public NestedNodeUtilTest() {
-    }
-
-    @Test
-    public void testIsNodeNew() {
-
-        TestNodeImpl node = new TestNodeImpl();
-        boolean expResult = true;
-        boolean result = NestedNodeUtil.isNodeNew(node);
-        assertEquals(expResult, result);
     }
 
     @Test

@@ -1,12 +1,12 @@
 package pl.exsio.nestedj.discriminator;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import pl.exsio.nestedj.model.NestedNode;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +19,7 @@ public class TreeDiscriminatorImpl<N extends NestedNode<N>> implements TreeDiscr
     }
 
     public TreeDiscriminatorImpl() {
-        this.valueProviders = new HashMap<>();
+        this.valueProviders = Maps.newHashMap();
     }
 
     public void setValueProviders(Map<String, ValueProvider> valueProviders) {
@@ -28,7 +28,7 @@ public class TreeDiscriminatorImpl<N extends NestedNode<N>> implements TreeDiscr
 
     @Override
     public List<Predicate> getPredicates(CriteriaBuilder cb, Root<N> root) {
-        List<Predicate> predicates = new ArrayList<>();
+        List<Predicate> predicates = Lists.newArrayList();
         for (Map.Entry<String, ValueProvider> providerEntry : valueProviders.entrySet()) {
             predicates.add(cb.equal(root.get(providerEntry.getKey()), providerEntry.getValue().getDiscriminatorValue()));
         }

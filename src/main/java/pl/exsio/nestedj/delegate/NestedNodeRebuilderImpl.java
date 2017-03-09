@@ -26,7 +26,6 @@ package pl.exsio.nestedj.delegate;
 import com.google.common.base.Preconditions;
 import pl.exsio.nestedj.discriminator.TreeDiscriminator;
 import pl.exsio.nestedj.ex.InvalidNodeException;
-import pl.exsio.nestedj.ex.InvalidNodesHierarchyException;
 import pl.exsio.nestedj.model.NestedNode;
 import pl.exsio.nestedj.model.NestedNodeInfo;
 
@@ -67,8 +66,8 @@ public class NestedNodeRebuilderImpl<N extends NestedNode<N>> extends NestedNode
     }
 
     @Override
-    public void rebuildTree(Class<N> nodeClass) throws InvalidNodesHierarchyException {
-        N first = this.findFirstNestedNode(nodeClass);
+    public void rebuildTree(Class<N> nodeClass) {
+        N first = findFirstNestedNode(nodeClass);
         resetFirst(first, nodeClass);
         restoreSiblings(first, nodeClass);
         rebuildRecursively(first, nodeClass);
@@ -77,7 +76,7 @@ public class NestedNodeRebuilderImpl<N extends NestedNode<N>> extends NestedNode
         }
     }
 
-    private void rebuildRecursively(N parent, Class<N> nodeClass) throws InvalidNodesHierarchyException {
+    private void rebuildRecursively(N parent, Class<N> nodeClass) {
         for (N child : getChildren(parent, nodeClass)) {
             inserter.insert(child, getNodeInfo(parent, nodeClass), NestedNodeMover.Mode.LAST_CHILD);
             rebuildRecursively(child, nodeClass);
@@ -113,9 +112,9 @@ public class NestedNodeRebuilderImpl<N extends NestedNode<N>> extends NestedNode
         return em.createQuery(select).getResultList();
     }
 
-    private void restoreSiblings(N first, Class<N> nodeClass) throws InvalidNodesHierarchyException {
+    private void restoreSiblings(N first, Class<N> nodeClass) {
         for (N node : getSiblings(first, nodeClass)) {
-            this.inserter.insert(node, getNodeInfo(first, nodeClass), NestedNodeMover.Mode.NEXT_SIBLING);
+            inserter.insert(node, getNodeInfo(first, nodeClass), NestedNodeMover.Mode.NEXT_SIBLING);
         }
     }
 

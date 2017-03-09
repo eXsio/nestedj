@@ -43,6 +43,4 @@ public interface NestedNode<N extends NestedNode> {
 
     void setParent(N parent);
 
-    boolean isRoot();
-
 }

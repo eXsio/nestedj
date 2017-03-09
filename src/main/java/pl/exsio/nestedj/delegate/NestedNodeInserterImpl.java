@@ -53,11 +53,11 @@ public class NestedNodeInserterImpl<N extends NestedNode<N>> extends NestedNodeD
     @Override
     public void insert(N node, NestedNodeInfo<N> parentInfo, Mode mode) {
         Class<N> nodeClass = getNodeClass(node);
-        this.makeSpaceForNewElement(getMoveFrom(parentInfo, mode), mode, nodeClass);
-        this.insertNodeIntoTree(parentInfo, node, mode, nodeClass);
+        makeSpaceForNewElement(getMoveFrom(parentInfo, mode), mode, nodeClass);
+        insertNodeIntoTree(parentInfo, node, mode);
     }
 
-    private void insertNodeIntoTree(NestedNodeInfo<N> parent, N node, Mode mode, Class<N> nodeClass) {
+    private void insertNodeIntoTree(NestedNodeInfo<N> parent, N node, Mode mode) {
         Long left = this.getNodeLeft(parent, mode);
         Long right = left + 1;
         Long level = this.getNodeLevel(parent, mode);

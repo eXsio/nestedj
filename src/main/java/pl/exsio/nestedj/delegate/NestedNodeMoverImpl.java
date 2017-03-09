@@ -42,9 +42,6 @@ import static pl.exsio.nestedj.util.NestedNodeUtil.level;
 import static pl.exsio.nestedj.util.NestedNodeUtil.parent;
 import static pl.exsio.nestedj.util.NestedNodeUtil.right;
 
-/**
- * @author exsio
- */
 public class NestedNodeMoverImpl<N extends NestedNode<N>> extends NestedNodeDelegate<N> implements NestedNodeMover<N> {
 
     private enum Sign {
@@ -64,29 +61,31 @@ public class NestedNodeMoverImpl<N extends NestedNode<N>> extends NestedNodeDele
     }
 
     @Override
-    public void move(NestedNodeInfo<N> nodeInfo, NestedNodeInfo<N> parentInfo, Mode mode) throws InvalidNodesHierarchyException {
+    public void move(NestedNodeInfo<N> nodeInfo, NestedNodeInfo<N> parentInfo, Mode mode) {
         Class<N> nodeClass = nodeInfo.getNodeClass();
-        if (!this.canMoveNodeToSelectedParent(nodeInfo, parentInfo)) {
+        if (!canMoveNodeToSelectedParent(nodeInfo, parentInfo)) {
             throw new InvalidNodesHierarchyException("You cannot move a parent node to it's child or move a node to itself");
         }
-        Sign sign = this.getSign(nodeInfo, parentInfo, mode);
-        Long start = this.getStart(nodeInfo, parentInfo, mode, sign);
-        Long stop = this.getStop(nodeInfo, parentInfo, mode, sign);
-        List<Long> nodeIds = this.getNodeIds(nodeInfo);
-        Long delta = this.getDelta(nodeIds);
-        Long nodeDelta = this.getNodeDelta(start, stop);
-        Sign nodeSign = this.getNodeSign(sign);
-        Long levelModificator = this.getLevelModificator(nodeInfo, parentInfo, mode);
-        N newParent = this.getNewParent(parentInfo, mode);
+        List<Long> nodeIds = getNodeIds(nodeInfo);
 
-        this.makeSpaceForMovedElement(sign, delta, start, stop, nodeClass);
-        this.performMove(nodeSign, nodeDelta, nodeIds, levelModificator, nodeClass);
-        this.updateParentField(newParent, nodeInfo, nodeClass);
+        Sign sign = getSign(nodeInfo, parentInfo, mode);
+        Long start = getStart(nodeInfo, parentInfo, mode, sign);
+        Long stop = getStop(nodeInfo, parentInfo, mode, sign);
+        Long delta = getDelta(nodeIds);
+        makeSpaceForMovedElement(sign, delta, start, stop, nodeClass);
+
+        Long nodeDelta = getNodeDelta(start, stop);
+        Sign nodeSign = getNodeSign(sign);
+        Long levelModificator = getLevelModificator(nodeInfo, parentInfo, mode);
+        performMove(nodeSign, nodeDelta, nodeIds, levelModificator, nodeClass);
+
+        N newParent = getNewParent(parentInfo, mode);
+        updateParentField(newParent, nodeInfo, nodeClass);
     }
 
     private void makeSpaceForMovedElement(Sign sign, Long delta, Long start, Long stop, Class<N> nodeClass) {
-        this.updateFields(sign, delta, start, stop, nodeClass, right(nodeClass));
-        this.updateFields(sign, delta, start, stop, nodeClass, left(nodeClass));
+        updateFields(sign, delta, start, stop, nodeClass, right(nodeClass));
+        updateFields(sign, delta, start, stop, nodeClass, left(nodeClass));
     }
 
     private void updateParentField(N newParent, NestedNodeInfo<N> node, Class<N> nodeClass) {

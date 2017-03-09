@@ -23,10 +23,6 @@
  */
 package pl.exsio.nestedj.ex;
 
-/**
- *
- * @author exsio
- */
 public class InvalidParentException extends RuntimeException {
 
     public InvalidParentException(String msg) {

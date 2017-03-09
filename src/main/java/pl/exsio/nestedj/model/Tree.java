@@ -25,11 +25,6 @@ package pl.exsio.nestedj.model;
 
 import java.util.List;
 
-/**
- *
- * @author exsio
- * @param <N>
- */
 public interface Tree<N extends NestedNode> {
     
     void setChildren(List<Tree<N>> children);

@@ -23,9 +23,6 @@
  */
 package pl.exsio.nestedj.delegate;
 
-/**
- * @author exsio
- */
 public interface NestedNodeHierarchyManipulator {
 
     enum Mode {

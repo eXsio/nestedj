@@ -23,10 +23,6 @@
  */
 package pl.exsio.nestedj.config;
 
-/**
- *
- * @author exsio
- */
 public interface NestedNodeConfig {
 
     String getRightFieldName();
