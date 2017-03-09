@@ -23,7 +23,6 @@
  */
 package pl.exsio.nestedj.util;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import pl.exsio.nestedj.annotation.LeftColumn;
 import pl.exsio.nestedj.annotation.LevelColumn;
@@ -57,9 +56,7 @@ public class NestedNodeUtil {
 
     private static NestedNodeConfigImpl getConfigForClass(Class nodeClass, NestedNodeConfigImpl config) {
 
-        Preconditions.checkNotNull(nodeClass);
-        Preconditions.checkNotNull(config);
-        if (!nodeClass.getCanonicalName().equals(Object.class.getCanonicalName())) {
+        if (!Object.class.equals(nodeClass)) {
             for (Field field : nodeClass.getDeclaredFields()) {
                 if (field.getAnnotation(LeftColumn.class) != null && config.getLeftFieldName() == null) {
                     config.setLeftFieldName(field.getName());

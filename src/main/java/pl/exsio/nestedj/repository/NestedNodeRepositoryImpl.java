@@ -23,6 +23,8 @@
  */
 package pl.exsio.nestedj.repository;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pl.exsio.nestedj.delegate.NestedNodeHierarchyManipulator;
 import pl.exsio.nestedj.delegate.NestedNodeInserter;
 import pl.exsio.nestedj.delegate.NestedNodeMover;
@@ -39,6 +41,8 @@ import pl.exsio.nestedj.model.Tree;
 import java.util.Optional;
 
 public class NestedNodeRepositoryImpl<N extends NestedNode<N>> implements NestedNodeRepository<N> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(NestedNodeRepositoryImpl.class);
 
     private NestedNodeInserter<N> inserter;
 
@@ -106,10 +110,11 @@ public class NestedNodeRepositoryImpl<N extends NestedNode<N>> implements Nested
                 boolean nodeInfoValid = isNodeInfoValid(nodeInfo);
                 if (nodeInfoValid) {
                     this.mover.move(nodeInfo.get(), parentInfo.get(), mode);
-                } else if (!nodeInfoValid && allowNullableTreeFields) {
+                } else if (allowNullableTreeFields) {
+                    LOGGER.warn("Nullable tree fields allowed. Trying to perform an insert on an existing, invalid tree node: {}", nodeInfo.get());
                     this.inserter.insert(node, parentInfo.get(), mode);
                 } else {
-                    new InvalidNodeException(String.format("Current configuration doesn't allow nullable tree fields: %s", nodeInfo.get()));
+                    throw new InvalidNodeException(String.format("Current configuration doesn't allow nullable tree fields: %s", nodeInfo.get()));
                 }
             } else {
                 this.inserter.insert(node, parentInfo.get(), mode);
@@ -120,7 +125,7 @@ public class NestedNodeRepositoryImpl<N extends NestedNode<N>> implements Nested
     }
 
     private boolean isNodeInfoValid(Optional<NestedNodeInfo<N>> nodeInfo) {
-        return nodeInfo.get().getLeft() != null && nodeInfo.get().getRight() != null;
+        return (nodeInfo.get().getLeft() != null && nodeInfo.get().getRight() != null);
     }
 
     @Override
