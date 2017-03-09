@@ -50,28 +50,6 @@ public abstract class FunctionalNestedjTest {
     @PersistenceContext
     protected EntityManager em;
 
-    private final Map<String, Long> nodeMap = new HashMap() {
-        {
-            put("a", 1000L);
-            put("b", 2000L);
-            put("c", 3000L);
-            put("d", 4000L);
-            put("e", 5000L);
-            put("f", 6000L);
-            put("g", 7000L);
-            put("h", 8000L);
-
-            put("a2", 9000L);
-            put("b2", 10000L);
-            put("c2", 11000L);
-            put("d2", 12000L);
-            put("e2", 13000L);
-            put("f2", 14000L);
-            put("g2", 15000L);
-            put("h2", 16000L);
-        }
-    };
-
     /**
      * STARTING NESTED TREE CONDITIONS
      * <p/>

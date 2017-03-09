@@ -901,17 +901,11 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         TestNodeImpl g = this.findNode("g");
         TestNodeImpl f = this.findNode("f");
         TestNodeImpl h = this.findNode("h");
-
-        i = em.find(TestNodeImpl.class, i.getId());
-        j = em.find(TestNodeImpl.class, j.getId());
-        k = em.find(TestNodeImpl.class, k.getId());
-        l = em.find(TestNodeImpl.class, l.getId());
-        m = em.find(TestNodeImpl.class, m.getId());
-        printNode("i", i);
-        printNode("j", j);
-        printNode("k", k);
-        printNode("l", l);
-        printNode("m", m);
+         i = this.findNode("i");
+         j = this.findNode("j");
+         k = this.findNode("k");
+         l = this.findNode("l");
+         m = this.findNode("m");
 
         assertTrue(a.getLeft() == 1);
         assertTrue(a.getRight() == 16);
@@ -966,17 +960,11 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
          g = this.findNode("g");
          f = this.findNode("f");
          h = this.findNode("h");
-
-        i = em.find(TestNodeImpl.class, i.getId());
-        j = em.find(TestNodeImpl.class, j.getId());
-        k = em.find(TestNodeImpl.class, k.getId());
-        l = em.find(TestNodeImpl.class, l.getId());
-        m = em.find(TestNodeImpl.class, m.getId());
-        printNode("i", i);
-        printNode("j", j);
-        printNode("k", k);
-        printNode("l", l);
-        printNode("m", m);
+        i = this.findNode("i");
+        j = this.findNode("j");
+        k = this.findNode("k");
+        l = this.findNode("l");
+        m = this.findNode("m");
 
         assertTrue(a.getLeft() == 1);
         assertTrue(a.getRight() == 16);
@@ -1005,6 +993,88 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         assertTrue(l.getRight() == 23);
         assertTrue(m.getLeft() == 24);
         assertTrue(m.getRight() == 25);
+
+        nodeRepository.removeSingle(i);
+
+        em.flush();
+        em.clear();
+
+        a = this.findNode("a");
+        b = this.findNode("b");
+        c = this.findNode("c");
+        d = this.findNode("d");
+        e = this.findNode("e");
+        g = this.findNode("g");
+        f = this.findNode("f");
+        h = this.findNode("h");
+        j = this.findNode("j");
+        k = this.findNode("k");
+        l = this.findNode("l");
+        m = this.findNode("m");
+
+        System.out.println("ASSERTS AFTER REMOVE SINGLE");
+
+        assertTrue(a.getLeft() == 1);
+        assertTrue(a.getRight() == 16);
+        assertTrue(b.getLeft() == 2);
+        assertTrue(b.getRight() == 7);
+        assertTrue(c.getLeft() == 8);
+        assertTrue(c.getRight() == 15);
+        assertTrue(d.getLeft() == 3);
+        assertTrue(d.getRight() == 4);
+        assertTrue(e.getLeft() == 5);
+        assertTrue(e.getRight() == 6);
+        assertTrue(f.getLeft() == 9);
+        assertTrue(f.getRight() == 10);
+        assertTrue(g.getLeft() == 11);
+        assertTrue(g.getRight() == 14);
+        assertTrue(h.getLeft() == 12);
+        assertTrue(h.getRight() == 13);
+
+        assertTrue(j.getLeft() == 17);
+        assertTrue(j.getRight() == 18);
+        assertTrue(j.getLevel() == 0);
+        assertTrue(j.getParent() == null);
+        assertTrue(k.getLeft() == 19);
+        assertTrue(k.getRight() == 20);
+        assertTrue(k.getLevel() == 0);
+        assertTrue(k.getParent() == null);
+        assertTrue(l.getLeft() == 21);
+        assertTrue(l.getRight() == 22);
+        assertTrue(l.getLevel() == 0);
+        assertTrue(l.getParent() == null);
+        assertTrue(m.getLeft() == 23);
+        assertTrue(m.getRight() == 24);
+        assertTrue(m.getLevel() == 0);
+        assertTrue(m.getParent() == null);
+
+        nodeRepository.removeSubtree(a);
+        em.flush();
+        em.clear();
+
+        j = this.findNode("j");
+        k = this.findNode("k");
+        l = this.findNode("l");
+        m = this.findNode("m");
+
+        System.out.println("ASSERTS AFTER REMOVE SUBTREE");
+
+        assertTrue(j.getLeft() == 1);
+        assertTrue(j.getRight() == 2);
+        assertTrue(j.getLevel() == 0);
+        assertTrue(j.getParent() == null);
+        assertTrue(k.getLeft() == 3);
+        assertTrue(k.getRight() == 4);
+        assertTrue(k.getLevel() == 0);
+        assertTrue(k.getParent() == null);
+        assertTrue(l.getLeft() == 5);
+        assertTrue(l.getRight() == 6);
+        assertTrue(l.getLevel() == 0);
+        assertTrue(l.getParent() == null);
+        assertTrue(m.getLeft() == 7);
+        assertTrue(m.getRight() == 8);
+        assertTrue(m.getLevel() == 0);
+        assertTrue(m.getParent() == null);
     }
 
     @Test
