@@ -27,25 +27,27 @@ import pl.exsio.nestedj.ex.InvalidNodesHierarchyException;
 import pl.exsio.nestedj.model.NestedNode;
 import pl.exsio.nestedj.model.Tree;
 
+import java.util.Optional;
+
 public interface NestedNodeRepository<N extends NestedNode> {
 
-    N insertAsFirstChildOf(N node, N parent) throws InvalidNodesHierarchyException;
+    void insertAsFirstChildOf(N node, N parent) throws InvalidNodesHierarchyException;
 
-    N insertAsLastChildOf(N node, N parent) throws InvalidNodesHierarchyException;
+    void insertAsLastChildOf(N node, N parent) throws InvalidNodesHierarchyException;
 
-    N insertAsNextSiblingOf(N node, N parent) throws InvalidNodesHierarchyException;
+    void insertAsNextSiblingOf(N node, N parent) throws InvalidNodesHierarchyException;
 
-    N insertAsPrevSiblingOf(N node, N parent) throws InvalidNodesHierarchyException;
+    void insertAsPrevSiblingOf(N node, N parent) throws InvalidNodesHierarchyException;
 
     void removeSingle(N node);
 
-    void removeSubtree(N node);    
+    void removeSubtree(N node);
 
     Iterable<N> getChildren(N node);
 
-     N getParent(N node);
+    Optional<N> getParent(N node);
 
-     Iterable<N> getParents(N node);
+    Iterable<N> getParents(N node);
 
     Iterable<N> getTreeAsList(N node);
 

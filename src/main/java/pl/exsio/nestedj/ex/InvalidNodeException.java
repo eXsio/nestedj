@@ -21,13 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package pl.exsio.nestedj.delegate;
+package pl.exsio.nestedj.ex;
 
-import pl.exsio.nestedj.ex.InvalidNodesHierarchyException;
-import pl.exsio.nestedj.model.NestedNode;
-import pl.exsio.nestedj.model.NestedNodeInfo;
+/**
+ *
+ * @author exsio
+ */
+public class InvalidNodeException extends RuntimeException {
 
-public interface NestedNodeMover<N extends NestedNode<N>> extends NestedNodeHierarchyManipulator {
-
-    void move(NestedNodeInfo<N> nodeInfo, NestedNodeInfo<N> parentInfo, Mode mode) throws InvalidNodesHierarchyException;
+    public InvalidNodeException(String msg) {
+        super(msg);
+    }
 }

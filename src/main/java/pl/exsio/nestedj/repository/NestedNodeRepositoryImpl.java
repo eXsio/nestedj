@@ -23,16 +23,20 @@
  */
 package pl.exsio.nestedj.repository;
 
-import pl.exsio.nestedj.delegate.NestedNodeInserter;
-import pl.exsio.nestedj.model.NestedNode;
 import pl.exsio.nestedj.delegate.NestedNodeHierarchyManipulator;
+import pl.exsio.nestedj.delegate.NestedNodeInserter;
 import pl.exsio.nestedj.delegate.NestedNodeMover;
 import pl.exsio.nestedj.delegate.NestedNodeRebuilder;
 import pl.exsio.nestedj.delegate.NestedNodeRemover;
 import pl.exsio.nestedj.delegate.NestedNodeRetriever;
+import pl.exsio.nestedj.ex.InvalidNodeException;
 import pl.exsio.nestedj.ex.InvalidNodesHierarchyException;
+import pl.exsio.nestedj.ex.InvalidParentException;
+import pl.exsio.nestedj.model.NestedNode;
+import pl.exsio.nestedj.model.NestedNodeInfo;
 import pl.exsio.nestedj.model.Tree;
-import pl.exsio.nestedj.util.NestedNodeUtil;
+
+import java.util.Optional;
 
 public class NestedNodeRepositoryImpl<N extends NestedNode<N>> implements NestedNodeRepository<N> {
 
@@ -45,6 +49,8 @@ public class NestedNodeRepositoryImpl<N extends NestedNode<N>> implements Nested
     protected NestedNodeRetriever<N> retriever;
 
     protected NestedNodeRebuilder rebuilder;
+
+    private boolean allowNullableTreeFields = false;
 
     public void setInserter(NestedNodeInserter<N> inserter) {
         this.inserter = inserter;
@@ -67,31 +73,54 @@ public class NestedNodeRepositoryImpl<N extends NestedNode<N>> implements Nested
     }
 
     @Override
-    public N insertAsFirstChildOf(N node, N parent) throws InvalidNodesHierarchyException {
-        return this.insertOrMove(node, parent, NestedNodeHierarchyManipulator.Mode.FIRST_CHILD);
+    public void insertAsFirstChildOf(N node, N parent) throws InvalidNodesHierarchyException {
+        this.insertOrMove(node, parent, NestedNodeHierarchyManipulator.Mode.FIRST_CHILD);
     }
 
     @Override
-    public N insertAsLastChildOf(N node, N parent) throws InvalidNodesHierarchyException {
-        return this.insertOrMove(node, parent, NestedNodeHierarchyManipulator.Mode.LAST_CHILD);
+    public void insertAsLastChildOf(N node, N parent) throws InvalidNodesHierarchyException {
+        this.insertOrMove(node, parent, NestedNodeHierarchyManipulator.Mode.LAST_CHILD);
     }
 
     @Override
-    public N insertAsNextSiblingOf(N node, N parent) throws InvalidNodesHierarchyException {
-        return this.insertOrMove(node, parent, NestedNodeHierarchyManipulator.Mode.NEXT_SIBLING);
+    public void insertAsNextSiblingOf(N node, N parent) throws InvalidNodesHierarchyException {
+        this.insertOrMove(node, parent, NestedNodeHierarchyManipulator.Mode.NEXT_SIBLING);
     }
 
     @Override
-    public N insertAsPrevSiblingOf(N node, N parent) throws InvalidNodesHierarchyException {
-        return this.insertOrMove(node, parent, NestedNodeHierarchyManipulator.Mode.PREV_SIBLING);
+    public void insertAsPrevSiblingOf(N node, N parent) throws InvalidNodesHierarchyException {
+        this.insertOrMove(node, parent, NestedNodeHierarchyManipulator.Mode.PREV_SIBLING);
     }
 
-    private N insertOrMove(N node, N parent, NestedNodeHierarchyManipulator.Mode mode) throws InvalidNodesHierarchyException {
-        if (NestedNodeUtil.isNodeNew(node)) {
-            return this.inserter.insert(node, parent, mode);
-        } else {
-            return this.mover.move(node, parent, mode);
+    private void insertOrMove(N node, N parent, NestedNodeHierarchyManipulator.Mode mode) throws InvalidNodesHierarchyException {
+        if (parent.getId() == null) {
+            throw new InvalidParentException("Cannot insert or move to a parent that has null id");
         }
+        Optional<NestedNodeInfo<N>> parentInfo = retriever.getNodeInfo(parent.getId(), getNodeClass(parent));
+        if (!parentInfo.isPresent()) {
+            throw new InvalidParentException(String.format("Cannot insert or move to non existent parent. Parent id: %d", parent.getId()));
+        }
+        if (node.getId() != null) {
+            Optional<NestedNodeInfo<N>> nodeInfo = retriever.getNodeInfo(node.getId(), getNodeClass(node));
+            if (nodeInfo.isPresent()) {
+                boolean nodeInfoValid = isNodeInfoValid(nodeInfo);
+                if (nodeInfoValid) {
+                    this.mover.move(nodeInfo.get(), parentInfo.get(), mode);
+                } else if (!nodeInfoValid && allowNullableTreeFields) {
+                    this.inserter.insert(node, parentInfo.get(), mode);
+                } else {
+                    new InvalidNodeException(String.format("Current configuration doesn't allow nullable tree fields: %s", nodeInfo.get()));
+                }
+            } else {
+                this.inserter.insert(node, parentInfo.get(), mode);
+            }
+        } else {
+            this.inserter.insert(node, parentInfo.get(), mode);
+        }
+    }
+
+    private boolean isNodeInfoValid(Optional<NestedNodeInfo<N>> nodeInfo) {
+        return nodeInfo.get().getLeft() != null && nodeInfo.get().getRight() != null;
     }
 
     @Override
@@ -115,7 +144,7 @@ public class NestedNodeRepositoryImpl<N extends NestedNode<N>> implements Nested
     }
 
     @Override
-    public N getParent(N node) {
+    public Optional<N> getParent(N node) {
         return this.retriever.getParent(node);
     }
 
@@ -131,5 +160,17 @@ public class NestedNodeRepositoryImpl<N extends NestedNode<N>> implements Nested
 
     public void rebuildTree(Class<? extends NestedNode> nodeClass) throws InvalidNodesHierarchyException {
         this.rebuilder.rebuildTree(nodeClass);
+    }
+
+    public boolean isAllowNullableTreeFields() {
+        return allowNullableTreeFields;
+    }
+
+    public void setAllowNullableTreeFields(boolean allowNullableTreeFields) {
+        this.allowNullableTreeFields = allowNullableTreeFields;
+    }
+
+    private Class<N> getNodeClass(N node) {
+        return (Class<N>) node.getClass();
     }
 }

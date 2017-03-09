@@ -24,17 +24,22 @@
 package pl.exsio.nestedj.delegate;
 
 import pl.exsio.nestedj.model.NestedNode;
+import pl.exsio.nestedj.model.NestedNodeInfo;
 import pl.exsio.nestedj.model.Tree;
 
-public interface NestedNodeRetriever<N extends NestedNode> {
+import java.util.Optional;
+
+public interface NestedNodeRetriever<N extends NestedNode<N>> {
 
     Iterable<N> getTreeAsList(N node);
 
     Iterable<N> getChildren(N node);
 
-    N getParent(N node);
+    Optional<N> getParent(N node);
 
     Tree<N> getTree(N node);
 
     Iterable<N> getParents(N node);
+
+    Optional<NestedNodeInfo<N>> getNodeInfo(Long nodeId, Class<N> nodeClass);
 }

@@ -23,9 +23,12 @@
  */
 package pl.exsio.nestedj.delegate;
 
+import com.google.common.base.Preconditions;
 import pl.exsio.nestedj.discriminator.TreeDiscriminator;
+import pl.exsio.nestedj.ex.InvalidNodeException;
 import pl.exsio.nestedj.ex.InvalidNodesHierarchyException;
 import pl.exsio.nestedj.model.NestedNode;
+import pl.exsio.nestedj.model.NestedNodeInfo;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -34,6 +37,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
 import java.util.List;
+import java.util.Optional;
 
 import static pl.exsio.nestedj.util.NestedNodeUtil.id;
 import static pl.exsio.nestedj.util.NestedNodeUtil.left;
@@ -45,30 +49,21 @@ public class NestedNodeRebuilderImpl<N extends NestedNode<N>> extends NestedNode
     @PersistenceContext
     private EntityManager em;
 
-    private NestedNodeInserter<N> inserter;
+    private final NestedNodeInserter<N> inserter;
 
-    public NestedNodeRebuilderImpl(TreeDiscriminator<N> treeDiscriminator) {
-        super(treeDiscriminator);
-    }
+    private final NestedNodeRetriever<N> retriever;
 
-    public NestedNodeRebuilderImpl(TreeDiscriminator<N> treeDiscriminator, NestedNodeInserter<N> inserter) {
+    public NestedNodeRebuilderImpl(TreeDiscriminator<N> treeDiscriminator, NestedNodeInserter<N> inserter, NestedNodeRetriever<N> retriever) {
         super(treeDiscriminator);
         this.inserter = inserter;
+        this.retriever = retriever;
     }
 
-    public NestedNodeRebuilderImpl(EntityManager em, TreeDiscriminator<N> treeDiscriminator, NestedNodeInserter<N> inserter) {
+    public NestedNodeRebuilderImpl(EntityManager em, TreeDiscriminator<N> treeDiscriminator, NestedNodeInserter<N> inserter, NestedNodeRetriever<N> retriever) {
         super(treeDiscriminator);
         this.em = em;
         this.inserter = inserter;
-    }
-
-    public NestedNodeRebuilderImpl(EntityManager em, TreeDiscriminator<N> treeDiscriminator) {
-        super(treeDiscriminator);
-        this.em = em;
-    }
-
-    public void setInserter(NestedNodeInserter<N> inserter) {
-        this.inserter = inserter;
+        this.retriever = retriever;
     }
 
     @Override
@@ -85,7 +80,7 @@ public class NestedNodeRebuilderImpl<N extends NestedNode<N>> extends NestedNode
 
     private void rebuildRecursively(N parent, Class<N> nodeClass) throws InvalidNodesHierarchyException {
         for (N child : this.getChildren(parent, nodeClass)) {
-            this.inserter.insert(child, parent, NestedNodeMover.Mode.LAST_CHILD);
+            this.inserter.insert(child, getNodeInfo(parent, nodeClass), NestedNodeMover.Mode.LAST_CHILD);
             this.rebuildRecursively(child, nodeClass);
         }
     }
@@ -95,7 +90,7 @@ public class NestedNodeRebuilderImpl<N extends NestedNode<N>> extends NestedNode
         CriteriaQuery<N> select = cb.createQuery(nodeClass);
         Root<N> root = select.from(nodeClass);
         select.where(getPredicates(cb, root, cb.isNull(root.get(parent(nodeClass)))))
-        .orderBy(cb.asc(root.get(id(nodeClass))));
+                .orderBy(cb.asc(root.get(id(nodeClass))));
         return em.createQuery(select).setMaxResults(1).getSingleResult();
     }
 
@@ -121,7 +116,7 @@ public class NestedNodeRebuilderImpl<N extends NestedNode<N>> extends NestedNode
 
     private void restoreSiblings(N first, Class<N> nodeClass) throws InvalidNodesHierarchyException {
         for (N node : this.getSiblings(first, nodeClass)) {
-            this.inserter.insert(node, first, NestedNodeMover.Mode.NEXT_SIBLING);
+            this.inserter.insert(node, getNodeInfo(first, nodeClass), NestedNodeMover.Mode.NEXT_SIBLING);
         }
     }
 
@@ -131,6 +126,15 @@ public class NestedNodeRebuilderImpl<N extends NestedNode<N>> extends NestedNode
         Root<N> root = select.from(nodeClass);
         select.where(getPredicates(cb, root, cb.equal(root.get(parent(nodeClass)), parent))).orderBy(cb.desc(root.get(id(nodeClass))));
         return em.createQuery(select).getResultList();
+    }
+
+    private NestedNodeInfo<N> getNodeInfo(N node, Class<N> nodeClass) {
+        Preconditions.checkNotNull(node.getId());
+        Optional<NestedNodeInfo<N>> nodeInfo = retriever.getNodeInfo(node.getId(), nodeClass);
+        if (!nodeInfo.isPresent()) {
+            throw new InvalidNodeException(String.format("Couldn't find node with Id %s and class %s", node.getId(), nodeClass));
+        }
+        return nodeInfo.get();
     }
 
     public void setEntityManager(EntityManager em) {

@@ -25,6 +25,7 @@ package pl.exsio.nestedj.delegate;
 
 import pl.exsio.nestedj.discriminator.TreeDiscriminator;
 import pl.exsio.nestedj.model.NestedNode;
+import pl.exsio.nestedj.model.NestedNodeInfo;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -50,14 +51,13 @@ public class NestedNodeInserterImpl<N extends NestedNode<N>> extends NestedNodeD
     }
 
     @Override
-    public N insert(N node, N parent, Mode mode) {
+    public void insert(N node, NestedNodeInfo<N> parentInfo, Mode mode) {
         Class<N> nodeClass = getNodeClass(node);
-        this.makeSpaceForNewElement(getMoveFrom(parent, mode), mode, nodeClass);
-        this.insertNodeIntoTree(parent, node, mode, nodeClass);
-        return node;
+        this.makeSpaceForNewElement(getMoveFrom(parentInfo, mode), mode, nodeClass);
+        this.insertNodeIntoTree(parentInfo, node, mode, nodeClass);
     }
 
-    private void insertNodeIntoTree(N parent, N node, Mode mode, Class<N> nodeClass) {
+    private void insertNodeIntoTree(NestedNodeInfo<N> parent, N node, Mode mode, Class<N> nodeClass) {
         Long left = this.getNodeLeft(parent, mode);
         Long right = left + 1;
         Long level = this.getNodeLevel(parent, mode);
@@ -90,7 +90,7 @@ public class NestedNodeInserterImpl<N extends NestedNode<N>> extends NestedNodeD
         em.createQuery(update).executeUpdate();
     }
 
-    private Long getMoveFrom(N parent, Mode mode) {
+    private Long getMoveFrom(NestedNodeInfo<N> parent, Mode mode) {
         switch (mode) {
             case PREV_SIBLING:
             case FIRST_CHILD:
@@ -102,7 +102,7 @@ public class NestedNodeInserterImpl<N extends NestedNode<N>> extends NestedNodeD
         }
     }
 
-    private Long getNodeLevel(N parent, Mode mode) {
+    private Long getNodeLevel(NestedNodeInfo<N> parent, Mode mode) {
         switch (mode) {
             case NEXT_SIBLING:
             case PREV_SIBLING:
@@ -114,19 +114,23 @@ public class NestedNodeInserterImpl<N extends NestedNode<N>> extends NestedNodeD
         }
     }
 
-    private N getNodeParent(N parent, Mode mode) {
+    private N getNodeParent(NestedNodeInfo<N> parent, Mode mode) {
         switch (mode) {
             case NEXT_SIBLING:
             case PREV_SIBLING:
-                return parent.getParent();
+                if (parent.getParentId() != null) {
+                    return em.getReference(parent.getNodeClass(), parent.getParentId());
+                } else {
+                    return null;
+                }
             case LAST_CHILD:
             case FIRST_CHILD:
             default:
-                return parent;
+                return em.getReference(parent.getNodeClass(), parent.getId());
         }
     }
 
-    private Long getNodeLeft(N parent, Mode mode) {
+    private Long getNodeLeft(NestedNodeInfo<N> parent, Mode mode) {
         switch (mode) {
             case NEXT_SIBLING:
                 return parent.getRight() + 1;

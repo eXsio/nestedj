@@ -64,6 +64,7 @@
     <bean id="rebuilder" class="pl.exsio.nestedj.delegate.NestedNodeRebuilderImpl">
         <constructor-arg index="0" ref="treeDiscriminator"/>
         <constructor-arg index="1" ref="inserter"/>
+        <constructor-arg index="2" ref="retriever"/>
     </bean>
 
     <bean id="NestedNodeRepository" class="pl.exsio.nestedj.repository.NestedNodeRepositoryImpl">

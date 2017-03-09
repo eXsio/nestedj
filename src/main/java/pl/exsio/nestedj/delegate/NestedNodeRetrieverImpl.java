@@ -25,18 +25,25 @@ package pl.exsio.nestedj.delegate;
 
 import pl.exsio.nestedj.discriminator.TreeDiscriminator;
 import pl.exsio.nestedj.model.NestedNode;
+import pl.exsio.nestedj.model.NestedNodeInfo;
 import pl.exsio.nestedj.model.Tree;
 import pl.exsio.nestedj.model.TreeImpl;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
+import java.util.Optional;
 
+import static pl.exsio.nestedj.util.NestedNodeUtil.id;
 import static pl.exsio.nestedj.util.NestedNodeUtil.left;
 import static pl.exsio.nestedj.util.NestedNodeUtil.level;
+import static pl.exsio.nestedj.util.NestedNodeUtil.parent;
 import static pl.exsio.nestedj.util.NestedNodeUtil.right;
 
 public class NestedNodeRetrieverImpl<N extends NestedNode<N>> extends NestedNodeDelegate<N> implements NestedNodeRetriever<N> {
@@ -92,7 +99,7 @@ public class NestedNodeRetrieverImpl<N extends NestedNode<N>> extends NestedNode
     }
 
     @Override
-    public N getParent(N node) {
+    public Optional<N> getParent(N node) {
         if (node.getLevel() > 0) {
             Class<N> nodeClass = getNodeClass(node);
             CriteriaBuilder cb = em.getCriteriaBuilder();
@@ -103,9 +110,9 @@ public class NestedNodeRetrieverImpl<N extends NestedNode<N>> extends NestedNode
                     cb.greaterThan(root.<Long>get(right(nodeClass)), node.getRight()),
                     cb.equal(root.<Long>get(level(nodeClass)), node.getLevel() - 1)
             )).orderBy(cb.asc(root.<Long>get(left(nodeClass))));
-            return em.createQuery(select).setMaxResults(1).getSingleResult();
+            return Optional.of(em.createQuery(select).setMaxResults(1).getSingleResult());
         } else {
-            return null;
+            return Optional.empty();
         }
     }
 
@@ -123,6 +130,31 @@ public class NestedNodeRetrieverImpl<N extends NestedNode<N>> extends NestedNode
             return em.createQuery(select).getResultList();
         } else {
             return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public Optional<NestedNodeInfo<N>> getNodeInfo(Long nodeId, Class<N> nodeClass) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<NestedNodeInfo> select = cb.createQuery(NestedNodeInfo.class);
+        Root<N> root = select.from(nodeClass);
+        Join<N, N> parent = root.join(parent(nodeClass), JoinType.LEFT);
+        select.select(
+                cb.construct(
+                        NestedNodeInfo.class,
+                        root.<Long>get(id(nodeClass)),
+                        parent.<Long>get(id(nodeClass)),
+                        root.<Long>get(left(nodeClass)),
+                        root.<Long>get(right(nodeClass)),
+                        root.<Long>get(level(nodeClass))
+                )
+        ).where(cb.equal(root.<Long>get(id(nodeClass)), nodeId));
+        try {
+            NestedNodeInfo<N> result = em.createQuery(select).getSingleResult();
+            result.setNodeClass(nodeClass);
+            return Optional.of(result);
+        } catch (NoResultException ex) {
+            return Optional.<NestedNodeInfo<N>>empty();
         }
     }
 

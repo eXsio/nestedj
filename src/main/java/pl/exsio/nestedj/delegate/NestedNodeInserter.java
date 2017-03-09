@@ -24,9 +24,10 @@
 package pl.exsio.nestedj.delegate;
 
 import pl.exsio.nestedj.model.NestedNode;
+import pl.exsio.nestedj.model.NestedNodeInfo;
 
 public interface NestedNodeInserter<N extends NestedNode<N>> extends NestedNodeHierarchyManipulator {
 
-    N insert(N node, N parent, Mode mode);
+    void insert(N node, NestedNodeInfo<N> parentInfo, Mode mode);
 
 }

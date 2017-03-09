@@ -26,6 +26,7 @@ package pl.exsio.nestedj.delegate;
 import pl.exsio.nestedj.discriminator.TreeDiscriminator;
 import pl.exsio.nestedj.ex.InvalidNodesHierarchyException;
 import pl.exsio.nestedj.model.NestedNode;
+import pl.exsio.nestedj.model.NestedNodeInfo;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -63,26 +64,24 @@ public class NestedNodeMoverImpl<N extends NestedNode<N>> extends NestedNodeDele
     }
 
     @Override
-    public N move(N node, N parent, Mode mode) throws InvalidNodesHierarchyException {
-        Class<N> nodeClass = getNodeClass(node);
-        if (!this.canMoveNodeToSelectedParent(node, parent)) {
+    public void move(NestedNodeInfo<N> nodeInfo, NestedNodeInfo<N> parentInfo, Mode mode) throws InvalidNodesHierarchyException {
+        Class<N> nodeClass = nodeInfo.getNodeClass();
+        if (!this.canMoveNodeToSelectedParent(nodeInfo, parentInfo)) {
             throw new InvalidNodesHierarchyException("You cannot move a parent node to it's child or move a node to itself");
         }
-        Sign sign = this.getSign(node, parent, mode);
-        Long start = this.getStart(node, parent, mode, sign);
-        Long stop = this.getStop(node, parent, mode, sign);
-        List<Long> nodeIds = this.getNodeIds(node, nodeClass);
+        Sign sign = this.getSign(nodeInfo, parentInfo, mode);
+        Long start = this.getStart(nodeInfo, parentInfo, mode, sign);
+        Long stop = this.getStop(nodeInfo, parentInfo, mode, sign);
+        List<Long> nodeIds = this.getNodeIds(nodeInfo);
         Long delta = this.getDelta(nodeIds);
         Long nodeDelta = this.getNodeDelta(start, stop);
         Sign nodeSign = this.getNodeSign(sign);
-        Long levelModificator = this.getLevelModificator(node, parent, mode);
-        N newParent = this.getNewParent(parent, mode);
+        Long levelModificator = this.getLevelModificator(nodeInfo, parentInfo, mode);
+        N newParent = this.getNewParent(parentInfo, mode);
 
         this.makeSpaceForMovedElement(sign, delta, start, stop, nodeClass);
         this.performMove(nodeSign, nodeDelta, nodeIds, levelModificator, nodeClass);
-        this.updateParentField(newParent, node, nodeClass);
-
-        return node;
+        this.updateParentField(newParent, nodeInfo, nodeClass);
     }
 
     private void makeSpaceForMovedElement(Sign sign, Long delta, Long start, Long stop, Class<N> nodeClass) {
@@ -90,7 +89,7 @@ public class NestedNodeMoverImpl<N extends NestedNode<N>> extends NestedNodeDele
         this.updateFields(sign, delta, start, stop, nodeClass, left(nodeClass));
     }
 
-    private void updateParentField(NestedNode newParent, NestedNode node, Class<N> nodeClass) {
+    private void updateParentField(N newParent, NestedNodeInfo<N> node, Class<N> nodeClass) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
         Root<N> root = update.from(nodeClass);
@@ -139,35 +138,39 @@ public class NestedNodeMoverImpl<N extends NestedNode<N>> extends NestedNodeDele
         em.createQuery(update).executeUpdate();
     }
 
-    private boolean canMoveNodeToSelectedParent(N node, NestedNode parent) {
+    private boolean canMoveNodeToSelectedParent(NestedNodeInfo<N> node, NestedNodeInfo<N> parent) {
         return !node.getId().equals(parent.getId()) && (node.getLeft() >= parent.getLeft() || node.getRight() <= parent.getRight());
     }
-    
-    private List<Long> getNodeIds(N node, Class<N> nodeClass) {
+
+    private List<Long> getNodeIds(NestedNodeInfo<N> node) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Long> select = cb.createQuery(Long.class);
-        Root<N> root = select.from(nodeClass);
-        select.select(root.<Long>get(id(nodeClass))).where(
+        Root<N> root = select.from(node.getNodeClass());
+        select.select(root.<Long>get(id(node.getNodeClass()))).where(
                 getPredicates(cb, root,
-                        cb.greaterThanOrEqualTo(root.<Long>get(left(nodeClass)), node.getLeft()),
-                        cb.lessThanOrEqualTo(root.<Long>get(right(nodeClass)), node.getRight())
+                        cb.greaterThanOrEqualTo(root.<Long>get(left(node.getNodeClass())), node.getLeft()),
+                        cb.lessThanOrEqualTo(root.<Long>get(right(node.getNodeClass())), node.getRight())
                 ));
         return em.createQuery(select).getResultList();
     }
 
-    private N getNewParent(N parent, Mode mode) {
+    private N getNewParent(NestedNodeInfo<N> parent, Mode mode) {
         switch (mode) {
             case NEXT_SIBLING:
             case PREV_SIBLING:
-                return (N) parent.getParent();
+                if (parent.getParentId() != null) {
+                    return em.getReference(parent.getNodeClass(), parent.getParentId());
+                } else {
+                    return null;
+                }
             case FIRST_CHILD:
             case LAST_CHILD:
             default:
-                return parent;
+                return em.getReference(parent.getNodeClass(), parent.getId());
         }
     }
 
-    private Long getLevelModificator(N node, N parent, Mode mode) {
+    private Long getLevelModificator(NestedNodeInfo<N> node, NestedNodeInfo<N> parent, Mode mode) {
         switch (mode) {
             case NEXT_SIBLING:
             case PREV_SIBLING:
@@ -191,7 +194,7 @@ public class NestedNodeMoverImpl<N extends NestedNode<N>> extends NestedNodeDele
         return (sign.equals(Sign.PLUS)) ? Sign.MINUS : Sign.PLUS;
     }
 
-    private Sign getSign(N node, N parent, Mode mode) {
+    private Sign getSign(NestedNodeInfo<N> node, NestedNodeInfo<N> parent, Mode mode) {
         switch (mode) {
             case PREV_SIBLING:
             case FIRST_CHILD:
@@ -203,7 +206,7 @@ public class NestedNodeMoverImpl<N extends NestedNode<N>> extends NestedNodeDele
         }
     }
 
-    private Long getStart(N node, N parent, Mode mode, Sign sign) {
+    private Long getStart(NestedNodeInfo<N> node, NestedNodeInfo<N> parent, Mode mode, Sign sign) {
         switch (mode) {
             case PREV_SIBLING:
                 return sign.equals(Sign.PLUS) ? parent.getLeft() - 1 : node.getRight();
@@ -218,7 +221,7 @@ public class NestedNodeMoverImpl<N extends NestedNode<N>> extends NestedNodeDele
         }
     }
 
-    private Long getStop(N node, N parent, Mode mode, Sign sign) {
+    private Long getStop(NestedNodeInfo<N> node, NestedNodeInfo<N> parent, Mode mode, Sign sign) {
         switch (mode) {
             case PREV_SIBLING:
                 return sign.equals(Sign.PLUS) ? node.getLeft() : parent.getLeft();
