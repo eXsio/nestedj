@@ -37,7 +37,7 @@ You can query for an entire tree branch of node ```C``` using a query similar to
  SELECT * FROM TREE_TABLE WHERE LEFT >=8 AND RIGHT <= 15
 ```
 
-Using the traditional parant_id relationship would mean firing multiple queries for each child / parent relationship.
+Using the traditional ```parant_id``` relationship would mean firing multiple queries for each child / parent relationship.
 
 ### Usage
 
@@ -86,18 +86,33 @@ I ommited the getters and setters for shortage. As You see, there are 4 specific
 
 Strictly speaking NestedSet doesn't need the parent mapping, but at the same time it's structure is so fragile, that this additional feature helps rebuild the tree if it becomes corrupted for some reason.
 
-After creating schema You can use the special ```NestedNodeDao``` to perform a tree-specific opeeration, such as:
+After creating schema You can use the special ```NestedNodeRepository``` to perform a tree-specific opeeration, such as:
 
-- ```insertAsFirstChildOf(node, parent)```
-- ```insertAsLastChildOf(node, parent)```
-- ```insertAsNextSibling(node, parent)```
-- ```insertAsPrevSibling(node, parent)```
-- ```removeSingle(node)```
-- ```removeSubtree(node)```
-- ```getTreeAsList(node)```
-- ```getTree(node)```
+```
+    void insertAsFirstChildOf(N node, N parent) throws InvalidNodesHierarchyException;
 
-and couple more.
+    void insertAsLastChildOf(N node, N parent);
+
+    void insertAsNextSiblingOf(N node, N parent);
+
+    void insertAsPrevSiblingOf(N node, N parent);
+
+    void removeSingle(N node);
+
+    void removeSubtree(N node);
+
+    Iterable<N> getChildren(N node);
+
+    Optional<N> getParent(N node);
+
+    Iterable<N> getParents(N node);
+
+    Iterable<N> getTreeAsList(N node);
+
+    Tree<N> getTree(N node);
+
+    void rebuildTree(Class<? extends NestedNode> nodeClass);
+```
 
 The Entity inheritance is permitted. NestedJ will begin searching for it's annotation at the top class and move down the inheritance tree.
 
@@ -120,7 +135,7 @@ The Entity inheritance is permitted. NestedJ will begin searching for it's annot
 
 ```
 
-### Initialization
+### First Steps
 
 In order to use NestedJ, You have to configure it. Here's the full code:
 
@@ -141,6 +156,14 @@ In order to use NestedJ, You have to configure it. Here's the full code:
  
 
 NestedNodeRepository is a default, provided implementation of ```NestedNodeDao```. If You need or want, You can implement your own inserter/mover/retriever/remover/rebuilder that fits to Your needs.
+
+### Multiple Trees in one Table/Entity
+
+You can have multiple independant trees in single Table/Entity. Just implement your own version of ```TreeDiscriminator``` that will apply additional selectors on all JPA Queries.
+
+### Fixing / Initializing / Rebilding the Tree
+
+Nested Set is a pretty fragile structure. One bad manual modification of the table can destroy it. Also inserting big number of records manually would be very hard if you'd have to insert them with the correct left/right/level values. Fortunately NestedJ can rebuild the Tree from scratch. Just use ```rebuild(Class<N> nodeClass)``` method on the ```NestedNodeRepository<N>```.
 
 
 ### BUGS
