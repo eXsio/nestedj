@@ -88,7 +88,7 @@ public class NestedNodeRebuilderImpl<N extends NestedNode<N>> extends NestedNode
         CriteriaQuery<N> select = cb.createQuery(nodeClass);
         Root<N> root = select.from(nodeClass);
         select.where(getPredicates(cb, root, cb.isNull(root.get(parent(nodeClass)))))
-                .orderBy(cb.asc(root.get(id(nodeClass))));
+                .orderBy(cb.desc(root.get(id(nodeClass))));
         return em.createQuery(select).setMaxResults(1).getSingleResult();
     }
 

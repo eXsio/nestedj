@@ -11,7 +11,8 @@
         <appender-ref ref="STDOUT"/>
     </root>
 
-    <logger name="org.hibernate.tool.schema.internal" level="ERROR"/>
+    <logger name="org.hibernate" level="INFO"/>
+    <!--<logger name="org.hibernate.tool.schema.internal" level="ERROR"/>-->
     <logger name="org.springframework" level="INFO" />
     <logger name="pl.exsio" level="INFO" />
 

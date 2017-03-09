@@ -742,6 +742,8 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         TestNodeImpl k = this.createTestNode("k");
         TestNodeImpl e = this.findNode("e");
         this.nodeRepository.insertAsPrevSiblingOf(k, e);
+        em.flush();
+        em.clear();
         TestNodeImpl a = this.findNode("a");
         TestNodeImpl h = this.findNode("h");
         TestNodeImpl c = this.findNode("c");
@@ -1093,7 +1095,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
 
     private void breakTree() {
 
-        this.em.createQuery("update TestNodeImpl set parent = null where id = 3 and discriminator = 'tree_1'").executeUpdate();
+        this.em.createQuery("update TestNodeImpl set parent = null where name='c' and discriminator = 'tree_1'").executeUpdate();
         this.em.createQuery("update TestNodeImpl set lft = 0, rgt = 0, lvl = 0 where discriminator = 'tree_1'").executeUpdate();
 
     }

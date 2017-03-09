@@ -25,6 +25,7 @@ package pl.exsio.nestedj;
 
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import pl.exsio.nestedj.model.TestNodeImpl;
@@ -32,14 +33,15 @@ import pl.exsio.nestedj.repository.NestedNodeRepositoryImpl;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author exsio
- */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:/testContext.xml"})
+@ContextConfiguration(classes = {TestConfiguration.class})
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public abstract class FunctionalNestedjTest {
 
     @Autowired
@@ -50,23 +52,23 @@ public abstract class FunctionalNestedjTest {
 
     private final Map<String, Long> nodeMap = new HashMap() {
         {
-            put("a", 1L);
-            put("b", 2L);
-            put("c", 3L);
-            put("d", 4L);
-            put("e", 5L);
-            put("f", 6L);
-            put("g", 7L);
-            put("h", 8L);
+            put("a", 1000L);
+            put("b", 2000L);
+            put("c", 3000L);
+            put("d", 4000L);
+            put("e", 5000L);
+            put("f", 6000L);
+            put("g", 7000L);
+            put("h", 8000L);
 
-            put("a2", 9L);
-            put("b2", 10L);
-            put("c2", 11L);
-            put("d2", 12L);
-            put("e2", 13L);
-            put("f2", 14L);
-            put("g2", 15L);
-            put("h2", 16L);
+            put("a2", 9000L);
+            put("b2", 10000L);
+            put("c2", 11000L);
+            put("d2", 12000L);
+            put("e2", 13000L);
+            put("f2", 14000L);
+            put("g2", 15000L);
+            put("h2", 16000L);
         }
     };
 
@@ -90,14 +92,20 @@ public abstract class FunctionalNestedjTest {
      */
     protected TestNodeImpl findNode(String symbol) {
 
-        TestNodeImpl n = this.em.find(TestNodeImpl.class, this.nodeMap.get(symbol));
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<TestNodeImpl> select = cb.createQuery(TestNodeImpl.class);
+        Root<TestNodeImpl> root = select.from(TestNodeImpl.class);
+        select.where(cb.equal(root.get("name"), symbol));
+        TestNodeImpl n = em.createQuery(select).getSingleResult();
         printNode(symbol, n);
         this.em.refresh(n);
         return n;
     }
 
     protected void printNode(String symbol, TestNodeImpl n) {
-        System.out.println(String.format("Node %s: %d/%d/%d", symbol, n.getLeft(), n.getRight(), n.getLevel()));
+        if(n != null) {
+            System.out.println(String.format("Node %s: %d/%d/%d", symbol, n.getLeft(), n.getRight(), n.getLevel()));
+        }
     }
 
     protected TestNodeImpl createTestNode(String symbol) {

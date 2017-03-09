@@ -41,9 +41,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-/**
- * @author exsio
- */
 @Entity
 @Table(name = "nested_nodes")
 @Inheritance(strategy = InheritanceType.JOINED)
