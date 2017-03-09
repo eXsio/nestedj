@@ -39,7 +39,48 @@ You can query for an entire tree branch of node ```C``` using a query similar to
 
 Using the traditional ```parant_id``` relationship would mean firing multiple queries for each child / parent relationship.
 
-### Usage
+### Installation
+
+```
+<repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+</repositories>
+
+<dependency>
+            <groupId>com.github.eXsio</groupId>
+            <artifactId>nestedj</artifactId>
+            <version>2.1.0</version>
+</dependency>
+
+
+```
+
+### First Steps
+
+In order to use NestedJ, You have to configure it. Here's the full code:
+
+
+    NestedNodeRepositoryImpl<TestNodeImpl> repository = new NestedNodeRepositoryImpl<>();
+        TreeDiscriminatorImpl treeDiscriminator = new TreeDiscriminatorImpl();
+        NestedNodeInserter<TestNodeImpl> inserter = new NestedNodeInserterImpl<>(entityManager, treeDiscriminator);
+        NestedNodeMover<TestNodeImpl> mover = new NestedNodeMoverImpl<>(entityManager, treeDiscriminator);
+        NestedNodeRetriever<TestNodeImpl> retriever = new NestedNodeRetrieverImpl<>(entityManager, treeDiscriminator);
+        NestedNodeRebuilder<TestNodeImpl> rebuilder = new NestedNodeRebuilderImpl<>(entityManager, treeDiscriminator, inserter, retriever);
+        NestedNodeRemover<TestNodeImpl> remover = new NestedNodeRemoverImpl<>(entityManager, treeDiscriminator);
+
+        repository.setInserter(inserter);
+        repository.setMover(mover);
+        repository.setRebuilder(rebuilder);
+        repository.setRetriever(retriever);
+        repository.setRemover(remover);
+ 
+
+NestedNodeRepository is a default, provided implementation of ```NestedNodeDao```. If You need or want, You can implement your own inserter/mover/retriever/remover/rebuilder that fits to Your needs.
+
+### Entiy mapping
 
 Here is the example entity annotated with NestedJ - specific Annotations:
 
@@ -86,6 +127,10 @@ I ommited the getters and setters for shortage. As You see, there are 4 specific
 
 Strictly speaking NestedSet doesn't need the parent mapping, but at the same time it's structure is so fragile, that this additional feature helps rebuild the tree if it becomes corrupted for some reason.
 
+It is recommended that ```LeftColumn```, ```RightColumn``` and ```LevelColumn``` be non nullable. This will ensure better stability of the Nested Set structure.
+
+### Usage
+
 After creating schema You can use the special ```NestedNodeRepository``` to perform a tree-specific opeeration, such as:
 
 ```
@@ -115,47 +160,6 @@ After creating schema You can use the special ```NestedNodeRepository``` to perf
 ```
 
 The Entity inheritance is permitted. NestedJ will begin searching for it's annotation at the top class and move down the inheritance tree.
-
-### Installation
-
-```
-<repositories>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
-        </repository>
-</repositories>
-
-<dependency>
-            <groupId>com.github.eXsio</groupId>
-            <artifactId>nestedj</artifactId>
-            <version>2.1.0</version>
-</dependency>
-
-
-```
-
-### First Steps
-
-In order to use NestedJ, You have to configure it. Here's the full code:
-
-
-    NestedNodeRepositoryImpl<TestNodeImpl> repository = new NestedNodeRepositoryImpl<>();
-        TreeDiscriminatorImpl treeDiscriminator = new TreeDiscriminatorImpl();
-        NestedNodeInserter<TestNodeImpl> inserter = new NestedNodeInserterImpl<>(entityManager, treeDiscriminator);
-        NestedNodeMover<TestNodeImpl> mover = new NestedNodeMoverImpl<>(entityManager, treeDiscriminator);
-        NestedNodeRetriever<TestNodeImpl> retriever = new NestedNodeRetrieverImpl<>(entityManager, treeDiscriminator);
-        NestedNodeRebuilder<TestNodeImpl> rebuilder = new NestedNodeRebuilderImpl<>(entityManager, treeDiscriminator, inserter, retriever);
-        NestedNodeRemover<TestNodeImpl> remover = new NestedNodeRemoverImpl<>(entityManager, treeDiscriminator);
-
-        repository.setInserter(inserter);
-        repository.setMover(mover);
-        repository.setRebuilder(rebuilder);
-        repository.setRetriever(retriever);
-        repository.setRemover(remover);
- 
-
-NestedNodeRepository is a default, provided implementation of ```NestedNodeDao```. If You need or want, You can implement your own inserter/mover/retriever/remover/rebuilder that fits to Your needs.
 
 ### Multiple Trees in one Table/Entity
 
