@@ -23,6 +23,7 @@
  */
 package pl.exsio.nestedj.model;
 
+import com.google.common.base.MoreObjects;
 import pl.exsio.nestedj.annotation.LeftColumn;
 import pl.exsio.nestedj.annotation.LevelColumn;
 import pl.exsio.nestedj.annotation.ParentColumn;
@@ -100,7 +101,6 @@ public class TestNodeImpl extends DummyObject implements NestedNode<TestNodeImpl
     }
 
 
-
     public String getDiscriminator() {
         return discriminator;
     }
@@ -145,7 +145,15 @@ public class TestNodeImpl extends DummyObject implements NestedNode<TestNodeImpl
 
     @Override
     public String toString() {
-        return "[TestNode id " + this.getId() + ": " + this.getName() + "; left: " + this.getLeft() + ", right: " + this.getRight() + ", level: " + this.getLevel() + "]";
+        return MoreObjects.toStringHelper(this)
+                .add("id", id)
+                .add("name", name)
+                .add("lft", lft)
+                .add("rgt", rgt)
+                .add("lvl", lvl)
+                .add("parent", parent != null ? parent.getId() : "null")
+                .add("discriminator", discriminator)
+                .toString();
     }
 
     @Override

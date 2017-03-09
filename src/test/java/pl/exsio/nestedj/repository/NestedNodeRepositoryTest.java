@@ -31,6 +31,7 @@ import pl.exsio.nestedj.model.TestNodeImpl;
 import pl.exsio.nestedj.model.Tree;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -57,7 +58,8 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
             assertTrue(x.getRight() == 0L);
 
             this.nodeRepository.rebuildTree(TestNodeImpl.class);
-
+            em.refresh(x);
+            printNode("x", x);
             assertTrue(x.getLeft() == 1);
             assertTrue(x.getRight() == 2);
 
@@ -167,9 +169,10 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
     @Test
     public void testGetParent() {
         TestNodeImpl b = this.findNode("b");
-        TestNodeImpl parent = this.nodeRepository.getParent(b);
-        assertTrue(parent instanceof TestNodeImpl);
-        assertTrue(parent.getName().equals("a"));
+        Optional<TestNodeImpl> parent = this.nodeRepository.getParent(b);
+        assertTrue(parent.isPresent());
+        assertTrue(parent.get() instanceof TestNodeImpl);
+        assertTrue(parent.get().getName().equals("a"));
         assertSecondTreeIntact();
     }
 
@@ -320,7 +323,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
     public void testInsertAsLastChildOfDeepMove() throws InvalidNodesHierarchyException {
         TestNodeImpl b = this.findNode("b");
         TestNodeImpl a = this.findNode("a");
-        b = this.nodeRepository.insertAsLastChildOf(b, a);
+        this.nodeRepository.insertAsLastChildOf(b, a);
         TestNodeImpl d = this.findNode("d");
         TestNodeImpl g = this.findNode("g");
         TestNodeImpl c = this.findNode("c");
@@ -345,7 +348,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
     public void testInsertAsFirstChildOfDeepMove() throws InvalidNodesHierarchyException {
         TestNodeImpl c = this.findNode("c");
         TestNodeImpl a = this.findNode("a");
-        c = this.nodeRepository.insertAsFirstChildOf(c, a);
+        this.nodeRepository.insertAsFirstChildOf(c, a);
         TestNodeImpl d = this.findNode("d");
         TestNodeImpl g = this.findNode("g");
         TestNodeImpl b = this.findNode("b");
@@ -370,7 +373,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
     public void testInsertAsNextSiblingOfDeepMove() throws InvalidNodesHierarchyException {
         TestNodeImpl b = this.findNode("b");
         TestNodeImpl a = this.findNode("a");
-        b = this.nodeRepository.insertAsNextSiblingOf(b, a);
+        this.nodeRepository.insertAsNextSiblingOf(b, a);
         TestNodeImpl d = this.findNode("d");
         TestNodeImpl g = this.findNode("g");
         TestNodeImpl e = this.findNode("e");
@@ -396,7 +399,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
     public void testInsertAsPrevSiblingOfDeepMove() throws InvalidNodesHierarchyException {
         TestNodeImpl c = this.findNode("c");
         TestNodeImpl a = this.findNode("a");
-        c = this.nodeRepository.insertAsPrevSiblingOf(c, a);
+        this.nodeRepository.insertAsPrevSiblingOf(c, a);
         TestNodeImpl d = this.findNode("d");
         TestNodeImpl g = this.findNode("g");
         TestNodeImpl f = this.findNode("f");
@@ -424,7 +427,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
     public void testInsertAsPrevSiblingOfMoveRight() throws InvalidNodesHierarchyException {
         TestNodeImpl d = this.findNode("d");
         TestNodeImpl g = this.findNode("g");
-        d = this.nodeRepository.insertAsPrevSiblingOf(d, g);
+        this.nodeRepository.insertAsPrevSiblingOf(d, g);
         TestNodeImpl f = this.findNode("f");
         TestNodeImpl c = this.findNode("c");
         TestNodeImpl a = this.findNode("a");
@@ -457,7 +460,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
     public void testInsertAsPrevSiblingOfMoveLeft() throws InvalidNodesHierarchyException {
         TestNodeImpl g = this.findNode("g");
         TestNodeImpl e = this.findNode("e");
-        g = this.nodeRepository.insertAsPrevSiblingOf(g, e);
+        this.nodeRepository.insertAsPrevSiblingOf(g, e);
         TestNodeImpl c = this.findNode("c");
         TestNodeImpl a = this.findNode("a");
         TestNodeImpl b = this.findNode("b");
@@ -485,7 +488,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
     public void testInsertAsNextSiblingOfMoveRight() throws InvalidNodesHierarchyException {
         TestNodeImpl d = this.findNode("d");
         TestNodeImpl f = this.findNode("f");
-        d = this.nodeRepository.insertAsNextSiblingOf(d, f);
+        this.nodeRepository.insertAsNextSiblingOf(d, f);
         TestNodeImpl g = this.findNode("g");
         TestNodeImpl c = this.findNode("c");
         TestNodeImpl a = this.findNode("a");
@@ -517,7 +520,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
     public void testInsertAsNextSiblingOfMoveLeft() throws InvalidNodesHierarchyException {
         TestNodeImpl g = this.findNode("g");
         TestNodeImpl d = this.findNode("d");
-        g = this.nodeRepository.insertAsNextSiblingOf(g, d);
+        this.nodeRepository.insertAsNextSiblingOf(g, d);
         TestNodeImpl c = this.findNode("c");
         TestNodeImpl a = this.findNode("a");
         TestNodeImpl b = this.findNode("b");
@@ -546,7 +549,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
     public void testInsertAsLastChildOfMoveLeft() throws InvalidNodesHierarchyException {
         TestNodeImpl g = this.findNode("g");
         TestNodeImpl b = this.findNode("b");
-        g = this.nodeRepository.insertAsLastChildOf(g, b);
+        this.nodeRepository.insertAsLastChildOf(g, b);
         TestNodeImpl f = this.findNode("f");
         TestNodeImpl c = this.findNode("c");
         TestNodeImpl a = this.findNode("a");
@@ -575,7 +578,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
     public void testInsertAsLastChildOfMoveRight() throws InvalidNodesHierarchyException {
         TestNodeImpl d = this.findNode("d");
         TestNodeImpl g = this.findNode("g");
-        d = this.nodeRepository.insertAsLastChildOf(d, g);
+        this.nodeRepository.insertAsLastChildOf(d, g);
         TestNodeImpl f = this.findNode("f");
         TestNodeImpl c = this.findNode("c");
         TestNodeImpl a = this.findNode("a");
@@ -605,7 +608,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
     public void testInsertAsFirstChildOfMoveRight() throws InvalidNodesHierarchyException {
         TestNodeImpl d = findNode("d");
         TestNodeImpl g = findNode("g");
-        d = this.nodeRepository.insertAsFirstChildOf(d, g);
+        this.nodeRepository.insertAsFirstChildOf(d, g);
 
         em.refresh(d);
         em.refresh(g);
@@ -636,7 +639,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
     public void testInsertAsFirstChildOfMoveLeft() throws InvalidNodesHierarchyException {
         TestNodeImpl g = this.findNode("g");
         TestNodeImpl b = this.findNode("b");
-        g = this.nodeRepository.insertAsFirstChildOf(g, b);
+        this.nodeRepository.insertAsFirstChildOf(g, b);
         TestNodeImpl f = this.findNode("f");
         TestNodeImpl c = this.findNode("c");
         TestNodeImpl a = this.findNode("a");
@@ -670,7 +673,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
 
         TestNodeImpl i = this.createTestNode("i");
         TestNodeImpl e = this.findNode("e");
-        i = this.nodeRepository.insertAsFirstChildOf(i, e);
+        this.nodeRepository.insertAsFirstChildOf(i, e);
         TestNodeImpl a = this.findNode("a");
         TestNodeImpl b = this.findNode("b");
         TestNodeImpl h = this.findNode("h");
@@ -690,7 +693,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
 
         TestNodeImpl i = this.createTestNode("i");
         TestNodeImpl b = this.findNode("b");
-        i = this.nodeRepository.insertAsFirstChildOf(i, b);
+        this.nodeRepository.insertAsFirstChildOf(i, b);
         TestNodeImpl a = this.findNode("a");
         em.flush();
         em.refresh(i);
@@ -721,7 +724,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
 
         TestNodeImpl j = this.createTestNode("j");
         TestNodeImpl b = this.findNode("b");
-        j = this.nodeRepository.insertAsLastChildOf(j, b);
+        this.nodeRepository.insertAsLastChildOf(j, b);
         TestNodeImpl a = this.findNode("a");
         TestNodeImpl h = this.findNode("h");
         TestNodeImpl c = this.findNode("c");
@@ -741,7 +744,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
 
         TestNodeImpl k = this.createTestNode("k");
         TestNodeImpl e = this.findNode("e");
-        k = this.nodeRepository.insertAsPrevSiblingOf(k, e);
+        this.nodeRepository.insertAsPrevSiblingOf(k, e);
         TestNodeImpl a = this.findNode("a");
         TestNodeImpl h = this.findNode("h");
         TestNodeImpl c = this.findNode("c");
@@ -762,7 +765,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
 
         TestNodeImpl m = this.createTestNode("m");
         TestNodeImpl h = this.findNode("h");
-        m = this.nodeRepository.insertAsNextSiblingOf(m, h);
+        this.nodeRepository.insertAsNextSiblingOf(m, h);
         TestNodeImpl a = this.findNode("a");
         TestNodeImpl g = this.findNode("g");
         TestNodeImpl c = this.findNode("c");
@@ -781,7 +784,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
     public void testInsertAsNextSiblingOfMoveEdge() throws InvalidNodesHierarchyException {
         TestNodeImpl h = this.findNode("h");
         TestNodeImpl c = this.findNode("c");
-        h = this.nodeRepository.insertAsLastChildOf(h, c);
+        this.nodeRepository.insertAsLastChildOf(h, c);
 
         TestNodeImpl a = this.findNode("a");
         TestNodeImpl b = this.findNode("b");
@@ -817,7 +820,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
 
         TestNodeImpl c = this.findNode("c");
         TestNodeImpl a = this.findNode("a");
-        c = this.nodeRepository.insertAsNextSiblingOf(c, a);
+        this.nodeRepository.insertAsNextSiblingOf(c, a);
 
         a = this.findNode("a");
         TestNodeImpl b = this.findNode("b");
@@ -858,13 +861,13 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         TestNodeImpl m = this.createTestNode("m");
         TestNodeImpl a = this.findNode("a");
 
-        i = this.nodeRepository.insertAsNextSiblingOf(i, a);
+        this.nodeRepository.insertAsNextSiblingOf(i, a);
         em.flush();
         em.clear();
 
         i = em.find(TestNodeImpl.class, i.getId());
         printNode("i", i);
-        j = this.nodeRepository.insertAsLastChildOf(j, i);
+        this.nodeRepository.insertAsLastChildOf(j, i);
         em.flush();
         em.clear();
 
@@ -872,13 +875,13 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         j = em.find(TestNodeImpl.class, j.getId());
         printNode("i", i);
         printNode("j", j);
-        k = this.nodeRepository.insertAsFirstChildOf(k, i);
+        this.nodeRepository.insertAsFirstChildOf(k, i);
         em.flush();
         em.clear();
 
         j = em.find(TestNodeImpl.class, j.getId());
         k = em.find(TestNodeImpl.class, k.getId());
-        l = this.nodeRepository.insertAsNextSiblingOf(l, k);
+        this.nodeRepository.insertAsNextSiblingOf(l, k);
         em.flush();
         em.clear();
         i = em.find(TestNodeImpl.class, i.getId());
@@ -886,7 +889,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         k = em.find(TestNodeImpl.class, k.getId());
         l = em.find(TestNodeImpl.class, l.getId());
 
-        m = this.nodeRepository.insertAsPrevSiblingOf(m, l);
+        this.nodeRepository.insertAsPrevSiblingOf(m, l);
         em.flush();
         em.clear();
 
@@ -944,65 +947,65 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         assertTrue(this.getParent(k) == i);
         assertSecondTreeIntact();
 
-//        this.em.createQuery("update TestNodeImpl set lft = 0, rgt = 0, lvl = 0 where discriminator = 'tree_1'").executeUpdate();
-//        em.flush();
-//        em.clear();
-//
-//        nodeRepository.rebuildTree(TestNodeImpl.class);
-//        em.flush();
-//        em.clear();
-//
-//        assertSecondTreeIntact();
-//
-//        System.out.println("ASSERTS AFTER REBUILD");
-//
-//        a = this.findNode("a");
-//         b = this.findNode("b");
-//         c = this.findNode("c");
-//         d = this.findNode("d");
-//         e = this.findNode("e");
-//         g = this.findNode("g");
-//         f = this.findNode("f");
-//         h = this.findNode("h");
-//
-//        i = em.find(TestNodeImpl.class, i.getId());
-//        j = em.find(TestNodeImpl.class, j.getId());
-//        k = em.find(TestNodeImpl.class, k.getId());
-//        l = em.find(TestNodeImpl.class, l.getId());
-//        m = em.find(TestNodeImpl.class, m.getId());
-//        printNode("i", i);
-//        printNode("j", j);
-//        printNode("k", k);
-//        printNode("l", l);
-//        printNode("m", m);
-//
-//        assertTrue(a.getLeft() == 1);
-//        assertTrue(a.getRight() == 16);
-//        assertTrue(b.getLeft() == 2);
-//        assertTrue(b.getRight() == 7);
-//        assertTrue(c.getLeft() == 8);
-//        assertTrue(c.getRight() == 15);
-//        assertTrue(d.getLeft() == 3);
-//        assertTrue(d.getRight() == 4);
-//        assertTrue(e.getLeft() == 5);
-//        assertTrue(e.getRight() == 6);
-//        assertTrue(f.getLeft() == 9);
-//        assertTrue(f.getRight() == 10);
-//        assertTrue(g.getLeft() == 11);
-//        assertTrue(g.getRight() == 14);
-//        assertTrue(h.getLeft() == 12);
-//        assertTrue(h.getRight() == 13);
-//
-//        assertTrue(i.getLeft() == 17);
-//        assertTrue(i.getRight() == 26);
-//        assertTrue(j.getLeft() == 24);
-//        assertTrue(j.getRight() == 25);
-//        assertTrue(k.getLeft() == 18);
-//        assertTrue(k.getRight() == 19);
-//        assertTrue(l.getLeft() == 22);
-//        assertTrue(l.getRight() == 23);
-//        assertTrue(m.getLeft() == 20);
-//        assertTrue(m.getRight() == 21);
+        this.em.createQuery("update TestNodeImpl set lft = 0, rgt = 0, lvl = 0 where discriminator = 'tree_1'").executeUpdate();
+        em.flush();
+        em.clear();
+
+        nodeRepository.rebuildTree(TestNodeImpl.class);
+        em.flush();
+        em.clear();
+
+        assertSecondTreeIntact();
+
+        System.out.println("ASSERTS AFTER REBUILD");
+
+        a = this.findNode("a");
+         b = this.findNode("b");
+         c = this.findNode("c");
+         d = this.findNode("d");
+         e = this.findNode("e");
+         g = this.findNode("g");
+         f = this.findNode("f");
+         h = this.findNode("h");
+
+        i = em.find(TestNodeImpl.class, i.getId());
+        j = em.find(TestNodeImpl.class, j.getId());
+        k = em.find(TestNodeImpl.class, k.getId());
+        l = em.find(TestNodeImpl.class, l.getId());
+        m = em.find(TestNodeImpl.class, m.getId());
+        printNode("i", i);
+        printNode("j", j);
+        printNode("k", k);
+        printNode("l", l);
+        printNode("m", m);
+
+        assertTrue(a.getLeft() == 1);
+        assertTrue(a.getRight() == 16);
+        assertTrue(b.getLeft() == 2);
+        assertTrue(b.getRight() == 7);
+        assertTrue(c.getLeft() == 8);
+        assertTrue(c.getRight() == 15);
+        assertTrue(d.getLeft() == 3);
+        assertTrue(d.getRight() == 4);
+        assertTrue(e.getLeft() == 5);
+        assertTrue(e.getRight() == 6);
+        assertTrue(f.getLeft() == 9);
+        assertTrue(f.getRight() == 10);
+        assertTrue(g.getLeft() == 11);
+        assertTrue(g.getRight() == 14);
+        assertTrue(h.getLeft() == 12);
+        assertTrue(h.getRight() == 13);
+
+        assertTrue(i.getLeft() == 17);
+        assertTrue(i.getRight() == 26);
+        assertTrue(j.getLeft() == 18);
+        assertTrue(j.getRight() == 19);
+        assertTrue(k.getLeft() == 20);
+        assertTrue(k.getRight() == 21);
+        assertTrue(l.getLeft() == 22);
+        assertTrue(l.getRight() == 23);
+        assertTrue(m.getLeft() == 24);
+        assertTrue(m.getRight() == 25);
     }
 
     @Test
@@ -1012,9 +1015,9 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         TestNodeImpl j = this.createTestNode("j");
         TestNodeImpl k = this.createTestNode("k");
         TestNodeImpl a = this.findNode("a");
-        i = this.nodeRepository.insertAsNextSiblingOf(i, a);
-        j = this.nodeRepository.insertAsLastChildOf(j, i);
-        k = this.nodeRepository.insertAsLastChildOf(k, i);
+        this.nodeRepository.insertAsNextSiblingOf(i, a);
+        this.nodeRepository.insertAsLastChildOf(j, i);
+        this.nodeRepository.insertAsLastChildOf(k, i);
 
         this.em.createQuery("update TestNodeImpl set lft = 0, rgt = 0, lvl = 0 where discriminator = 'tree_1'").executeUpdate();
         em.flush();

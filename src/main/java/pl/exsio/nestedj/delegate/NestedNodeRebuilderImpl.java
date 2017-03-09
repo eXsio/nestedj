@@ -69,19 +69,18 @@ public class NestedNodeRebuilderImpl<N extends NestedNode<N>> extends NestedNode
     @Override
     public void rebuildTree(Class<N> nodeClass) throws InvalidNodesHierarchyException {
         N first = this.findFirstNestedNode(nodeClass);
-        this.resetFirst(first, nodeClass);
-        this.restoreSiblings(first, nodeClass);
-        this.rebuildRecursively(first, nodeClass);
-        for (N node : this.getSiblings(first, nodeClass)) {
-            this.rebuildRecursively(node, nodeClass);
+        resetFirst(first, nodeClass);
+        restoreSiblings(first, nodeClass);
+        rebuildRecursively(first, nodeClass);
+        for (N node : getSiblings(first, nodeClass)) {
+            rebuildRecursively(node, nodeClass);
         }
-        this.em.refresh(first);
     }
 
     private void rebuildRecursively(N parent, Class<N> nodeClass) throws InvalidNodesHierarchyException {
-        for (N child : this.getChildren(parent, nodeClass)) {
-            this.inserter.insert(child, getNodeInfo(parent, nodeClass), NestedNodeMover.Mode.LAST_CHILD);
-            this.rebuildRecursively(child, nodeClass);
+        for (N child : getChildren(parent, nodeClass)) {
+            inserter.insert(child, getNodeInfo(parent, nodeClass), NestedNodeMover.Mode.LAST_CHILD);
+            rebuildRecursively(child, nodeClass);
         }
     }
 
@@ -110,12 +109,12 @@ public class NestedNodeRebuilderImpl<N extends NestedNode<N>> extends NestedNode
         select.where(getPredicates(cb, root,
                 cb.isNull(root.get(parent(nodeClass))),
                 cb.notEqual(root.get(id(nodeClass)), first.getId())
-        )).orderBy(cb.desc(root.get(id(nodeClass))));
+        )).orderBy(cb.asc(root.get(id(nodeClass))));
         return em.createQuery(select).getResultList();
     }
 
     private void restoreSiblings(N first, Class<N> nodeClass) throws InvalidNodesHierarchyException {
-        for (N node : this.getSiblings(first, nodeClass)) {
+        for (N node : getSiblings(first, nodeClass)) {
             this.inserter.insert(node, getNodeInfo(first, nodeClass), NestedNodeMover.Mode.NEXT_SIBLING);
         }
     }
@@ -124,7 +123,7 @@ public class NestedNodeRebuilderImpl<N extends NestedNode<N>> extends NestedNode
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<N> select = cb.createQuery(nodeClass);
         Root<N> root = select.from(nodeClass);
-        select.where(getPredicates(cb, root, cb.equal(root.get(parent(nodeClass)), parent))).orderBy(cb.desc(root.get(id(nodeClass))));
+        select.where(getPredicates(cb, root, cb.equal(root.get(parent(nodeClass)), parent))).orderBy(cb.asc(root.get(id(nodeClass))));
         return em.createQuery(select).getResultList();
     }
 

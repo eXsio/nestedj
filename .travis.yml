@@ -1,4 +1,6 @@
 language: java
+jdk:
+  - oraclejdk8
 script: mvn test -f pom.xml
 sudo: false
 
