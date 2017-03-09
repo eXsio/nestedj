@@ -42,19 +42,19 @@ Using the traditional ```parant_id``` relationship would mean firing multiple qu
 ### Installation
 
 ```
+
 <repositories>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
-        </repository>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
 </repositories>
 
 <dependency>
-            <groupId>com.github.eXsio</groupId>
-            <artifactId>nestedj</artifactId>
-            <version>2.1.0</version>
+    <groupId>com.github.eXsio</groupId>
+    <artifactId>nestedj</artifactId>
+    <version>2.1.0</version>
 </dependency>
-
 
 ```
 
