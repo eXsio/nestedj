@@ -63,7 +63,7 @@ Using the traditional ```parant_id``` relationship would mean firing multiple qu
 In order to use NestedJ, You have to configure it. Here's the full code:
 
 
-    NestedNodeRepositoryImpl<TestNodeImpl> repository = new NestedNodeRepositoryImpl<>();
+        NestedNodeRepositoryImpl<TestNodeImpl> repository = new NestedNodeRepositoryImpl<>();
         TreeDiscriminatorImpl treeDiscriminator = new TreeDiscriminatorImpl();
         NestedNodeInserter<TestNodeImpl> inserter = new NestedNodeInserterImpl<>(entityManager, treeDiscriminator);
         NestedNodeMover<TestNodeImpl> mover = new NestedNodeMoverImpl<>(entityManager, treeDiscriminator);
@@ -165,7 +165,7 @@ The Entity inheritance is permitted. NestedJ will begin searching for it's annot
 
 You can have multiple independant trees in single Table/Entity. Just implement your own version of ```TreeDiscriminator``` that will apply additional selectors on all JPA Queries.
 
-### Fixing / Initializing / Rebilding the Tree
+### Fixing / Initializing / Rebuilding the Tree
 
 Nested Set is a pretty fragile structure. One bad manual modification of the table can destroy it. Also inserting big number of records manually would be very hard if you'd have to insert them with the correct left/right/level values. Fortunately NestedJ can rebuild the Tree from scratch. Just use ```rebuild(Class<N> nodeClass)``` method on the ```NestedNodeRepository<N>```.
 
