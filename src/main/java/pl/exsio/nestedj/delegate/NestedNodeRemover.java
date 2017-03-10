@@ -24,10 +24,11 @@
 package pl.exsio.nestedj.delegate;
 
 import pl.exsio.nestedj.model.NestedNode;
+import pl.exsio.nestedj.model.NestedNodeInfo;
 
 public interface NestedNodeRemover<N extends NestedNode<N>> {
 
-    void removeSingle(N node);
+    void removeSingle(NestedNodeInfo<N> node);
 
-    void removeSubtree(N node);
+    void removeSubtree(NestedNodeInfo<N> node);
 }

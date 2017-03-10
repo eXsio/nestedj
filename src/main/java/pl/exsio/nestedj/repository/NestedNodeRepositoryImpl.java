@@ -32,7 +32,6 @@ import pl.exsio.nestedj.delegate.NestedNodeRebuilder;
 import pl.exsio.nestedj.delegate.NestedNodeRemover;
 import pl.exsio.nestedj.delegate.NestedNodeRetriever;
 import pl.exsio.nestedj.ex.InvalidNodeException;
-import pl.exsio.nestedj.ex.InvalidNodesHierarchyException;
 import pl.exsio.nestedj.ex.InvalidParentException;
 import pl.exsio.nestedj.model.NestedNode;
 import pl.exsio.nestedj.model.NestedNodeInfo;
@@ -130,12 +129,23 @@ public class NestedNodeRepositoryImpl<N extends NestedNode<N>> implements Nested
 
     @Override
     public void removeSingle(N node) {
-        this.remover.removeSingle(node);
+        Optional<NestedNodeInfo<N>> nodeInfo = retriever.getNodeInfo(node.getId(), getNodeClass(node));
+        if (nodeInfo.isPresent()) {
+            this.remover.removeSingle(nodeInfo.get());
+        } else {
+            throw new InvalidNodeException(String.format("Couldn't remove node, was it already removed?: %s", node));
+        }
+
     }
 
     @Override
     public void removeSubtree(N node) {
-        this.remover.removeSubtree(node);
+        Optional<NestedNodeInfo<N>> nodeInfo = retriever.getNodeInfo(node.getId(), getNodeClass(node));
+        if (nodeInfo.isPresent()) {
+            this.remover.removeSubtree(nodeInfo.get());
+        } else {
+            throw new InvalidNodeException(String.format("Couldn't remove node subtree, was it already removed?: %s", node));
+        }
     }
 
     @Override

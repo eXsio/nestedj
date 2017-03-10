@@ -24,7 +24,9 @@
 package pl.exsio.nestedj.delegate;
 
 import pl.exsio.nestedj.discriminator.TreeDiscriminator;
+import pl.exsio.nestedj.ex.InvalidNodeException;
 import pl.exsio.nestedj.model.NestedNode;
+import pl.exsio.nestedj.model.NestedNodeInfo;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -57,17 +59,17 @@ public class NestedNodeRemoverImpl<N extends NestedNode<N>> extends NestedNodeDe
     }
 
     @Override
-    public void removeSingle(N node) {
-        Class<N> nodeClass = getNodeClass(node);
-        Long from = node.getRight();
-        Optional<N> parent = this.findNodeParent(node, nodeClass);
-        updateNodesParent(node, parent, nodeClass);
+    public void removeSingle(NestedNodeInfo<N> nodeInfo) {
+        Class<N> nodeClass = nodeInfo.getNodeClass();
+        Long from = nodeInfo.getRight();
+        Optional<N> parent = this.findNodeParent(nodeInfo, nodeClass);
+        updateNodesParent(nodeInfo, parent, nodeClass);
         prepareTreeForSingleNodeRemoval(from, nodeClass);
-        updateDeletedNodeChildren(node, nodeClass);
-        performSingleDeletion(node, nodeClass);
+        updateDeletedNodeChildren(nodeInfo, nodeClass);
+        performSingleDeletion(nodeInfo, nodeClass);
     }
 
-    private void performSingleDeletion(N node, Class<N> nodeClass) {
+    private void performSingleDeletion(NestedNodeInfo<N> node, Class<N> nodeClass) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaDelete<N> delete = cb.createCriteriaDelete(nodeClass);
         Root<N> root = delete.from(nodeClass);
@@ -82,7 +84,7 @@ public class NestedNodeRemoverImpl<N extends NestedNode<N>> extends NestedNodeDe
         updateFieldsBeforeSingleNodeRemoval(from, nodeClass, left(nodeClass));
     }
 
-    private void updateDeletedNodeChildren(N node, Class<N> nodeClass) {
+    private void updateDeletedNodeChildren(NestedNodeInfo<N> node, Class<N> nodeClass) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
         Root<N> root = update.from(nodeClass);
@@ -110,7 +112,7 @@ public class NestedNodeRemoverImpl<N extends NestedNode<N>> extends NestedNodeDe
     }
 
 
-    private void updateNodesParent(NestedNode node, Optional<N> parent, Class<N> nodeClass) {
+    private void updateNodesParent(NestedNodeInfo<N> node, Optional<N> parent, Class<N> nodeClass) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
         Root<N> root = update.from(nodeClass);
@@ -124,7 +126,7 @@ public class NestedNodeRemoverImpl<N extends NestedNode<N>> extends NestedNodeDe
         em.createQuery(update).executeUpdate();
     }
 
-    private Optional<N> findNodeParent(N node, Class<N> nodeClass) {
+    private Optional<N> findNodeParent(NestedNodeInfo<N> node, Class<N> nodeClass) {
         if (node.getLevel() > 0) {
             CriteriaBuilder cb = em.getCriteriaBuilder();
             CriteriaQuery<N> select = cb.createQuery(nodeClass);
@@ -137,18 +139,18 @@ public class NestedNodeRemoverImpl<N extends NestedNode<N>> extends NestedNodeDe
             try {
                 return Optional.of(em.createQuery(select).setMaxResults(1).getSingleResult());
             } catch (NoResultException ex) {
-                return Optional.empty();
+                throw new InvalidNodeException(String.format("Couldn't find node's parent, although its level is greater than 0. It seems the tree is malformed: %s", node));
             }
         }
         return Optional.empty();
     }
 
     @Override
-    public void removeSubtree(N node) {
-        Class<N> nodeClass = getNodeClass(node);
-        Long delta = node.getRight() - node.getLeft() + 1;
-        Long from = node.getRight();
-        performBatchDeletion(node, nodeClass);
+    public void removeSubtree(NestedNodeInfo<N> nodeInfo) {
+        Class<N> nodeClass = nodeInfo.getNodeClass();
+        Long delta = nodeInfo.getRight() - nodeInfo.getLeft() + 1;
+        Long from = nodeInfo.getRight();
+        performBatchDeletion(nodeInfo, nodeClass);
         updateFieldsAfterSubtreeRemoval(from, delta, nodeClass, right(nodeClass));
         updateFieldsAfterSubtreeRemoval(from, delta, nodeClass, left(nodeClass));
     }
@@ -164,7 +166,7 @@ public class NestedNodeRemoverImpl<N extends NestedNode<N>> extends NestedNodeDe
         em.createQuery(update).executeUpdate();
     }
 
-    private void performBatchDeletion(N node, Class<N> nodeClass) {
+    private void performBatchDeletion(NestedNodeInfo<N> node, Class<N> nodeClass) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaDelete<N> delete = cb.createCriteriaDelete(nodeClass);
         Root<N> root = delete.from(nodeClass);
