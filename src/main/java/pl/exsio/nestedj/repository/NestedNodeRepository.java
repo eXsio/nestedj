@@ -23,7 +23,6 @@
  */
 package pl.exsio.nestedj.repository;
 
-import pl.exsio.nestedj.ex.InvalidNodesHierarchyException;
 import pl.exsio.nestedj.model.NestedNode;
 import pl.exsio.nestedj.model.Tree;
 
@@ -31,13 +30,13 @@ import java.util.Optional;
 
 public interface NestedNodeRepository<N extends NestedNode> {
 
-    void insertAsFirstChildOf(N node, N parent) throws InvalidNodesHierarchyException;
+    void insertAsFirstChildOf(N node, N parent);
 
-    void insertAsLastChildOf(N node, N parent) throws InvalidNodesHierarchyException;
+    void insertAsLastChildOf(N node, N parent);
 
-    void insertAsNextSiblingOf(N node, N parent) throws InvalidNodesHierarchyException;
+    void insertAsNextSiblingOf(N node, N parent);
 
-    void insertAsPrevSiblingOf(N node, N parent) throws InvalidNodesHierarchyException;
+    void insertAsPrevSiblingOf(N node, N parent);
 
     void removeSingle(N node);
 
@@ -53,5 +52,7 @@ public interface NestedNodeRepository<N extends NestedNode> {
 
     Tree<N> getTree(N node);
 
-    void rebuildTree(Class<? extends NestedNode> nodeClass) throws InvalidNodesHierarchyException;
+    void rebuildTree(Class<N> nodeClass);
+
+    void destroyTree(Class<N> nodeClass);
 }

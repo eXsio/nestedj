@@ -28,4 +28,6 @@ import pl.exsio.nestedj.model.NestedNode;
 public interface NestedNodeRebuilder<N extends NestedNode<N>> {
 
     void rebuildTree(Class<N> nodeClass);
+
+    void destroyTree(Class<N> nodeClass);
 }

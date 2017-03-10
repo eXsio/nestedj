@@ -40,6 +40,7 @@ import java.util.Optional;
 
 import static pl.exsio.nestedj.util.NestedNodeUtil.id;
 import static pl.exsio.nestedj.util.NestedNodeUtil.left;
+import static pl.exsio.nestedj.util.NestedNodeUtil.level;
 import static pl.exsio.nestedj.util.NestedNodeUtil.parent;
 import static pl.exsio.nestedj.util.NestedNodeUtil.right;
 
@@ -74,6 +75,20 @@ public class NestedNodeRebuilderImpl<N extends NestedNode<N>> extends NestedNode
         for (N node : getSiblings(first, nodeClass)) {
             rebuildRecursively(node, nodeClass);
         }
+    }
+
+    @Override
+    public void destroyTree(Class<N> nodeClass) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
+        Root<N> root = update.from(nodeClass);
+        update
+                .set(root.<Long>get(left(nodeClass)), 0L)
+                .set(root.<Long>get(right(nodeClass)), 0L)
+                .set(root.<Long>get(level(nodeClass)), 0L)
+                .where(getPredicates(cb, root));
+
+        em.createQuery(update).executeUpdate();
     }
 
     private void rebuildRecursively(N parent, Class<N> nodeClass) {

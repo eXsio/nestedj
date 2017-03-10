@@ -53,7 +53,7 @@ Using the traditional ```parant_id``` relationship would mean firing multiple qu
 <dependency>
     <groupId>com.github.eXsio</groupId>
     <artifactId>nestedj</artifactId>
-    <version>2.1.0</version>
+    <version>2.1.1</version>
 </dependency>
 
 ```
@@ -134,7 +134,7 @@ It is recommended that ```LeftColumn```, ```RightColumn``` and ```LevelColumn```
 After creating schema You can use the special ```NestedNodeRepository``` to perform a tree-specific opeeration, such as:
 
 ```
-    void insertAsFirstChildOf(N node, N parent) throws InvalidNodesHierarchyException;
+    void insertAsFirstChildOf(N node, N parent);
 
     void insertAsLastChildOf(N node, N parent);
 
@@ -156,7 +156,9 @@ After creating schema You can use the special ```NestedNodeRepository``` to perf
 
     Tree<N> getTree(N node);
 
-    void rebuildTree(Class<? extends NestedNode> nodeClass);
+    void rebuildTree(Class<N> nodeClass);
+    
+    void destroyTree(Class<N> nodeClass);
 ```
 
 The Entity inheritance is permitted. NestedJ will begin searching for it's annotation at the top class and move down the inheritance tree.

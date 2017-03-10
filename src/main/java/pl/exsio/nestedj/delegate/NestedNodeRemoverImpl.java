@@ -34,6 +34,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
 
+import static pl.exsio.nestedj.util.NestedNodeUtil.id;
 import static pl.exsio.nestedj.util.NestedNodeUtil.left;
 import static pl.exsio.nestedj.util.NestedNodeUtil.level;
 import static pl.exsio.nestedj.util.NestedNodeUtil.parent;
@@ -61,7 +62,17 @@ public class NestedNodeRemoverImpl<N extends NestedNode<N>> extends NestedNodeDe
         updateNodesParent(node, parent, nodeClass);
         prepareTreeForSingleNodeRemoval(from, nodeClass);
         updateDeletedNodeChildren(node, nodeClass);
-        em.remove(node);
+        performSingleDeletion(node, nodeClass);
+    }
+
+    private void performSingleDeletion(N node, Class<N> nodeClass) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaDelete<N> delete = cb.createCriteriaDelete(nodeClass);
+        Root<N> root = delete.from(nodeClass);
+        delete.where(getPredicates(cb, root,
+                cb.equal(root.<Long>get(id(nodeClass)), node.getId())
+        ));
+        em.createQuery(delete).executeUpdate();
     }
 
     private void prepareTreeForSingleNodeRemoval(Long from, Class<N> nodeClass) {
