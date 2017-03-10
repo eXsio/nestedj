@@ -53,7 +53,7 @@ Using the traditional ```parant_id``` relationship would mean firing multiple qu
 <dependency>
     <groupId>com.github.eXsio</groupId>
     <artifactId>nestedj</artifactId>
-    <version>2.1.1</version>
+    <version>2.1.2</version>
 </dependency>
 
 ```

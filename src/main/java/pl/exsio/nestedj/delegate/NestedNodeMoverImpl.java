@@ -35,6 +35,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
 import java.util.List;
+import java.util.Optional;
 
 import static pl.exsio.nestedj.util.NestedNodeUtil.id;
 import static pl.exsio.nestedj.util.NestedNodeUtil.left;
@@ -79,7 +80,7 @@ public class NestedNodeMoverImpl<N extends NestedNode<N>> extends NestedNodeDele
         Long levelModificator = getLevelModificator(nodeInfo, parentInfo, mode);
         performMove(nodeSign, nodeDelta, nodeIds, levelModificator, nodeClass);
 
-        N newParent = getNewParent(parentInfo, mode);
+        Optional<N> newParent = getNewParent(parentInfo, mode);
         updateParentField(newParent, nodeInfo, nodeClass);
     }
 
@@ -88,12 +89,12 @@ public class NestedNodeMoverImpl<N extends NestedNode<N>> extends NestedNodeDele
         updateFields(sign, delta, start, stop, nodeClass, left(nodeClass));
     }
 
-    private void updateParentField(N newParent, NestedNodeInfo<N> node, Class<N> nodeClass) {
+    private void updateParentField(Optional<N> newParent, NestedNodeInfo<N> node, Class<N> nodeClass) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
         Root<N> root = update.from(nodeClass);
 
-        update.set(root.get(parent(nodeClass)), newParent)
+        update.set(root.get(parent(nodeClass)), newParent.isPresent() ? newParent.get() : null)
                 .where(getPredicates(cb, root, cb.equal(root.get(id(nodeClass)), node.getId())));
 
         em.createQuery(update).executeUpdate();
@@ -153,19 +154,19 @@ public class NestedNodeMoverImpl<N extends NestedNode<N>> extends NestedNodeDele
         return em.createQuery(select).getResultList();
     }
 
-    private N getNewParent(NestedNodeInfo<N> parent, Mode mode) {
+    private Optional<N> getNewParent(NestedNodeInfo<N> parent, Mode mode) {
         switch (mode) {
             case NEXT_SIBLING:
             case PREV_SIBLING:
                 if (parent.getParentId() != null) {
-                    return em.getReference(parent.getNodeClass(), parent.getParentId());
+                    return Optional.of(em.getReference(parent.getNodeClass(), parent.getParentId()));
                 } else {
-                    return null;
+                    return Optional.empty();
                 }
             case FIRST_CHILD:
             case LAST_CHILD:
             default:
-                return em.getReference(parent.getNodeClass(), parent.getId());
+                return Optional.of(em.getReference(parent.getNodeClass(), parent.getId()));
         }
     }
 

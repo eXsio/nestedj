@@ -32,6 +32,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
+import java.util.Optional;
 
 import static pl.exsio.nestedj.util.NestedNodeUtil.left;
 import static pl.exsio.nestedj.util.NestedNodeUtil.right;
@@ -61,12 +62,12 @@ public class NestedNodeInserterImpl<N extends NestedNode<N>> extends NestedNodeD
         Long left = this.getNodeLeft(parent, mode);
         Long right = left + 1;
         Long level = this.getNodeLevel(parent, mode);
-        N nodeParent = this.getNodeParent(parent, mode);
+        Optional<N> nodeParent = this.getNodeParent(parent, mode);
 
         node.setLeft(left);
         node.setRight(right);
         node.setLevel(level);
-        node.setParent(nodeParent);
+        node.setParent(nodeParent.isPresent() ? nodeParent.get() : null);
 
         em.persist(node);
     }
@@ -114,19 +115,19 @@ public class NestedNodeInserterImpl<N extends NestedNode<N>> extends NestedNodeD
         }
     }
 
-    private N getNodeParent(NestedNodeInfo<N> parent, Mode mode) {
+    private Optional<N> getNodeParent(NestedNodeInfo<N> parent, Mode mode) {
         switch (mode) {
             case NEXT_SIBLING:
             case PREV_SIBLING:
                 if (parent.getParentId() != null) {
-                    return em.getReference(parent.getNodeClass(), parent.getParentId());
+                    return Optional.of(em.getReference(parent.getNodeClass(), parent.getParentId()));
                 } else {
-                    return null;
+                    return Optional.empty();
                 }
             case LAST_CHILD:
             case FIRST_CHILD:
             default:
-                return em.getReference(parent.getNodeClass(), parent.getId());
+                return Optional.of(em.getReference(parent.getNodeClass(), parent.getId()));
         }
     }
 

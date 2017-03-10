@@ -27,12 +27,14 @@ import pl.exsio.nestedj.discriminator.TreeDiscriminator;
 import pl.exsio.nestedj.model.NestedNode;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
+import java.util.Optional;
 
 import static pl.exsio.nestedj.util.NestedNodeUtil.id;
 import static pl.exsio.nestedj.util.NestedNodeUtil.left;
@@ -58,7 +60,7 @@ public class NestedNodeRemoverImpl<N extends NestedNode<N>> extends NestedNodeDe
     public void removeSingle(N node) {
         Class<N> nodeClass = getNodeClass(node);
         Long from = node.getRight();
-        N parent = this.findNodeParent(node, nodeClass);
+        Optional<N> parent = this.findNodeParent(node, nodeClass);
         updateNodesParent(node, parent, nodeClass);
         prepareTreeForSingleNodeRemoval(from, nodeClass);
         updateDeletedNodeChildren(node, nodeClass);
@@ -108,12 +110,12 @@ public class NestedNodeRemoverImpl<N extends NestedNode<N>> extends NestedNodeDe
     }
 
 
-    private void updateNodesParent(NestedNode node, N parent, Class<N> nodeClass) {
+    private void updateNodesParent(NestedNode node, Optional<N> parent, Class<N> nodeClass) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
         Root<N> root = update.from(nodeClass);
-
-        update.set(root.get(parent(nodeClass)), parent)
+        N newParent = parent.isPresent() ? parent.get() : null;
+        update.set(root.get(parent(nodeClass)), newParent)
                 .where(getPredicates(cb, root,
                         cb.greaterThanOrEqualTo(root.<Long>get(left(nodeClass)), node.getLeft()),
                         cb.lessThanOrEqualTo(root.<Long>get(right(nodeClass)), node.getRight()),
@@ -122,7 +124,7 @@ public class NestedNodeRemoverImpl<N extends NestedNode<N>> extends NestedNodeDe
         em.createQuery(update).executeUpdate();
     }
 
-    private N findNodeParent(N node, Class<N> nodeClass) {
+    private Optional<N> findNodeParent(N node, Class<N> nodeClass) {
         if (node.getLevel() > 0) {
             CriteriaBuilder cb = em.getCriteriaBuilder();
             CriteriaQuery<N> select = cb.createQuery(nodeClass);
@@ -132,9 +134,13 @@ public class NestedNodeRemoverImpl<N extends NestedNode<N>> extends NestedNodeDe
                     cb.greaterThan(root.<Long>get(right(nodeClass)), node.getRight()),
                     cb.equal(root.<Long>get(level(nodeClass)), node.getLevel() - 1)
             ));
-            return em.createQuery(select).setMaxResults(1).getSingleResult();
+            try {
+                return Optional.of(em.createQuery(select).setMaxResults(1).getSingleResult());
+            } catch (NoResultException ex) {
+                return Optional.empty();
+            }
         }
-        return null;
+        return Optional.empty();
     }
 
     @Override
