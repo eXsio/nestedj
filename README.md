@@ -17,6 +17,7 @@ Nested Set is a RDBMS Tree implmentation. It allows to query for whole tree bran
 Given the below structure:
 
                          1 A 16
+                         /   \
                         /     \                    
                        /       \                   
                       /         \                 
