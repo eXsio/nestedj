@@ -90,7 +90,7 @@ In order to use NestedJ, You have to configure it. Here's the full code:
         repository.setRemover(remover);
  
 
-NestedNodeRepository is a default, provided implementation of ```NestedNodeDao```. If You need or want, You can implement your own inserter/mover/retriever/remover/rebuilder that fits to Your needs.
+```NestedNodeRepositoryImpl``` is a default, provided implementation of ```NestedNodeRepository```. If You need or want, You can implement your own inserter/mover/retriever/remover/rebuilder that fits to Your needs.
 
 ### Entiy mapping
 
