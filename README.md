@@ -35,19 +35,19 @@ Given the below structure:
 You can query for an entire tree branch of node ```C``` using a query similar to this:
 
 ```
-SELECT * FROM TREE_TABLE WHERE **LEFT >=8** AND **RIGHT <= 15**
+SELECT * FROM TREE_TABLE WHERE LEFT >=8 AND RIGHT <= 15
 ```
 
 You can query for a top level parent of a given (```H``` in this example) node using a query similar to this:
 
 ```
-SELECT * FROM TREE_TABLE WHERE **LEFT < 12** AND **RIGHT > 13** AND **LEVEL = 0**
+SELECT * FROM TREE_TABLE WHERE LEFT < 12 AND RIGHT > 13 AND LEVEL = 0
 ```
 
 You can also query for an entire path leading to a given (```D``` in this example) node using a query similar to this:
 
 ```
-SELECT * FROM TREE_TABLE WHERE **LEFT < 3** AND **RIGHT > 4** ORDER BY **LEVEL ASC**
+SELECT * FROM TREE_TABLE WHERE LEFT < 3 AND RIGHT > 4 ORDER BY LEVEL ASC
 ```
 
 Using the traditional ```parant_id``` relationship would mean firing multiple queries for each child / parent relationship.
