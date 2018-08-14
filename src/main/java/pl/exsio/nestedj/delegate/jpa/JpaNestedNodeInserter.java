@@ -23,7 +23,6 @@
  */
 package pl.exsio.nestedj.delegate.jpa;
 
-import pl.exsio.nestedj.delegate.NestedNodeDelegate;
 import pl.exsio.nestedj.delegate.NestedNodeInserter;
 import pl.exsio.nestedj.discriminator.TreeDiscriminator;
 import pl.exsio.nestedj.model.NestedNode;
@@ -39,13 +38,10 @@ import java.util.Optional;
 import static pl.exsio.nestedj.util.NestedNodeUtil.left;
 import static pl.exsio.nestedj.util.NestedNodeUtil.right;
 
-public class JpaNestedNodeInserter<ID extends Serializable, N extends NestedNode<ID, N>> extends NestedNodeDelegate<ID, N> implements NestedNodeInserter<ID, N> {
-
-    private final EntityManager entityManager;
+public class JpaNestedNodeInserter<ID extends Serializable, N extends NestedNode<ID, N>> extends JpaNestedNodeDelegate<ID, N> implements NestedNodeInserter<ID, N> {
 
     public JpaNestedNodeInserter(EntityManager entityManager, TreeDiscriminator<ID, N> treeDiscriminator) {
-        super(treeDiscriminator);
-        this.entityManager = entityManager;
+        super(entityManager, treeDiscriminator);
     }
 
     @Override

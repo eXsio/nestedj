@@ -23,7 +23,6 @@
  */
 package pl.exsio.nestedj.delegate.jpa;
 
-import pl.exsio.nestedj.delegate.NestedNodeDelegate;
 import pl.exsio.nestedj.delegate.NestedNodeMover;
 import pl.exsio.nestedj.discriminator.TreeDiscriminator;
 import pl.exsio.nestedj.ex.InvalidNodesHierarchyException;
@@ -41,17 +40,14 @@ import java.util.Optional;
 
 import static pl.exsio.nestedj.util.NestedNodeUtil.*;
 
-public class JpaNestedNodeMover<ID extends Serializable, N extends NestedNode<ID, N>> extends NestedNodeDelegate<ID, N> implements NestedNodeMover<ID, N> {
+public class JpaNestedNodeMover<ID extends Serializable, N extends NestedNode<ID, N>> extends JpaNestedNodeDelegate<ID, N> implements NestedNodeMover<ID, N> {
 
     private enum Sign {
         PLUS, MINUS
     }
 
-    private final EntityManager entityManager;
-
     public JpaNestedNodeMover(EntityManager entityManager, TreeDiscriminator<ID, N> treeDiscriminator) {
-        super(treeDiscriminator);
-        this.entityManager = entityManager;
+        super(entityManager, treeDiscriminator);
     }
 
     @Override

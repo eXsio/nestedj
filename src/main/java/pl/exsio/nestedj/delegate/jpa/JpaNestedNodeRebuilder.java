@@ -24,7 +24,10 @@
 package pl.exsio.nestedj.delegate.jpa;
 
 import com.google.common.base.Preconditions;
-import pl.exsio.nestedj.delegate.*;
+import pl.exsio.nestedj.delegate.NestedNodeInserter;
+import pl.exsio.nestedj.delegate.NestedNodeMover;
+import pl.exsio.nestedj.delegate.NestedNodeRebuilder;
+import pl.exsio.nestedj.delegate.NestedNodeRetriever;
 import pl.exsio.nestedj.discriminator.TreeDiscriminator;
 import pl.exsio.nestedj.ex.InvalidNodeException;
 import pl.exsio.nestedj.model.NestedNode;
@@ -41,17 +44,14 @@ import java.util.Optional;
 
 import static pl.exsio.nestedj.util.NestedNodeUtil.*;
 
-public class JpaNestedNodeRebuilder<ID extends Serializable, N extends NestedNode<ID, N>> extends NestedNodeDelegate<ID, N> implements NestedNodeRebuilder<ID, N> {
-
-    private final EntityManager entityManager;
+public class JpaNestedNodeRebuilder<ID extends Serializable, N extends NestedNode<ID, N>> extends JpaNestedNodeDelegate<ID, N> implements NestedNodeRebuilder<ID, N> {
 
     private final NestedNodeInserter<ID, N> inserter;
 
     private final NestedNodeRetriever<ID, N> retriever;
 
     public JpaNestedNodeRebuilder(EntityManager entityManager, TreeDiscriminator<ID, N> treeDiscriminator, NestedNodeInserter<ID, N> inserter, NestedNodeRetriever<ID, N> retriever) {
-        super(treeDiscriminator);
-        this.entityManager = entityManager;
+        super(entityManager, treeDiscriminator);
         this.inserter = inserter;
         this.retriever = retriever;
     }
