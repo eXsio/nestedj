@@ -25,7 +25,7 @@ package pl.exsio.nestedj.config;
 
 import com.google.common.base.MoreObjects;
 
-public class NestedNodeConfigImpl implements NestedNodeConfig {
+public class PojoNestedNodeConfig implements NestedNodeConfig {
 
     protected String rightFieldName;
 

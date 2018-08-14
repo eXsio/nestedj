@@ -29,7 +29,7 @@ import pl.exsio.nestedj.annotation.LevelColumn;
 import pl.exsio.nestedj.annotation.ParentColumn;
 import pl.exsio.nestedj.annotation.RightColumn;
 import pl.exsio.nestedj.config.NestedNodeConfig;
-import pl.exsio.nestedj.config.NestedNodeConfigImpl;
+import pl.exsio.nestedj.config.PojoNestedNodeConfig;
 import pl.exsio.nestedj.model.NestedNode;
 
 import javax.persistence.Id;
@@ -47,14 +47,14 @@ public class NestedNodeUtil {
 
     public static NestedNodeConfig getNodeConfig(Class<? extends NestedNode> nodeClass) {
         if (!configs.containsKey(nodeClass)) {
-            NestedNodeConfigImpl config = new NestedNodeConfigImpl();
+            PojoNestedNodeConfig config = new PojoNestedNodeConfig();
             config = getConfigForClass(nodeClass, config);
             configs.put(nodeClass, config);
         }
         return configs.get(nodeClass);
     }
 
-    private static NestedNodeConfigImpl getConfigForClass(Class nodeClass, NestedNodeConfigImpl config) {
+    private static PojoNestedNodeConfig getConfigForClass(Class nodeClass, PojoNestedNodeConfig config) {
 
         if (!Object.class.equals(nodeClass)) {
             for (Field field : nodeClass.getDeclaredFields()) {

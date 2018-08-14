@@ -34,7 +34,7 @@ public class DefaultNestedNodeConfigTest {
 
     @Test
     public void testGetRightFieldName() {
-        NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
+        PojoNestedNodeConfig instance = new PojoNestedNodeConfig();
         String expResult = null;
         String result = instance.getRightFieldName();
         assertEquals(expResult, result);
@@ -43,7 +43,7 @@ public class DefaultNestedNodeConfigTest {
     @Test
     public void testSetRightFieldName() {
         String rightFieldName = "rightField";
-        NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
+        PojoNestedNodeConfig instance = new PojoNestedNodeConfig();
         instance.setRightFieldName(rightFieldName);
         assertEquals(instance.getRightFieldName(), rightFieldName);
     }
@@ -51,14 +51,14 @@ public class DefaultNestedNodeConfigTest {
     @Test
     public void testSetIdFieldName() {
         String idFieldName = "idField";
-        NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
+        PojoNestedNodeConfig instance = new PojoNestedNodeConfig();
         instance.setIdFieldName(idFieldName);
         assertEquals(instance.getIdFieldName(), idFieldName);
     }
 
     @Test
     public void testGetIdFieldName() {
-        NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
+        PojoNestedNodeConfig instance = new PojoNestedNodeConfig();
         String expResult = null;
         String result = instance.getIdFieldName();
         assertEquals(expResult, result);
@@ -66,7 +66,7 @@ public class DefaultNestedNodeConfigTest {
 
     @Test
     public void testGetLeftFieldName() {
-        NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
+        PojoNestedNodeConfig instance = new PojoNestedNodeConfig();
         String expResult = null;
         String result = instance.getLeftFieldName();
         assertEquals(expResult, result);
@@ -75,14 +75,14 @@ public class DefaultNestedNodeConfigTest {
     @Test
     public void testSetLeftFieldName() {
         String leftFieldName = "leftField";
-        NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
+        PojoNestedNodeConfig instance = new PojoNestedNodeConfig();
         instance.setLeftFieldName(leftFieldName);
         assertEquals(instance.getLeftFieldName(), leftFieldName);
     }
 
     @Test
     public void testGetLevelFieldName() {
-        NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
+        PojoNestedNodeConfig instance = new PojoNestedNodeConfig();
         String expResult = null;
         String result = instance.getLevelFieldName();
         assertEquals(expResult, result);
@@ -91,14 +91,14 @@ public class DefaultNestedNodeConfigTest {
     @Test
     public void testSetLevelFieldName() {
         String levelFieldName = "levelField";
-        NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
+        PojoNestedNodeConfig instance = new PojoNestedNodeConfig();
         instance.setLevelFieldName(levelFieldName);
         assertEquals(instance.getLevelFieldName(), levelFieldName);
     }
 
     @Test
     public void testGetParentFieldName() {
-        NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
+        PojoNestedNodeConfig instance = new PojoNestedNodeConfig();
         String expResult = null;
         String result = instance.getParentFieldName();
         assertEquals(expResult, result);
@@ -107,7 +107,7 @@ public class DefaultNestedNodeConfigTest {
     @Test
     public void testSetParentFieldName() {
         String parentFieldName = "parentFIeld";
-        NestedNodeConfigImpl instance = new NestedNodeConfigImpl();
+        PojoNestedNodeConfig instance = new PojoNestedNodeConfig();
         instance.setParentFieldName(parentFieldName);
         assertEquals(instance.getParentFieldName(), parentFieldName);
     }
