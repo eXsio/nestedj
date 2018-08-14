@@ -20,7 +20,7 @@ Given the below structure:
                         / \                    
                        /   \                   
                       /     \                 
-     *             2 B 7   8 C 17              
+                   2 B 7   8 C 17              
                     /         \ _______               
                    /\         /\       \          
                   /  \       /  \   15 I 16            
