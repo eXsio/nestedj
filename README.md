@@ -16,14 +16,14 @@ Nested Set is a RDBMS Tree implmentation. It allows to query for whole tree bran
 
 Given the below structure:
 
-                       1 A 16
+                       1 A 18
                         / \                    
                        /   \                   
                       /     \                 
-     *             2 B 7   8 C 15              
-                    /         \                
-                   /\         /\               
-                  /  \       /  \              
+     *             2 B 7   8 C 17              
+                    /         \ _______               
+                   /\         /\       \          
+                  /  \       /  \   15 I 16            
                  /    \     /    \             
                 /   5 E 6  9 F 10 \            
              3 D 4             11 G 14
@@ -34,7 +34,7 @@ Given the below structure:
 You can query for an entire tree branch of node ```C``` using a query similar to this:
 
 ```
- SELECT * FROM TREE_TABLE WHERE LEFT >=8 AND RIGHT <= 15
+ SELECT * FROM TREE_TABLE WHERE LEFT >=8 AND RIGHT <= 17
 ```
 
 You can query for a top level parent of a given (```H``` in this example) node using a query similar to this:
@@ -52,6 +52,8 @@ SELECT * FROM TREE_TABLE WHERE LEFT < 3 AND RIGHT > 4 ORDER BY LEVEL ASC
 
 Using the traditional ```parant_id``` relationship would mean firing multiple queries for each child / parent relationship.
 
+##### Important: Nested Set is NOT a binary tree - the number of nodes on any level is unlimited. 
+
 ### Installation
 
 ```
@@ -66,32 +68,36 @@ Using the traditional ```parant_id``` relationship would mean firing multiple qu
 <dependency>
     <groupId>com.github.eXsio</groupId>
     <artifactId>nestedj</artifactId>
-    <version>2.1.3</version>
+    <version>2.2.0</version>
 </dependency>
 
 ```
 
 ### First Steps
 
-In order to use NestedJ, You have to configure it. Here's the full code:
+In order to use NestedJ, You have to configure it. In 9 our of 10 cases you will want to use the preconfigured builder methods available in the ```NestedNodeRepository``` interface:
+ 
+ 
+ Here's the full code:
 
 
-        NestedNodeRepositoryImpl<TestNodeImpl> repository = new NestedNodeRepositoryImpl<>();
-        TreeDiscriminatorImpl treeDiscriminator = new TreeDiscriminatorImpl();
-        NestedNodeInserter<TestNodeImpl> inserter = new NestedNodeInserterImpl<>(entityManager, treeDiscriminator);
-        NestedNodeMover<TestNodeImpl> mover = new NestedNodeMoverImpl<>(entityManager, treeDiscriminator);
-        NestedNodeRetriever<TestNodeImpl> retriever = new NestedNodeRetrieverImpl<>(entityManager, treeDiscriminator);
-        NestedNodeRebuilder<TestNodeImpl> rebuilder = new NestedNodeRebuilderImpl<>(entityManager, treeDiscriminator, inserter, retriever);
-        NestedNodeRemover<TestNodeImpl> remover = new NestedNodeRemoverImpl<>(entityManager, treeDiscriminator);
-
-        repository.setInserter(inserter);
-        repository.setMover(mover);
-        repository.setRebuilder(rebuilder);
-        repository.setRetriever(retriever);
-        repository.setRemover(remover);
+    NestedNodeRepository.createDefault(entityManager)
+    NestedNodeRepository.createDiscriminated(entityManager, new CustomTreeDiscriminator());
  
 
-NestedNodeRepository is a default, provided implementation of ```NestedNodeDao```. If You need or want, You can implement your own inserter/mover/retriever/remover/rebuilder that fits to Your needs.
+```DelegatingNestedNodeRepository``` is a default, provided implementation of ```NestedNodeRepository```. If You need or want, You can implement your own inserter/mover/retriever/remover/rebuilder that fit your needs and configure the whole thing by hand:
+
+```
+    CustomNestedNodeInserter<ID, N> inserter = new CustomNestedNodeInserter<>(entityManager, discriminator);
+    CustomNestedNodeRetriever<ID, N> retriever = new CustomNestedNodeRetriever<>(entityManager, discriminator);
+    return new DelegatingNestedNodeRepository<>(inserter,
+            new CustomNestedNodeMover<>(entityManager, discriminator),
+            new CustomNestedNodeRemover<>(entityManager, discriminator),
+            retriever,
+            new CustomNestedNodeRebuilder<>(entityManager, discriminator, inserter, retriever)
+    );
+
+```
 
 ### Entiy mapping
 
@@ -101,7 +107,7 @@ Here is the example entity annotated with NestedJ - specific Annotations:
 
 @Entity
 @Table(name = "nested_nodes")
-public class TestNodeImpl extends DummyObject implements NestedNode<TestNodeImpl> {
+public class TestNodeImpl extends DummyObject implements NestedNode<Long, TestNodeImpl> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -132,7 +138,7 @@ public class TestNodeImpl extends DummyObject implements NestedNode<TestNodeImpl
 }
 ```
 
-I ommited the getters and setters for shortage. As You see, there are 4 specific columns:
+I have ommited the getters and setters for shortage. As You see, there are 4 specific columns:
 - Left
 - Right
 - Level
@@ -141,6 +147,8 @@ I ommited the getters and setters for shortage. As You see, there are 4 specific
 Strictly speaking NestedSet doesn't need the parent mapping, but at the same time it's structure is so fragile, that this additional feature helps rebuild the tree if it becomes corrupted for some reason.
 
 It is recommended that ```LeftColumn```, ```RightColumn``` and ```LevelColumn``` be non nullable. This will ensure better stability of the Nested Set structure.
+
+The ID of the entity interface is a parametrized type, which allows for using Long as well as UUID or any other ```Serializable``` class.
 
 ### Usage
 
@@ -167,7 +175,7 @@ After creating schema You can use the special ```NestedNodeRepository``` to perf
 
     Iterable<N> getTreeAsList(N node);
 
-    Tree<N> getTree(N node);
+    Tree<ID, N> getTree(N node);
 
     void rebuildTree(Class<N> nodeClass);
     
@@ -182,7 +190,7 @@ You can have multiple independant trees in single Table/Entity. Just implement y
 
 ### Fixing / Initializing / Rebuilding the Tree
 
-Nested Set is a pretty fragile structure. One bad manual modification of the table can destroy it. Also inserting big number of records manually would be very hard if you'd have to insert them with the correct left/right/level values. Fortunately NestedJ can rebuild the Tree from scratch. Just use ```rebuild(Class<N> nodeClass)``` method on the ```NestedNodeRepository<N>```.
+Nested Set is a pretty fragile structure. One bad manual modification of the table can destroy it. Also inserting big number of records manually would be very hard if you'd have to insert them with the correct left/right/level values. Fortunately NestedJ can rebuild the Tree from scratch. Just use ```rebuild(Class<N> nodeClass)``` method on the ```NestedNodeRepository<ID, N>```.
 
 
 ### BUGS
