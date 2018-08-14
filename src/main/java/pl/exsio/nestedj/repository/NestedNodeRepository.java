@@ -1,4 +1,4 @@
-/* 
+/*
  * The MIN License
  *
  * Copyright 2015 exsio.
@@ -23,12 +23,17 @@
  */
 package pl.exsio.nestedj.repository;
 
+import pl.exsio.nestedj.delegate.jpa.*;
+import pl.exsio.nestedj.discriminator.MapTreeDiscriminator;
+import pl.exsio.nestedj.discriminator.TreeDiscriminator;
 import pl.exsio.nestedj.model.NestedNode;
 import pl.exsio.nestedj.model.Tree;
 
+import javax.persistence.EntityManager;
+import java.io.Serializable;
 import java.util.Optional;
 
-public interface NestedNodeRepository<N extends NestedNode> {
+public interface NestedNodeRepository<ID extends Serializable, N extends NestedNode<ID, N>> {
 
     void insertAsFirstChildOf(N node, N parent);
 
@@ -50,9 +55,25 @@ public interface NestedNodeRepository<N extends NestedNode> {
 
     Iterable<N> getTreeAsList(N node);
 
-    Tree<N> getTree(N node);
+    Tree<ID, N> getTree(N node);
 
     void rebuildTree(Class<N> nodeClass);
 
     void destroyTree(Class<N> nodeClass);
+
+    static <ID extends Serializable, N extends NestedNode<ID, N>> NestedNodeRepository<ID, N> createDefault(EntityManager entityManager) {
+        return createDiscriminated(entityManager, new MapTreeDiscriminator<ID, N>());
+    }
+
+    static <ID extends Serializable, N extends NestedNode<ID, N>> NestedNodeRepository<ID, N> createDiscriminated(EntityManager entityManager, TreeDiscriminator<ID, N> discriminator) {
+        JpaNestedNodeInserter<ID, N> inserter = new JpaNestedNodeInserter<>(entityManager, discriminator);
+        JpaNestedNodeRetriever<ID, N> retriever = new JpaNestedNodeRetriever<>(entityManager, discriminator);
+        return new DelegatingNestedNodeRepository<>(inserter,
+                new JpaNestedNodeMover<>(entityManager, discriminator),
+                new JpaNestedNodeRemover<>(entityManager, discriminator),
+                retriever,
+                new JpaNestedNodeRebuilder<>(entityManager, discriminator, inserter, retriever)
+        );
+    }
+
 }

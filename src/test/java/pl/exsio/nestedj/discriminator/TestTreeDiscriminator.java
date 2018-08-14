@@ -5,17 +5,12 @@ import pl.exsio.nestedj.model.TestNodeImpl;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TestTreeDiscriminator extends TreeDiscriminatorImpl<TestNodeImpl> {
+public class TestTreeDiscriminator extends MapTreeDiscriminator<Long, TestNodeImpl> {
 
 
     public TestTreeDiscriminator() {
         Map<String, ValueProvider> valueProviders = new HashMap<>();
-        valueProviders.put("discriminator", new ValueProvider() {
-            @Override
-            public Object getDiscriminatorValue() {
-                return "tree_1";
-            }
-        });
+        valueProviders.put("discriminator", () -> "tree_1");
 
         setValueProviders(valueProviders);
     }

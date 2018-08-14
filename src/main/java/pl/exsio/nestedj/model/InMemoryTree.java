@@ -25,54 +25,55 @@ package pl.exsio.nestedj.model;
 
 import com.google.common.collect.Lists;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class TreeImpl<N extends NestedNode> implements Tree<N> {
+public class InMemoryTree<ID extends Serializable, N extends NestedNode<ID, N>> implements Tree<ID, N> {
 
-    private List<Tree<N>> children;
+    private List<Tree<ID, N>> children;
 
-    private Tree<N> parent;
+    private Tree<ID, N> parent;
 
     private N node;
 
-    private TreeImpl() {
+    private InMemoryTree() {
         this.children = Lists.newLinkedList();
     }
 
-    public TreeImpl(N node) {
+    public InMemoryTree(N node) {
         this();
         this.node = node;
     }
 
-    public TreeImpl(N node, Tree<N> parent) {
+    public InMemoryTree(N node, Tree<ID, N> parent) {
         this();
         this.parent = parent;
         this.node = node;
     }
 
     @Override
-    public void addChild(Tree<N> child) {
+    public void addChild(Tree<ID, N> child) {
         this.children.add(child);
         child.setParent(this);
     }
 
     @Override
-    public void setChildren(List<Tree<N>> children) {
+    public void setChildren(List<Tree<ID, N>> children) {
         this.children = children;
     }
 
     @Override
-    public List<Tree<N>> getChildren() {
+    public List<Tree<ID, N>> getChildren() {
         return this.children;
     }
 
     @Override
-    public Tree<N> getParent() {
+    public Tree<ID, N> getParent() {
         return this.parent;
     }
 
     @Override
-    public void setParent(Tree<N> parent) {
+    public void setParent(Tree<ID, N> parent) {
         this.parent = parent;
     }
 

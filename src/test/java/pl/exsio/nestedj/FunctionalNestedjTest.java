@@ -29,15 +29,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import pl.exsio.nestedj.model.TestNodeImpl;
-import pl.exsio.nestedj.repository.NestedNodeRepositoryImpl;
+import pl.exsio.nestedj.repository.DelegatingNestedNodeRepository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import java.util.HashMap;
-import java.util.Map;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {TestConfiguration.class})
@@ -45,7 +43,7 @@ import java.util.Map;
 public abstract class FunctionalNestedjTest {
 
     @Autowired
-    protected NestedNodeRepositoryImpl<TestNodeImpl> nodeRepository;
+    protected DelegatingNestedNodeRepository<Long, TestNodeImpl> nodeRepository;
 
     @PersistenceContext
     protected EntityManager em;

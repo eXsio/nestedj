@@ -7,18 +7,19 @@ import pl.exsio.nestedj.model.NestedNode;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-public class TreeDiscriminatorImpl<N extends NestedNode<N>> implements TreeDiscriminator<N> {
+public class MapTreeDiscriminator<ID extends Serializable, N extends NestedNode<ID, N>> implements TreeDiscriminator<ID, N> {
 
     private Map<String, ValueProvider> valueProviders;
 
-    public TreeDiscriminatorImpl(Map<String, ValueProvider> valueProviders) {
+    public MapTreeDiscriminator(Map<String, ValueProvider> valueProviders) {
         this.valueProviders = valueProviders;
     }
 
-    public TreeDiscriminatorImpl() {
+    public MapTreeDiscriminator() {
         this.valueProviders = Maps.newHashMap();
     }
 

@@ -25,7 +25,9 @@ package pl.exsio.nestedj.delegate;
 
 import pl.exsio.nestedj.model.NestedNode;
 
-public interface NestedNodeRebuilder<N extends NestedNode<N>> {
+import java.io.Serializable;
+
+public interface NestedNodeRebuilder<ID extends Serializable, N extends NestedNode<ID, N>> {
 
     void rebuildTree(Class<N> nodeClass);
 

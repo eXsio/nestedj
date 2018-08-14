@@ -9,20 +9,9 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
-import pl.exsio.nestedj.delegate.NestedNodeInserter;
-import pl.exsio.nestedj.delegate.NestedNodeInserterImpl;
-import pl.exsio.nestedj.delegate.NestedNodeMover;
-import pl.exsio.nestedj.delegate.NestedNodeMoverImpl;
-import pl.exsio.nestedj.delegate.NestedNodeRebuilder;
-import pl.exsio.nestedj.delegate.NestedNodeRebuilderImpl;
-import pl.exsio.nestedj.delegate.NestedNodeRemover;
-import pl.exsio.nestedj.delegate.NestedNodeRemoverImpl;
-import pl.exsio.nestedj.delegate.NestedNodeRetriever;
-import pl.exsio.nestedj.delegate.NestedNodeRetrieverImpl;
 import pl.exsio.nestedj.discriminator.TestTreeDiscriminator;
 import pl.exsio.nestedj.model.TestNodeImpl;
 import pl.exsio.nestedj.repository.NestedNodeRepository;
-import pl.exsio.nestedj.repository.NestedNodeRepositoryImpl;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -81,22 +70,8 @@ public class TestConfiguration {
     }
 
     @Bean
-    public NestedNodeRepository<TestNodeImpl> repository() {
-        NestedNodeRepositoryImpl<TestNodeImpl> repository = new NestedNodeRepositoryImpl<>();
-        TestTreeDiscriminator treeDiscriminator = new TestTreeDiscriminator();
-        NestedNodeInserter<TestNodeImpl> inserter = new NestedNodeInserterImpl<>(entityManager, treeDiscriminator);
-        NestedNodeMover<TestNodeImpl> mover = new NestedNodeMoverImpl<>(entityManager, treeDiscriminator);
-        NestedNodeRetriever<TestNodeImpl> retriever = new NestedNodeRetrieverImpl<>(entityManager, treeDiscriminator);
-        NestedNodeRebuilder<TestNodeImpl> rebuilder = new NestedNodeRebuilderImpl<>(entityManager, treeDiscriminator, inserter, retriever);
-        NestedNodeRemover<TestNodeImpl> remover = new NestedNodeRemoverImpl<>(entityManager, treeDiscriminator);
-
-        repository.setInserter(inserter);
-        repository.setMover(mover);
-        repository.setRebuilder(rebuilder);
-        repository.setRetriever(retriever);
-        repository.setRemover(remover);
-
-        return repository;
+    public NestedNodeRepository<Long, TestNodeImpl> repository() {
+        return NestedNodeRepository.createDiscriminated(entityManager, new TestTreeDiscriminator());
     }
 
 }

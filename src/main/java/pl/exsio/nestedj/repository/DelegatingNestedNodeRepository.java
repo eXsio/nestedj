@@ -25,55 +25,42 @@ package pl.exsio.nestedj.repository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pl.exsio.nestedj.delegate.NestedNodeHierarchyManipulator;
-import pl.exsio.nestedj.delegate.NestedNodeInserter;
-import pl.exsio.nestedj.delegate.NestedNodeMover;
-import pl.exsio.nestedj.delegate.NestedNodeRebuilder;
-import pl.exsio.nestedj.delegate.NestedNodeRemover;
-import pl.exsio.nestedj.delegate.NestedNodeRetriever;
+import pl.exsio.nestedj.delegate.*;
 import pl.exsio.nestedj.ex.InvalidNodeException;
 import pl.exsio.nestedj.ex.InvalidParentException;
 import pl.exsio.nestedj.model.NestedNode;
 import pl.exsio.nestedj.model.NestedNodeInfo;
 import pl.exsio.nestedj.model.Tree;
 
+import java.io.Serializable;
 import java.util.Optional;
 
-public class NestedNodeRepositoryImpl<N extends NestedNode<N>> implements NestedNodeRepository<N> {
+public class DelegatingNestedNodeRepository<ID extends Serializable, N extends NestedNode<ID, N>> implements NestedNodeRepository<ID, N> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(NestedNodeRepositoryImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DelegatingNestedNodeRepository.class);
 
-    private NestedNodeInserter<N> inserter;
+    private final NestedNodeInserter<ID, N> inserter;
 
-    private NestedNodeMover<N> mover;
+    private final NestedNodeMover<ID, N> mover;
 
-    private NestedNodeRemover<N> remover;
+    private final NestedNodeRemover<ID, N> remover;
 
-    private NestedNodeRetriever<N> retriever;
+    private final NestedNodeRetriever<ID, N> retriever;
 
-    private NestedNodeRebuilder<N> rebuilder;
+    private final NestedNodeRebuilder<ID, N> rebuilder;
 
     private boolean allowNullableTreeFields = false;
 
-    public void setInserter(NestedNodeInserter<N> inserter) {
+    public DelegatingNestedNodeRepository(NestedNodeInserter<ID, N> inserter, NestedNodeMover<ID, N> mover,
+                                          NestedNodeRemover<ID, N> remover, NestedNodeRetriever<ID, N> retriever,
+                                          NestedNodeRebuilder<ID, N> rebuilder) {
         this.inserter = inserter;
-    }
-
-    public void setMover(NestedNodeMover<N> mover) {
         this.mover = mover;
-    }
-
-    public void setRemover(NestedNodeRemover<N> remover) {
         this.remover = remover;
-    }
-
-    public void setRetriever(NestedNodeRetriever<N> retriever) {
         this.retriever = retriever;
-    }
-
-    public void setRebuilder(NestedNodeRebuilder<N> rebuilder) {
         this.rebuilder = rebuilder;
     }
+
 
     @Override
     public void insertAsFirstChildOf(N node, N parent) {
@@ -99,14 +86,14 @@ public class NestedNodeRepositoryImpl<N extends NestedNode<N>> implements Nested
         if (parent.getId() == null) {
             throw new InvalidParentException("Cannot insert or move to a parent that has null id");
         }
-        Optional<NestedNodeInfo<N>> parentInfo = retriever.getNodeInfo(parent.getId(), getNodeClass(parent));
+        Optional<NestedNodeInfo<ID, N>> parentInfo = retriever.getNodeInfo(parent.getId(), getNodeClass(parent));
         if (!parentInfo.isPresent()) {
-            throw new InvalidParentException(String.format("Cannot insert or move to non existent parent. Parent id: %d", parent.getId()));
+            throw new InvalidParentException(String.format("Cannot insert or move to non existent parent. Parent id: %s", parent.getId()));
         }
         if (node.getId() != null) {
-            Optional<NestedNodeInfo<N>> nodeInfo = retriever.getNodeInfo(node.getId(), getNodeClass(node));
+            Optional<NestedNodeInfo<ID, N>> nodeInfo = retriever.getNodeInfo(node.getId(), getNodeClass(node));
             if (nodeInfo.isPresent()) {
-                boolean nodeInfoValid = isNodeInfoValid(nodeInfo);
+                boolean nodeInfoValid = isNodeInfoValid(nodeInfo.get());
                 if (nodeInfoValid) {
                     this.mover.move(nodeInfo.get(), parentInfo.get(), mode);
                 } else if (allowNullableTreeFields) {
@@ -123,13 +110,13 @@ public class NestedNodeRepositoryImpl<N extends NestedNode<N>> implements Nested
         }
     }
 
-    private boolean isNodeInfoValid(Optional<NestedNodeInfo<N>> nodeInfo) {
-        return (nodeInfo.get().getLeft() != null && nodeInfo.get().getRight() != null);
+    private boolean isNodeInfoValid(NestedNodeInfo<ID, N> nodeInfo) {
+        return (nodeInfo.getLeft() != null && nodeInfo.getRight() != null);
     }
 
     @Override
     public void removeSingle(N node) {
-        Optional<NestedNodeInfo<N>> nodeInfo = retriever.getNodeInfo(node.getId(), getNodeClass(node));
+        Optional<NestedNodeInfo<ID, N>> nodeInfo = retriever.getNodeInfo(node.getId(), getNodeClass(node));
         if (nodeInfo.isPresent()) {
             this.remover.removeSingle(nodeInfo.get());
         } else {
@@ -140,7 +127,7 @@ public class NestedNodeRepositoryImpl<N extends NestedNode<N>> implements Nested
 
     @Override
     public void removeSubtree(N node) {
-        Optional<NestedNodeInfo<N>> nodeInfo = retriever.getNodeInfo(node.getId(), getNodeClass(node));
+        Optional<NestedNodeInfo<ID, N>> nodeInfo = retriever.getNodeInfo(node.getId(), getNodeClass(node));
         if (nodeInfo.isPresent()) {
             this.remover.removeSubtree(nodeInfo.get());
         } else {
@@ -164,7 +151,7 @@ public class NestedNodeRepositoryImpl<N extends NestedNode<N>> implements Nested
     }
 
     @Override
-    public Tree<N> getTree(N node) {
+    public Tree<ID, N> getTree(N node) {
         return this.retriever.getTree(node);
     }
 

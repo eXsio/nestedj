@@ -23,19 +23,20 @@
  */
 package pl.exsio.nestedj.model;
 
+import java.io.Serializable;
 import java.util.List;
 
-public interface Tree<N extends NestedNode> {
+public interface Tree<ID extends Serializable, N extends NestedNode<ID, N>> {
     
-    void setChildren(List<Tree<N>> children);
+    void setChildren(List<Tree<ID, N>> children);
     
-    void addChild(Tree<N> child);
+    void addChild(Tree<ID, N> child);
     
-    List<Tree<N>> getChildren();
+    List<Tree<ID, N>> getChildren();
     
-    Tree<N> getParent();
+    Tree<ID, N> getParent();
     
-    void setParent(Tree<N> parent);
+    void setParent(Tree<ID, N> parent);
     
     N getNode();
     

@@ -2,9 +2,11 @@ package pl.exsio.nestedj.model;
 
 import com.google.common.base.MoreObjects;
 
-public class NestedNodeInfo<N extends NestedNode<N>> {
+import java.io.Serializable;
 
-    private final Long id;
+public class NestedNodeInfo<ID extends Serializable, N extends NestedNode<ID, N>> {
+
+    private final ID id;
 
     private final Long parentId;
 
@@ -16,7 +18,7 @@ public class NestedNodeInfo<N extends NestedNode<N>> {
 
     private Class<N> nodeClass;
 
-    public NestedNodeInfo(Long id, Long parentId, Long left, Long right, Long level) {
+    public NestedNodeInfo(ID id, Long parentId, Long left, Long right, Long level) {
         this.id = id;
         this.parentId = parentId;
         this.left = left;
@@ -24,7 +26,7 @@ public class NestedNodeInfo<N extends NestedNode<N>> {
         this.level = level;
     }
 
-    public Long getId() {
+    public ID getId() {
         return id;
     }
 

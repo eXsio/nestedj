@@ -21,44 +21,41 @@
  * OUN OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package pl.exsio.nestedj.delegate;
+package pl.exsio.nestedj.delegate.jpa;
 
+import pl.exsio.nestedj.delegate.NestedNodeDelegate;
+import pl.exsio.nestedj.delegate.NestedNodeInserter;
 import pl.exsio.nestedj.discriminator.TreeDiscriminator;
 import pl.exsio.nestedj.model.NestedNode;
 import pl.exsio.nestedj.model.NestedNodeInfo;
 
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
+import java.io.Serializable;
 import java.util.Optional;
 
 import static pl.exsio.nestedj.util.NestedNodeUtil.left;
 import static pl.exsio.nestedj.util.NestedNodeUtil.right;
 
-public class NestedNodeInserterImpl<N extends NestedNode<N>> extends NestedNodeDelegate<N> implements NestedNodeInserter<N> {
+public class JpaNestedNodeInserter<ID extends Serializable, N extends NestedNode<ID, N>> extends NestedNodeDelegate<ID, N> implements NestedNodeInserter<ID, N> {
 
-    @PersistenceContext
-    private EntityManager em;
+    private final EntityManager entityManager;
 
-    public NestedNodeInserterImpl(TreeDiscriminator<N> treeDiscriminator) {
+    public JpaNestedNodeInserter(EntityManager entityManager, TreeDiscriminator<ID, N> treeDiscriminator) {
         super(treeDiscriminator);
-    }
-
-    public NestedNodeInserterImpl(EntityManager em, TreeDiscriminator<N> treeDiscriminator) {
-        super(treeDiscriminator);
-        this.em = em;
+        this.entityManager = entityManager;
     }
 
     @Override
-    public void insert(N node, NestedNodeInfo<N> parentInfo, Mode mode) {
+    public void insert(N node, NestedNodeInfo<ID, N> parentInfo, Mode mode) {
         Class<N> nodeClass = getNodeClass(node);
         makeSpaceForNewElement(getMoveFrom(parentInfo, mode), mode, nodeClass);
         insertNodeIntoTree(parentInfo, node, mode);
     }
 
-    private void insertNodeIntoTree(NestedNodeInfo<N> parent, N node, Mode mode) {
+    private void insertNodeIntoTree(NestedNodeInfo<ID, N> parent, N node, Mode mode) {
         Long left = this.getNodeLeft(parent, mode);
         Long right = left + 1;
         Long level = this.getNodeLevel(parent, mode);
@@ -67,9 +64,9 @@ public class NestedNodeInserterImpl<N extends NestedNode<N>> extends NestedNodeD
         node.setLeft(left);
         node.setRight(right);
         node.setLevel(level);
-        node.setParent(nodeParent.isPresent() ? nodeParent.get() : null);
+        node.setParent(nodeParent.orElse(null));
 
-        em.persist(node);
+        entityManager.persist(node);
     }
 
     private void makeSpaceForNewElement(Long from, Mode mode, Class<N> nodeClass) {
@@ -78,20 +75,20 @@ public class NestedNodeInserterImpl<N extends NestedNode<N>> extends NestedNodeD
     }
 
     private void updateFields(Long from, Mode mode, Class<N> nodeClass, String fieldName) {
-        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
         Root<N> root = update.from(nodeClass);
 
-        update.set(root.<Long>get(fieldName), cb.sum(root.<Long>get(fieldName), 2L));
+        update.set(root.<Long>get(fieldName), cb.sum(root.get(fieldName), 2L));
         if (applyGte(mode)) {
-            update.where(getPredicates(cb, root, cb.greaterThanOrEqualTo(root.<Long>get(fieldName), from)));
+            update.where(getPredicates(cb, root, cb.greaterThanOrEqualTo(root.get(fieldName), from)));
         } else {
-            update.where(getPredicates(cb, root, cb.greaterThan(root.<Long>get(fieldName), from)));
+            update.where(getPredicates(cb, root, cb.greaterThan(root.get(fieldName), from)));
         }
-        em.createQuery(update).executeUpdate();
+        entityManager.createQuery(update).executeUpdate();
     }
 
-    private Long getMoveFrom(NestedNodeInfo<N> parent, Mode mode) {
+    private Long getMoveFrom(NestedNodeInfo<ID, N> parent, Mode mode) {
         switch (mode) {
             case PREV_SIBLING:
             case FIRST_CHILD:
@@ -103,7 +100,7 @@ public class NestedNodeInserterImpl<N extends NestedNode<N>> extends NestedNodeD
         }
     }
 
-    private Long getNodeLevel(NestedNodeInfo<N> parent, Mode mode) {
+    private Long getNodeLevel(NestedNodeInfo<ID, N> parent, Mode mode) {
         switch (mode) {
             case NEXT_SIBLING:
             case PREV_SIBLING:
@@ -115,23 +112,23 @@ public class NestedNodeInserterImpl<N extends NestedNode<N>> extends NestedNodeD
         }
     }
 
-    private Optional<N> getNodeParent(NestedNodeInfo<N> parent, Mode mode) {
+    private Optional<N> getNodeParent(NestedNodeInfo<ID, N> parent, Mode mode) {
         switch (mode) {
             case NEXT_SIBLING:
             case PREV_SIBLING:
                 if (parent.getParentId() != null) {
-                    return Optional.of(em.getReference(parent.getNodeClass(), parent.getParentId()));
+                    return Optional.of(entityManager.getReference(parent.getNodeClass(), parent.getParentId()));
                 } else {
                     return Optional.empty();
                 }
             case LAST_CHILD:
             case FIRST_CHILD:
             default:
-                return Optional.of(em.getReference(parent.getNodeClass(), parent.getId()));
+                return Optional.of(entityManager.getReference(parent.getNodeClass(), parent.getId()));
         }
     }
 
-    private Long getNodeLeft(NestedNodeInfo<N> parent, Mode mode) {
+    private Long getNodeLeft(NestedNodeInfo<ID, N> parent, Mode mode) {
         switch (mode) {
             case NEXT_SIBLING:
                 return parent.getRight() + 1;
@@ -155,10 +152,6 @@ public class NestedNodeInserterImpl<N extends NestedNode<N>> extends NestedNodeD
             default:
                 return true;
         }
-    }
-
-    public void setEntityManager(EntityManager em) {
-        this.em = em;
     }
 
 }

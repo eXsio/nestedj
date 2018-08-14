@@ -21,8 +21,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package pl.exsio.nestedj.delegate;
+package pl.exsio.nestedj.delegate.jpa;
 
+import pl.exsio.nestedj.delegate.NestedNodeDelegate;
+import pl.exsio.nestedj.delegate.NestedNodeRemover;
 import pl.exsio.nestedj.discriminator.TreeDiscriminator;
 import pl.exsio.nestedj.ex.InvalidNodeException;
 import pl.exsio.nestedj.model.NestedNode;
@@ -30,36 +32,23 @@ import pl.exsio.nestedj.model.NestedNodeInfo;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
-import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaDelete;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.CriteriaUpdate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
+import java.io.Serializable;
 import java.util.Optional;
 
-import static pl.exsio.nestedj.util.NestedNodeUtil.id;
-import static pl.exsio.nestedj.util.NestedNodeUtil.left;
-import static pl.exsio.nestedj.util.NestedNodeUtil.level;
-import static pl.exsio.nestedj.util.NestedNodeUtil.parent;
-import static pl.exsio.nestedj.util.NestedNodeUtil.right;
+import static pl.exsio.nestedj.util.NestedNodeUtil.*;
 
-public class NestedNodeRemoverImpl<N extends NestedNode<N>> extends NestedNodeDelegate<N> implements NestedNodeRemover<N> {
+public class JpaNestedNodeRemover<ID extends Serializable, N extends NestedNode<ID, N>> extends NestedNodeDelegate<ID, N> implements NestedNodeRemover<ID, N> {
 
-    @PersistenceContext
-    private EntityManager em;
+    private final EntityManager entityManager;
 
-    public NestedNodeRemoverImpl(TreeDiscriminator<N> treeDiscriminator) {
+    public JpaNestedNodeRemover(EntityManager entityManager, TreeDiscriminator<ID, N> treeDiscriminator) {
         super(treeDiscriminator);
-    }
-
-    public NestedNodeRemoverImpl(EntityManager em, TreeDiscriminator<N> treeDiscriminator) {
-        super(treeDiscriminator);
-        this.em = em;
+        this.entityManager = entityManager;
     }
 
     @Override
-    public void removeSingle(NestedNodeInfo<N> nodeInfo) {
+    public void removeSingle(NestedNodeInfo<ID, N> nodeInfo) {
         Class<N> nodeClass = nodeInfo.getNodeClass();
         Long from = nodeInfo.getRight();
         Optional<N> parent = this.findNodeParent(nodeInfo, nodeClass);
@@ -69,14 +58,14 @@ public class NestedNodeRemoverImpl<N extends NestedNode<N>> extends NestedNodeDe
         performSingleDeletion(nodeInfo, nodeClass);
     }
 
-    private void performSingleDeletion(NestedNodeInfo<N> node, Class<N> nodeClass) {
-        CriteriaBuilder cb = em.getCriteriaBuilder();
+    private void performSingleDeletion(NestedNodeInfo<ID, N> node, Class<N> nodeClass) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaDelete<N> delete = cb.createCriteriaDelete(nodeClass);
         Root<N> root = delete.from(nodeClass);
         delete.where(getPredicates(cb, root,
                 cb.equal(root.<Long>get(id(nodeClass)), node.getId())
         ));
-        em.createQuery(delete).executeUpdate();
+        entityManager.createQuery(delete).executeUpdate();
     }
 
     private void prepareTreeForSingleNodeRemoval(Long from, Class<N> nodeClass) {
@@ -84,60 +73,60 @@ public class NestedNodeRemoverImpl<N extends NestedNode<N>> extends NestedNodeDe
         updateFieldsBeforeSingleNodeRemoval(from, nodeClass, left(nodeClass));
     }
 
-    private void updateDeletedNodeChildren(NestedNodeInfo<N> node, Class<N> nodeClass) {
-        CriteriaBuilder cb = em.getCriteriaBuilder();
+    private void updateDeletedNodeChildren(NestedNodeInfo<ID, N> node, Class<N> nodeClass) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
         Root<N> root = update.from(nodeClass);
-        update.set(root.<Long>get(right(nodeClass)), cb.diff(root.<Long>get(right(nodeClass)), 1L))
-                .set(root.<Long>get(left(nodeClass)), cb.diff(root.<Long>get(left(nodeClass)), 1L))
-                .set(root.<Long>get(level(nodeClass)), cb.diff(root.<Long>get(level(nodeClass)), 1L));
+        update.set(root.<Long>get(right(nodeClass)), cb.diff(root.get(right(nodeClass)), 1L))
+                .set(root.<Long>get(left(nodeClass)), cb.diff(root.get(left(nodeClass)), 1L))
+                .set(root.<Long>get(level(nodeClass)), cb.diff(root.get(level(nodeClass)), 1L));
 
         update.where(getPredicates(cb, root,
-                        cb.lessThan(root.<Long>get(right(nodeClass)), node.getRight()),
-                        cb.greaterThan(root.<Long>get(left(nodeClass)), node.getLeft()))
+                        cb.lessThan(root.get(right(nodeClass)), node.getRight()),
+                        cb.greaterThan(root.get(left(nodeClass)), node.getLeft()))
         );
 
-        em.createQuery(update).executeUpdate();
+        entityManager.createQuery(update).executeUpdate();
     }
 
     private void updateFieldsBeforeSingleNodeRemoval(Long from, Class<N> nodeClass, String field) {
-        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
         Root<N> root = update.from(nodeClass);
 
-        update.set(root.<Long>get(field), cb.diff(root.<Long>get(field), 2L))
-                .where(getPredicates(cb, root, cb.greaterThan(root.<Long>get(field), from)));
+        update.set(root.<Long>get(field), cb.diff(root.get(field), 2L))
+                .where(getPredicates(cb, root, cb.greaterThan(root.get(field), from)));
 
-        em.createQuery(update).executeUpdate();
+        entityManager.createQuery(update).executeUpdate();
     }
 
 
-    private void updateNodesParent(NestedNodeInfo<N> node, Optional<N> parent, Class<N> nodeClass) {
-        CriteriaBuilder cb = em.getCriteriaBuilder();
+    private void updateNodesParent(NestedNodeInfo<ID, N> node, Optional<N> parent, Class<N> nodeClass) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
         Root<N> root = update.from(nodeClass);
-        N newParent = parent.isPresent() ? parent.get() : null;
+        N newParent = parent.orElse(null);
         update.set(root.get(parent(nodeClass)), newParent)
                 .where(getPredicates(cb, root,
-                        cb.greaterThanOrEqualTo(root.<Long>get(left(nodeClass)), node.getLeft()),
-                        cb.lessThanOrEqualTo(root.<Long>get(right(nodeClass)), node.getRight()),
+                        cb.greaterThanOrEqualTo(root.get(left(nodeClass)), node.getLeft()),
+                        cb.lessThanOrEqualTo(root.get(right(nodeClass)), node.getRight()),
                         cb.equal(root.<Long>get(level(nodeClass)), node.getLevel() + 1)
                 ));
-        em.createQuery(update).executeUpdate();
+        entityManager.createQuery(update).executeUpdate();
     }
 
-    private Optional<N> findNodeParent(NestedNodeInfo<N> node, Class<N> nodeClass) {
+    private Optional<N> findNodeParent(NestedNodeInfo<ID, N> node, Class<N> nodeClass) {
         if (node.getLevel() > 0) {
-            CriteriaBuilder cb = em.getCriteriaBuilder();
+            CriteriaBuilder cb = entityManager.getCriteriaBuilder();
             CriteriaQuery<N> select = cb.createQuery(nodeClass);
             Root<N> root = select.from(nodeClass);
             select.where(getPredicates(cb, root,
-                    cb.lessThan(root.<Long>get(left(nodeClass)), node.getLeft()),
-                    cb.greaterThan(root.<Long>get(right(nodeClass)), node.getRight()),
+                    cb.lessThan(root.get(left(nodeClass)), node.getLeft()),
+                    cb.greaterThan(root.get(right(nodeClass)), node.getRight()),
                     cb.equal(root.<Long>get(level(nodeClass)), node.getLevel() - 1)
             ));
             try {
-                return Optional.of(em.createQuery(select).setMaxResults(1).getSingleResult());
+                return Optional.of(entityManager.createQuery(select).setMaxResults(1).getSingleResult());
             } catch (NoResultException ex) {
                 throw new InvalidNodeException(String.format("Couldn't find node's parent, although its level is greater than 0. It seems the tree is malformed: %s", node));
             }
@@ -146,7 +135,7 @@ public class NestedNodeRemoverImpl<N extends NestedNode<N>> extends NestedNodeDe
     }
 
     @Override
-    public void removeSubtree(NestedNodeInfo<N> nodeInfo) {
+    public void removeSubtree(NestedNodeInfo<ID, N> nodeInfo) {
         Class<N> nodeClass = nodeInfo.getNodeClass();
         Long delta = nodeInfo.getRight() - nodeInfo.getLeft() + 1;
         Long from = nodeInfo.getRight();
@@ -156,30 +145,26 @@ public class NestedNodeRemoverImpl<N extends NestedNode<N>> extends NestedNodeDe
     }
 
     private void updateFieldsAfterSubtreeRemoval(Long from, Long delta, Class<N> nodeClass, String field) {
-        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
         Root<N> root = update.from(nodeClass);
 
-        update.set(root.<Long>get(field), cb.diff(root.<Long>get(field), delta))
-                .where(getPredicates(cb, root, cb.greaterThan(root.<Long>get(field), from)));
+        update.set(root.<Long>get(field), cb.diff(root.get(field), delta))
+                .where(getPredicates(cb, root, cb.greaterThan(root.get(field), from)));
 
-        em.createQuery(update).executeUpdate();
+        entityManager.createQuery(update).executeUpdate();
     }
 
-    private void performBatchDeletion(NestedNodeInfo<N> node, Class<N> nodeClass) {
-        CriteriaBuilder cb = em.getCriteriaBuilder();
+    private void performBatchDeletion(NestedNodeInfo<ID, N> node, Class<N> nodeClass) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaDelete<N> delete = cb.createCriteriaDelete(nodeClass);
         Root<N> root = delete.from(nodeClass);
         delete.where(getPredicates(cb, root,
-                cb.greaterThanOrEqualTo(root.<Long>get(left(nodeClass)), node.getLeft()),
-                cb.lessThanOrEqualTo(root.<Long>get(right(nodeClass)), node.getRight())
+                cb.greaterThanOrEqualTo(root.get(left(nodeClass)), node.getLeft()),
+                cb.lessThanOrEqualTo(root.get(right(nodeClass)), node.getRight())
         ));
 
-        em.createQuery(delete).executeUpdate();
-    }
-
-    public void setEntityManager(EntityManager em) {
-        this.em = em;
+        entityManager.createQuery(delete).executeUpdate();
     }
 
 }

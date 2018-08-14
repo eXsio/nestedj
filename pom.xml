@@ -4,7 +4,7 @@
 
     <groupId>pl.exsio</groupId>
     <artifactId>NestedJ</artifactId>
-    <version>2.1.1.RELEASE</version>
+    <version>2.2.0.RELEASE</version>
     <packaging>jar</packaging>
 
     <name>NestedJ</name>
@@ -13,7 +13,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.4.5.RELEASE</version>
+        <version>2.0.3.RELEASE</version>
         <relativePath />
     </parent>
 
@@ -22,9 +22,12 @@
         <java.version>1.8</java.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <logback.version>1.1.2</logback.version>
-        <slf4j.version>1.7.7</slf4j.version>
-        <hibernate.version>5.2.4.Final</hibernate.version>
+        <logback.version>1.2.3</logback.version>
+        <slf4j.version>1.7.25</slf4j.version>
+        <hibernate.version>5.2.15.Final</hibernate.version>
+        <h2.version>1.4.197</h2.version>
+        <junit.version>4.12</junit.version>
+        <guava.version>26.0-jre</guava.version>
     </properties>
 
     <dependencies>
@@ -38,7 +41,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>21.0</version>
+            <version>${guava.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -61,13 +64,14 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.12</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>1.4.193</version>
+            <version>${h2.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>

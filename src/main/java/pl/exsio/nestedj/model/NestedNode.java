@@ -23,9 +23,11 @@
  */
 package pl.exsio.nestedj.model;
 
-public interface NestedNode<N extends NestedNode> {
+import java.io.Serializable;
 
-    Long getId();
+public interface NestedNode<ID extends Serializable, N extends NestedNode<ID, N>> {
+
+    ID getId();
 
     Long getLeft();
 

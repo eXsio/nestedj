@@ -16,26 +16,25 @@ Nested Set is a RDBMS Tree implmentation. It allows to query for whole tree bran
 
 Given the below structure:
 
-                         1 A 16
-                         /   \
-                        /     \                    
-                       /       \                   
-                      /         \                 
-                   2 B 7       8 C 15              
-                    /             \                
-                   /\             /\               
-                  /  \           /  \              
-                 /    \         /    \             
-                /    5 E 6   9 F 10   \            
-             3 D 4                  11 G 14
-                                        \
-                                         \
-                                       12 H 13
+                       1 A 16
+                        / \                    
+                       /   \                   
+                      /     \                 
+     *             2 B 7   8 C 15              
+                    /         \                
+                   /\         /\               
+                  /  \       /  \              
+                 /    \     /    \             
+                /   5 E 6  9 F 10 \            
+             3 D 4             11 G 14
+                                   \
+                                    \
+                                  12 H 13
                                   
 You can query for an entire tree branch of node ```C``` using a query similar to this:
 
 ```
-SELECT * FROM TREE_TABLE WHERE LEFT >=8 AND RIGHT <= 15
+ SELECT * FROM TREE_TABLE WHERE LEFT >=8 AND RIGHT <= 15
 ```
 
 You can query for a top level parent of a given (```H``` in this example) node using a query similar to this:
@@ -49,6 +48,7 @@ You can also query for an entire path leading to a given (```D``` in this exampl
 ```
 SELECT * FROM TREE_TABLE WHERE LEFT < 3 AND RIGHT > 4 ORDER BY LEVEL ASC
 ```
+
 
 Using the traditional ```parant_id``` relationship would mean firing multiple queries for each child / parent relationship.
 
@@ -91,7 +91,7 @@ In order to use NestedJ, You have to configure it. Here's the full code:
         repository.setRemover(remover);
  
 
-```NestedNodeRepositoryImpl``` is a default, provided implementation of ```NestedNodeRepository```. If You need or want, You can implement your own inserter/mover/retriever/remover/rebuilder that fits to Your needs.
+NestedNodeRepository is a default, provided implementation of ```NestedNodeDao```. If You need or want, You can implement your own inserter/mover/retriever/remover/rebuilder that fits to Your needs.
 
 ### Entiy mapping
 
@@ -140,7 +140,7 @@ I ommited the getters and setters for shortage. As You see, there are 4 specific
 
 Strictly speaking NestedSet doesn't need the parent mapping, but at the same time it's structure is so fragile, that this additional feature helps rebuild the tree if it becomes corrupted for some reason.
 
-It is **recommended** that ```LeftColumn```, ```RightColumn``` and ```LevelColumn``` be **non nullable**. This will ensure better stability of the Nested Set structure.
+It is recommended that ```LeftColumn```, ```RightColumn``` and ```LevelColumn``` be non nullable. This will ensure better stability of the Nested Set structure.
 
 ### Usage
 

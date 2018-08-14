@@ -29,22 +29,12 @@ import pl.exsio.nestedj.annotation.LevelColumn;
 import pl.exsio.nestedj.annotation.ParentColumn;
 import pl.exsio.nestedj.annotation.RightColumn;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "nested_nodes")
 @Inheritance(strategy = InheritanceType.JOINED)
-public class TestNodeImpl extends DummyObject implements NestedNode<TestNodeImpl> {
+public class TestNodeImpl extends DummyObject implements NestedNode<Long, TestNodeImpl> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

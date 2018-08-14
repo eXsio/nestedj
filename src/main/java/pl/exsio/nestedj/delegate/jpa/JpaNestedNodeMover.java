@@ -21,48 +21,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package pl.exsio.nestedj.delegate;
+package pl.exsio.nestedj.delegate.jpa;
 
+import pl.exsio.nestedj.delegate.NestedNodeDelegate;
+import pl.exsio.nestedj.delegate.NestedNodeMover;
 import pl.exsio.nestedj.discriminator.TreeDiscriminator;
 import pl.exsio.nestedj.ex.InvalidNodesHierarchyException;
 import pl.exsio.nestedj.model.NestedNode;
 import pl.exsio.nestedj.model.NestedNodeInfo;
 
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
-import static pl.exsio.nestedj.util.NestedNodeUtil.id;
-import static pl.exsio.nestedj.util.NestedNodeUtil.left;
-import static pl.exsio.nestedj.util.NestedNodeUtil.level;
-import static pl.exsio.nestedj.util.NestedNodeUtil.parent;
-import static pl.exsio.nestedj.util.NestedNodeUtil.right;
+import static pl.exsio.nestedj.util.NestedNodeUtil.*;
 
-public class NestedNodeMoverImpl<N extends NestedNode<N>> extends NestedNodeDelegate<N> implements NestedNodeMover<N> {
+public class JpaNestedNodeMover<ID extends Serializable, N extends NestedNode<ID, N>> extends NestedNodeDelegate<ID, N> implements NestedNodeMover<ID, N> {
 
     private enum Sign {
         PLUS, MINUS
     }
 
-    @PersistenceContext
-    private EntityManager em;
+    private final EntityManager entityManager;
 
-    public NestedNodeMoverImpl(TreeDiscriminator<N> treeDiscriminator) {
+    public JpaNestedNodeMover(EntityManager entityManager, TreeDiscriminator<ID, N> treeDiscriminator) {
         super(treeDiscriminator);
-    }
-
-    public NestedNodeMoverImpl(EntityManager em, TreeDiscriminator<N> treeDiscriminator) {
-        super(treeDiscriminator);
-        this.em = em;
+        this.entityManager = entityManager;
     }
 
     @Override
-    public void move(NestedNodeInfo<N> nodeInfo, NestedNodeInfo<N> parentInfo, Mode mode) {
+    public void move(NestedNodeInfo<ID, N> nodeInfo, NestedNodeInfo<ID, N> parentInfo, Mode mode) {
         Class<N> nodeClass = nodeInfo.getNodeClass();
         if (!canMoveNodeToSelectedParent(nodeInfo, parentInfo)) {
             throw new InvalidNodesHierarchyException("You cannot move a parent node to it's child or move a node to itself");
@@ -89,88 +82,88 @@ public class NestedNodeMoverImpl<N extends NestedNode<N>> extends NestedNodeDele
         updateFields(sign, delta, start, stop, nodeClass, left(nodeClass));
     }
 
-    private void updateParentField(Optional<N> newParent, NestedNodeInfo<N> node, Class<N> nodeClass) {
-        CriteriaBuilder cb = em.getCriteriaBuilder();
+    private void updateParentField(Optional<N> newParent, NestedNodeInfo<ID, N> node, Class<N> nodeClass) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
         Root<N> root = update.from(nodeClass);
 
-        update.set(root.get(parent(nodeClass)), newParent.isPresent() ? newParent.get() : null)
+        update.set(root.get(parent(nodeClass)), newParent.orElse(null))
                 .where(getPredicates(cb, root, cb.equal(root.get(id(nodeClass)), node.getId())));
 
-        em.createQuery(update).executeUpdate();
+        entityManager.createQuery(update).executeUpdate();
     }
 
     private void performMove(Sign nodeSign, Long nodeDelta, List nodeIds, Long levelModificator, Class<N> nodeClass) {
         if (!nodeIds.isEmpty()) {
-            CriteriaBuilder cb = em.getCriteriaBuilder();
+            CriteriaBuilder cb = entityManager.getCriteriaBuilder();
             CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
             Root<N> root = update.from(nodeClass);
 
-            update.set(root.<Long>get(level(nodeClass)), cb.sum(root.<Long>get(level(nodeClass)), levelModificator));
+            update.set(root.<Long>get(level(nodeClass)), cb.sum(root.get(level(nodeClass)), levelModificator));
             if (Sign.MINUS.equals(nodeSign)) {
-                update.set(root.<Long>get(right(nodeClass)), cb.diff(root.<Long>get(right(nodeClass)), nodeDelta));
-                update.set(root.<Long>get(left(nodeClass)), cb.diff(root.<Long>get(left(nodeClass)), nodeDelta));
+                update.set(root.<Long>get(right(nodeClass)), cb.diff(root.get(right(nodeClass)), nodeDelta));
+                update.set(root.<Long>get(left(nodeClass)), cb.diff(root.get(left(nodeClass)), nodeDelta));
             } else if (Sign.PLUS.equals(nodeSign)) {
-                update.set(root.<Long>get(right(nodeClass)), cb.sum(root.<Long>get(right(nodeClass)), nodeDelta));
-                update.set(root.<Long>get(left(nodeClass)), cb.sum(root.<Long>get(left(nodeClass)), nodeDelta));
+                update.set(root.<Long>get(right(nodeClass)), cb.sum(root.get(right(nodeClass)), nodeDelta));
+                update.set(root.<Long>get(left(nodeClass)), cb.sum(root.get(left(nodeClass)), nodeDelta));
             }
             update.where(getPredicates(cb, root, root.get(id(nodeClass)).in(nodeIds)));
 
-            em.createQuery(update).executeUpdate();
+            entityManager.createQuery(update).executeUpdate();
         }
     }
 
     private void updateFields(Sign sign, Long delta, Long start, Long stop, Class<N> nodeClass, String field) {
-        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
         Root<N> root = update.from(nodeClass);
 
         if (Sign.MINUS.equals(sign)) {
-            update.set(root.<Long>get(field), cb.diff(root.<Long>get(field), delta));
+            update.set(root.<Long>get(field), cb.diff(root.get(field), delta));
         } else if (Sign.PLUS.equals(sign)) {
-            update.set(root.<Long>get(field), cb.sum(root.<Long>get(field), delta));
+            update.set(root.<Long>get(field), cb.sum(root.get(field), delta));
         }
         update.where(getPredicates(cb, root,
-                cb.greaterThan(root.<Long>get(field), start),
-                cb.lessThan(root.<Long>get(field), stop)
+                cb.greaterThan(root.get(field), start),
+                cb.lessThan(root.get(field), stop)
         ));
 
-        em.createQuery(update).executeUpdate();
+        entityManager.createQuery(update).executeUpdate();
     }
 
-    private boolean canMoveNodeToSelectedParent(NestedNodeInfo<N> node, NestedNodeInfo<N> parent) {
+    private boolean canMoveNodeToSelectedParent(NestedNodeInfo<ID, N> node, NestedNodeInfo<ID, N> parent) {
         return !node.getId().equals(parent.getId()) && (node.getLeft() >= parent.getLeft() || node.getRight() <= parent.getRight());
     }
 
-    private List<Long> getNodeIds(NestedNodeInfo<N> node) {
-        CriteriaBuilder cb = em.getCriteriaBuilder();
+    private List<Long> getNodeIds(NestedNodeInfo<ID, N> node) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Long> select = cb.createQuery(Long.class);
         Root<N> root = select.from(node.getNodeClass());
-        select.select(root.<Long>get(id(node.getNodeClass()))).where(
+        select.select(root.get(id(node.getNodeClass()))).where(
                 getPredicates(cb, root,
-                        cb.greaterThanOrEqualTo(root.<Long>get(left(node.getNodeClass())), node.getLeft()),
-                        cb.lessThanOrEqualTo(root.<Long>get(right(node.getNodeClass())), node.getRight())
+                        cb.greaterThanOrEqualTo(root.get(left(node.getNodeClass())), node.getLeft()),
+                        cb.lessThanOrEqualTo(root.get(right(node.getNodeClass())), node.getRight())
                 ));
-        return em.createQuery(select).getResultList();
+        return entityManager.createQuery(select).getResultList();
     }
 
-    private Optional<N> getNewParent(NestedNodeInfo<N> parent, Mode mode) {
+    private Optional<N> getNewParent(NestedNodeInfo<ID, N> parent, Mode mode) {
         switch (mode) {
             case NEXT_SIBLING:
             case PREV_SIBLING:
                 if (parent.getParentId() != null) {
-                    return Optional.of(em.getReference(parent.getNodeClass(), parent.getParentId()));
+                    return Optional.of(entityManager.getReference(parent.getNodeClass(), parent.getParentId()));
                 } else {
                     return Optional.empty();
                 }
             case FIRST_CHILD:
             case LAST_CHILD:
             default:
-                return Optional.of(em.getReference(parent.getNodeClass(), parent.getId()));
+                return Optional.of(entityManager.getReference(parent.getNodeClass(), parent.getId()));
         }
     }
 
-    private Long getLevelModificator(NestedNodeInfo<N> node, NestedNodeInfo<N> parent, Mode mode) {
+    private Long getLevelModificator(NestedNodeInfo<ID, N> node, NestedNodeInfo<ID, N> parent, Mode mode) {
         switch (mode) {
             case NEXT_SIBLING:
             case PREV_SIBLING:
@@ -194,7 +187,7 @@ public class NestedNodeMoverImpl<N extends NestedNode<N>> extends NestedNodeDele
         return (sign.equals(Sign.PLUS)) ? Sign.MINUS : Sign.PLUS;
     }
 
-    private Sign getSign(NestedNodeInfo<N> node, NestedNodeInfo<N> parent, Mode mode) {
+    private Sign getSign(NestedNodeInfo<ID, N> node, NestedNodeInfo<ID, N> parent, Mode mode) {
         switch (mode) {
             case PREV_SIBLING:
             case FIRST_CHILD:
@@ -206,7 +199,7 @@ public class NestedNodeMoverImpl<N extends NestedNode<N>> extends NestedNodeDele
         }
     }
 
-    private Long getStart(NestedNodeInfo<N> node, NestedNodeInfo<N> parent, Mode mode, Sign sign) {
+    private Long getStart(NestedNodeInfo<ID, N> node, NestedNodeInfo<ID, N> parent, Mode mode, Sign sign) {
         switch (mode) {
             case PREV_SIBLING:
                 return sign.equals(Sign.PLUS) ? parent.getLeft() - 1 : node.getRight();
@@ -221,7 +214,7 @@ public class NestedNodeMoverImpl<N extends NestedNode<N>> extends NestedNodeDele
         }
     }
 
-    private Long getStop(NestedNodeInfo<N> node, NestedNodeInfo<N> parent, Mode mode, Sign sign) {
+    private Long getStop(NestedNodeInfo<ID, N> node, NestedNodeInfo<ID, N> parent, Mode mode, Sign sign) {
         switch (mode) {
             case PREV_SIBLING:
                 return sign.equals(Sign.PLUS) ? node.getLeft() : parent.getLeft();
@@ -233,10 +226,6 @@ public class NestedNodeMoverImpl<N extends NestedNode<N>> extends NestedNodeDele
             default:
                 return sign.equals(Sign.PLUS) ? node.getLeft() : parent.getRight();
         }
-    }
-
-    public void setEntityManager(EntityManager em) {
-        this.em = em;
     }
 
 }
