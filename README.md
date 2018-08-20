@@ -114,7 +114,7 @@ In order to use NestedJ, You have to configure it. In 9 our of 10 cases you will
 
 ### Entiy mapping
 
-Here is the example entity annotated with NestedJ - specific Annotations:
+Here is the example entity that implements the ```NestedNode``` interface:
 
 ```
 
@@ -137,14 +137,59 @@ public class TestNode implements NestedNode<Long> {
 
     @Column(name = "parent_id")
     protected Long parentId;
+    
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public Long getTreeLeft() {
+        return treeLeft;
+    }
+
+    @Override
+    public Long getTreeRight() {
+        return treeRight;
+    }
+
+    @Override
+    public Long getTreeLevel() {
+        return treeLevel;
+    }
+
+    @Override
+    public Long getParentId() {
+        return parentId;
+    }
+
+    @Override
+    public void setTreeLeft(Long treeLeft) {
+        this.treeLeft = treeLeft;
+    }
+
+    @Override
+    public void setTreeRight(Long treeRight) {
+        this.treeRight = treeRight;
+    }
+
+    @Override
+    public void setTreeLevel(Long treeLevel) {
+        this.treeLevel = treeLevel;
+    }
+
+    @Override
+    public void setParentId(Long parentId) {
+        this.parentId = parentId;
+    }
 }
 ```
 
-I have ommited the getters and setters for shortage. As You see, there are 4 specific columns:
+As You see, there are 4 specific columns:
 - Left
 - Right
 - Level
-- Parent
+- Parent ID
 
 Strictly speaking NestedSet doesn't need the parent id column, but at the same time it's structure is so fragile, that this additional feature helps rebuild the tree if it becomes corrupted for some reason.
 
