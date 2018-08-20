@@ -35,9 +35,13 @@ import pl.exsio.nestedj.model.Tree;
 import java.io.Serializable;
 import java.util.Optional;
 
-public class DelegatingNestedNodeRepository<ID extends Serializable, N extends NestedNode<ID, N>> implements NestedNodeRepository<ID, N> {
+public class DelegatingNestedNodeRepository<ID extends Serializable, N extends NestedNode<ID>> implements NestedNodeRepository<ID, N> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DelegatingNestedNodeRepository.class);
+
+    private final Class<ID> idClass;
+
+    private final Class<N> nodeClass;
 
     private final NestedNodeInserter<ID, N> inserter;
 
@@ -51,9 +55,10 @@ public class DelegatingNestedNodeRepository<ID extends Serializable, N extends N
 
     private boolean allowNullableTreeFields = false;
 
-    public DelegatingNestedNodeRepository(NestedNodeInserter<ID, N> inserter, NestedNodeMover<ID, N> mover,
-                                          NestedNodeRemover<ID, N> remover, NestedNodeRetriever<ID, N> retriever,
-                                          NestedNodeRebuilder<ID, N> rebuilder) {
+
+    public DelegatingNestedNodeRepository(Class<ID> idClass, Class<N> nodeClass, NestedNodeMover<ID, N> mover, NestedNodeRemover<ID, N> remover, NestedNodeRetriever<ID, N> retriever, NestedNodeRebuilder<ID, N> rebuilder, NestedNodeInserter<ID, N> inserter) {
+        this.idClass = idClass;
+        this.nodeClass = nodeClass;
         this.inserter = inserter;
         this.mover = mover;
         this.remover = remover;
@@ -86,27 +91,27 @@ public class DelegatingNestedNodeRepository<ID extends Serializable, N extends N
         if (parent.getId() == null) {
             throw new InvalidParentException("Cannot insert or move to a parent that has null id");
         }
-        Optional<NestedNodeInfo<ID, N>> parentInfo = retriever.getNodeInfo(parent.getId(), getNodeClass(parent));
+        Optional<NestedNodeInfo<ID, N>> parentInfo = retriever.getNodeInfo(parent.getId(), nodeClass, idClass);
         if (!parentInfo.isPresent()) {
             throw new InvalidParentException(String.format("Cannot insert or move to non existent parent. Parent id: %s", parent.getId()));
         }
         if (node.getId() != null) {
-            Optional<NestedNodeInfo<ID, N>> nodeInfo = retriever.getNodeInfo(node.getId(), getNodeClass(node));
+            Optional<NestedNodeInfo<ID, N>> nodeInfo = retriever.getNodeInfo(node.getId(), nodeClass, idClass);
             if (nodeInfo.isPresent()) {
                 boolean nodeInfoValid = isNodeInfoValid(nodeInfo.get());
                 if (nodeInfoValid) {
                     this.mover.move(nodeInfo.get(), parentInfo.get(), mode);
                 } else if (allowNullableTreeFields) {
                     LOGGER.warn("Nullable tree fields allowed. Trying to perform an insert on an existing, invalid tree node: {}", nodeInfo.get());
-                    this.inserter.insert(node, parentInfo.get(), mode);
+                    this.inserter.insert(node, parentInfo.get(), mode, nodeClass);
                 } else {
                     throw new InvalidNodeException(String.format("Current configuration doesn't allow nullable tree fields: %s", nodeInfo.get()));
                 }
             } else {
-                this.inserter.insert(node, parentInfo.get(), mode);
+                this.inserter.insert(node, parentInfo.get(), mode, nodeClass);
             }
         } else {
-            this.inserter.insert(node, parentInfo.get(), mode);
+            this.inserter.insert(node, parentInfo.get(), mode, nodeClass);
         }
     }
 
@@ -116,7 +121,7 @@ public class DelegatingNestedNodeRepository<ID extends Serializable, N extends N
 
     @Override
     public void removeSingle(N node) {
-        Optional<NestedNodeInfo<ID, N>> nodeInfo = retriever.getNodeInfo(node.getId(), getNodeClass(node));
+        Optional<NestedNodeInfo<ID, N>> nodeInfo = retriever.getNodeInfo(node.getId(), nodeClass, idClass);
         if (nodeInfo.isPresent()) {
             this.remover.removeSingle(nodeInfo.get());
         } else {
@@ -127,7 +132,7 @@ public class DelegatingNestedNodeRepository<ID extends Serializable, N extends N
 
     @Override
     public void removeSubtree(N node) {
-        Optional<NestedNodeInfo<ID, N>> nodeInfo = retriever.getNodeInfo(node.getId(), getNodeClass(node));
+        Optional<NestedNodeInfo<ID, N>> nodeInfo = retriever.getNodeInfo(node.getId(), nodeClass, idClass);
         if (nodeInfo.isPresent()) {
             this.remover.removeSubtree(nodeInfo.get());
         } else {
@@ -137,36 +142,36 @@ public class DelegatingNestedNodeRepository<ID extends Serializable, N extends N
 
     @Override
     public Iterable<N> getTreeAsList(N node) {
-        return this.retriever.getTreeAsList(node);
+        return this.retriever.getTreeAsList(node, nodeClass);
     }
 
     @Override
     public Iterable<N> getChildren(N node) {
-        return this.retriever.getChildren(node);
+        return this.retriever.getChildren(node, nodeClass);
     }
 
     @Override
     public Optional<N> getParent(N node) {
-        return this.retriever.getParent(node);
+        return this.retriever.getParent(node, nodeClass);
     }
 
     @Override
     public Tree<ID, N> getTree(N node) {
-        return this.retriever.getTree(node);
+        return this.retriever.getTree(node, nodeClass);
     }
 
     @Override
     public Iterable<N> getParents(N node) {
-        return this.retriever.getParents(node);
+        return this.retriever.getParents(node, nodeClass);
     }
 
     @Override
-    public void rebuildTree(Class<N> nodeClass) {
-        this.rebuilder.rebuildTree(nodeClass);
+    public void rebuildTree() {
+        this.rebuilder.rebuildTree(nodeClass, idClass);
     }
 
     @Override
-    public void destroyTree(Class<N> nodeClass) {
+    public void destroyTree() {
         rebuilder.destroyTree(nodeClass);
     }
 
@@ -176,9 +181,5 @@ public class DelegatingNestedNodeRepository<ID extends Serializable, N extends N
 
     public void setAllowNullableTreeFields(boolean allowNullableTreeFields) {
         this.allowNullableTreeFields = allowNullableTreeFields;
-    }
-
-    private Class<N> getNodeClass(N node) {
-        return (Class<N>) node.getClass();
     }
 }

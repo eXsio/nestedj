@@ -35,18 +35,18 @@ import javax.persistence.criteria.Root;
 import java.io.Serializable;
 import java.util.Optional;
 
-import static pl.exsio.nestedj.util.NestedNodeUtil.left;
-import static pl.exsio.nestedj.util.NestedNodeUtil.right;
+import static pl.exsio.nestedj.model.NestedNode.LEFT;
+import static pl.exsio.nestedj.model.NestedNode.RIGHT;
 
-public class JpaNestedNodeInserter<ID extends Serializable, N extends NestedNode<ID, N>> extends JpaNestedNodeDelegate<ID, N> implements NestedNodeInserter<ID, N> {
+
+public class JpaNestedNodeInserter<ID extends Serializable, N extends NestedNode<ID>> extends JpaNestedNodeDelegate<ID, N> implements NestedNodeInserter<ID, N> {
 
     public JpaNestedNodeInserter(EntityManager entityManager, TreeDiscriminator<ID, N> treeDiscriminator) {
         super(entityManager, treeDiscriminator);
     }
 
     @Override
-    public void insert(N node, NestedNodeInfo<ID, N> parentInfo, Mode mode) {
-        Class<N> nodeClass = getNodeClass(node);
+    public void insert(N node, NestedNodeInfo<ID, N> parentInfo, Mode mode, Class<N> nodeClass) {
         makeSpaceForNewElement(getMoveFrom(parentInfo, mode), mode, nodeClass);
         insertNodeIntoTree(parentInfo, node, mode);
     }
@@ -55,19 +55,16 @@ public class JpaNestedNodeInserter<ID extends Serializable, N extends NestedNode
         Long left = this.getNodeLeft(parent, mode);
         Long right = left + 1;
         Long level = this.getNodeLevel(parent, mode);
-        Optional<N> nodeParent = this.getNodeParent(parent, mode);
-
-        node.setLeft(left);
-        node.setRight(right);
-        node.setLevel(level);
-        node.setParent(nodeParent.orElse(null));
-
+        node.setTreeLeft(left);
+        node.setTreeRight(right);
+        node.setTreeLevel(level);
+        node.setParentId(this.getNodeParent(parent, mode).orElse(null));
         entityManager.persist(node);
     }
 
     private void makeSpaceForNewElement(Long from, Mode mode, Class<N> nodeClass) {
-        this.updateFields(from, mode, nodeClass, right(nodeClass));
-        this.updateFields(from, mode, nodeClass, left(nodeClass));
+        this.updateFields(from, mode, nodeClass, RIGHT);
+        this.updateFields(from, mode, nodeClass, LEFT);
     }
 
     private void updateFields(Long from, Mode mode, Class<N> nodeClass, String fieldName) {
@@ -108,19 +105,19 @@ public class JpaNestedNodeInserter<ID extends Serializable, N extends NestedNode
         }
     }
 
-    private Optional<N> getNodeParent(NestedNodeInfo<ID, N> parent, Mode mode) {
+    private Optional<ID> getNodeParent(NestedNodeInfo<ID, N> parent, Mode mode) {
         switch (mode) {
             case NEXT_SIBLING:
             case PREV_SIBLING:
                 if (parent.getParentId() != null) {
-                    return Optional.of(entityManager.getReference(parent.getNodeClass(), parent.getParentId()));
+                    return Optional.of(parent.getParentId());
                 } else {
                     return Optional.empty();
                 }
             case LAST_CHILD:
             case FIRST_CHILD:
             default:
-                return Optional.of(entityManager.getReference(parent.getNodeClass(), parent.getId()));
+                return Optional.of(parent.getId());
         }
     }
 

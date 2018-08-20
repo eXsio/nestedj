@@ -1,11 +1,11 @@
 package pl.exsio.nestedj.discriminator;
 
-import pl.exsio.nestedj.model.TestNodeImpl;
+import pl.exsio.nestedj.model.TestNode;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class TestTreeDiscriminator extends MapTreeDiscriminator<Long, TestNodeImpl> {
+public class TestTreeDiscriminator extends MapTreeDiscriminator<Long, TestNode> {
 
 
     public TestTreeDiscriminator() {

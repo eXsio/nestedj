@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public abstract class JpaNestedNodeDelegate<ID extends Serializable, N extends NestedNode<ID, N>> {
+public abstract class JpaNestedNodeDelegate<ID extends Serializable, N extends NestedNode<ID>> {
 
     private final TreeDiscriminator<ID, N> treeDiscriminator;
 
@@ -27,9 +27,5 @@ public abstract class JpaNestedNodeDelegate<ID extends Serializable, N extends N
         List<Predicate> predicateList = new ArrayList<>(treeDiscriminator.getPredicates(cb, root));
         Collections.addAll(predicateList, predicates);
         return predicateList.toArray(new Predicate[predicateList.size()]);
-    }
-
-    protected Class<N> getNodeClass(N node) {
-        return (Class<N>) node.getClass();
     }
 }

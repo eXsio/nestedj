@@ -32,69 +32,68 @@ import pl.exsio.nestedj.model.Tree;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
-import javax.persistence.criteria.*;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Optional;
 
-import static pl.exsio.nestedj.util.NestedNodeUtil.*;
+import static pl.exsio.nestedj.model.NestedNode.*;
 
-public class JpaNestedNodeRetriever<ID extends Serializable, N extends NestedNode<ID, N>> extends JpaNestedNodeDelegate<ID, N> implements NestedNodeRetriever<ID, N> {
+public class JpaNestedNodeRetriever<ID extends Serializable, N extends NestedNode<ID>> extends JpaNestedNodeDelegate<ID, N> implements NestedNodeRetriever<ID, N> {
 
     public JpaNestedNodeRetriever(EntityManager entityManager, TreeDiscriminator<ID, N> treeDiscriminator) {
         super(entityManager, treeDiscriminator);
     }
 
     @Override
-    public Tree<ID, N> getTree(N node) {
+    public Tree<ID, N> getTree(N node, Class<N> nodeClass) {
         Tree<ID, N> tree = new InMemoryTree<>(node);
-        for (N n : getChildren(node)) {
-            Tree<ID, N> subtree = this.getTree(n);
+        for (N n : getChildren(node, nodeClass)) {
+            Tree<ID, N> subtree = this.getTree(n, nodeClass);
             tree.addChild(subtree);
         }
         return tree;
     }
 
     @Override
-    public Iterable<N> getTreeAsList(N node) {
-        Class<N> nodeClass = getNodeClass(node);
+    public Iterable<N> getTreeAsList(N node, Class<N> nodeClass) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<N> select = cb.createQuery(nodeClass);
         Root<N> root = select.from(nodeClass);
         select.where(getPredicates(cb, root,
-                cb.greaterThanOrEqualTo(root.<Long>get(left(nodeClass)), node.getLeft()),
-                cb.lessThanOrEqualTo(root.<Long>get(right(nodeClass)), node.getRight())
-        )).orderBy(cb.asc(root.<Long>get(left(nodeClass))));
+                cb.greaterThanOrEqualTo(root.get(LEFT), node.getTreeLeft()),
+                cb.lessThanOrEqualTo(root.get(RIGHT), node.getTreeRight())
+        )).orderBy(cb.asc(root.<Long>get(LEFT)));
 
         return entityManager.createQuery(select).getResultList();
     }
 
     @Override
-    public Iterable<N> getChildren(N node) {
-        Class<N> nodeClass = getNodeClass(node);
+    public Iterable<N> getChildren(N node, Class<N> nodeClass) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<N> select = cb.createQuery(nodeClass);
         Root<N> root = select.from(nodeClass);
         select.where(getPredicates(cb, root,
-                cb.greaterThanOrEqualTo(root.<Long>get(left(nodeClass)), node.getLeft()),
-                cb.lessThanOrEqualTo(root.<Long>get(right(nodeClass)), node.getRight()),
-                cb.equal(root.<Long>get(level(nodeClass)), node.getLevel() + 1)
-        )).orderBy(cb.asc(root.<Long>get(left(nodeClass))));
+                cb.greaterThanOrEqualTo(root.get(LEFT), node.getTreeLeft()),
+                cb.lessThanOrEqualTo(root.get(RIGHT), node.getTreeRight()),
+                cb.equal(root.<Long>get(LEVEL), node.getTreeLevel() + 1)
+        )).orderBy(cb.asc(root.<Long>get(LEFT)));
         return entityManager.createQuery(select).getResultList();
     }
 
     @Override
-    public Optional<N> getParent(N node) {
-        if (node.getLevel() > 0) {
-            Class<N> nodeClass = getNodeClass(node);
+    public Optional<N> getParent(N node, Class<N> nodeClass) {
+        if (node.getTreeLevel() > 0) {
             CriteriaBuilder cb = entityManager.getCriteriaBuilder();
             CriteriaQuery<N> select = cb.createQuery(nodeClass);
             Root<N> root = select.from(nodeClass);
             select.where(getPredicates(cb, root,
-                    cb.lessThan(root.<Long>get(left(nodeClass)), node.getLeft()),
-                    cb.greaterThan(root.<Long>get(right(nodeClass)), node.getRight()),
-                    cb.equal(root.<Long>get(level(nodeClass)), node.getLevel() - 1)
-            )).orderBy(cb.asc(root.<Long>get(left(nodeClass))));
+                    cb.lessThan(root.<Long>get(LEFT), node.getTreeLeft()),
+                    cb.greaterThan(root.<Long>get(RIGHT), node.getTreeRight()),
+                    cb.equal(root.<Long>get(LEVEL), node.getTreeLevel() - 1)
+            )).orderBy(cb.asc(root.<Long>get(LEFT)));
             return Optional.of(entityManager.createQuery(select).setMaxResults(1).getSingleResult());
         } else {
             return Optional.empty();
@@ -102,16 +101,15 @@ public class JpaNestedNodeRetriever<ID extends Serializable, N extends NestedNod
     }
 
     @Override
-    public Iterable<N> getParents(N node) {
-        if (node.getLevel() > 0) {
-            Class<N> nodeClass = getNodeClass(node);
+    public Iterable<N> getParents(N node, Class<N> nodeClass) {
+        if (node.getTreeLevel() > 0) {
             CriteriaBuilder cb = entityManager.getCriteriaBuilder();
             CriteriaQuery<N> select = cb.createQuery(nodeClass);
             Root<N> root = select.from(nodeClass);
             select.where(getPredicates(cb, root,
-                    cb.lessThan(root.<Long>get(left(nodeClass)), node.getLeft()),
-                    cb.greaterThan(root.<Long>get(right(nodeClass)), node.getRight())
-            )).orderBy(cb.desc(root.<Long>get(left(nodeClass))));
+                    cb.lessThan(root.<Long>get(LEFT), node.getTreeLeft()),
+                    cb.greaterThan(root.<Long>get(RIGHT), node.getTreeRight())
+            )).orderBy(cb.desc(root.<Long>get(LEFT)));
             return entityManager.createQuery(select).getResultList();
         } else {
             return new ArrayList<>();
@@ -119,24 +117,24 @@ public class JpaNestedNodeRetriever<ID extends Serializable, N extends NestedNod
     }
 
     @Override
-    public Optional<NestedNodeInfo<ID, N>> getNodeInfo(ID nodeId, Class<N> nodeClass) {
+    public Optional<NestedNodeInfo<ID, N>> getNodeInfo(ID nodeId, Class<N> nodeClass, Class<ID> idClass) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<NestedNodeInfo> select = cb.createQuery(NestedNodeInfo.class);
         Root<N> root = select.from(nodeClass);
-        Join<N, N> parent = root.join(parent(nodeClass), JoinType.LEFT);
         select.select(
                 cb.construct(
                         NestedNodeInfo.class,
-                        root.get(id(nodeClass)),
-                        parent.get(id(nodeClass)),
-                        root.get(left(nodeClass)),
-                        root.get(right(nodeClass)),
-                        root.get(level(nodeClass))
+                        root.get(ID),
+                        root.get(PARENT_ID),
+                        root.get(LEFT),
+                        root.get(RIGHT),
+                        root.get(LEVEL)
                 )
-        ).where(cb.equal(root.get(id(nodeClass)), nodeId));
+        ).where(cb.equal(root.get(ID), nodeId));
         try {
             NestedNodeInfo<ID, N> result = entityManager.createQuery(select).getSingleResult();
             result.setNodeClass(nodeClass);
+            result.setIdClass(idClass);
             return Optional.of(result);
         } catch (NoResultException ex) {
             return Optional.empty();

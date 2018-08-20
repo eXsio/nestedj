@@ -38,9 +38,9 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
-import static pl.exsio.nestedj.util.NestedNodeUtil.*;
+import static pl.exsio.nestedj.model.NestedNode.*;
 
-public class JpaNestedNodeMover<ID extends Serializable, N extends NestedNode<ID, N>> extends JpaNestedNodeDelegate<ID, N> implements NestedNodeMover<ID, N> {
+public class JpaNestedNodeMover<ID extends Serializable, N extends NestedNode<ID>> extends JpaNestedNodeDelegate<ID, N> implements NestedNodeMover<ID, N> {
 
     private enum Sign {
         PLUS, MINUS
@@ -69,22 +69,22 @@ public class JpaNestedNodeMover<ID extends Serializable, N extends NestedNode<ID
         Long levelModificator = getLevelModificator(nodeInfo, parentInfo, mode);
         performMove(nodeSign, nodeDelta, nodeIds, levelModificator, nodeClass);
 
-        Optional<N> newParent = getNewParent(parentInfo, mode);
-        updateParentField(newParent, nodeInfo, nodeClass);
+        Optional<ID> newParent = getNewParentId(parentInfo, mode);
+        updateParentField(newParent, nodeInfo);
     }
 
     private void makeSpaceForMovedElement(Sign sign, Long delta, Long start, Long stop, Class<N> nodeClass) {
-        updateFields(sign, delta, start, stop, nodeClass, right(nodeClass));
-        updateFields(sign, delta, start, stop, nodeClass, left(nodeClass));
+        updateFields(sign, delta, start, stop, nodeClass, RIGHT);
+        updateFields(sign, delta, start, stop, nodeClass, LEFT);
     }
 
-    private void updateParentField(Optional<N> newParent, NestedNodeInfo<ID, N> node, Class<N> nodeClass) {
+    private void updateParentField(Optional<ID> newParent, NestedNodeInfo<ID, N> node) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
-        Root<N> root = update.from(nodeClass);
+        CriteriaUpdate<N> update = cb.createCriteriaUpdate(node.getNodeClass());
+        Root<N> root = update.from(node.getNodeClass());
 
-        update.set(root.get(parent(nodeClass)), newParent.orElse(null))
-                .where(getPredicates(cb, root, cb.equal(root.get(id(nodeClass)), node.getId())));
+        update.set(root.get(PARENT_ID), newParent.orElse(null))
+                .where(getPredicates(cb, root, cb.equal(root.get(ID), node.getId())));
 
         entityManager.createQuery(update).executeUpdate();
     }
@@ -95,15 +95,15 @@ public class JpaNestedNodeMover<ID extends Serializable, N extends NestedNode<ID
             CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
             Root<N> root = update.from(nodeClass);
 
-            update.set(root.<Long>get(level(nodeClass)), cb.sum(root.get(level(nodeClass)), levelModificator));
+            update.set(root.<Long>get(LEVEL), cb.sum(root.get(LEVEL), levelModificator));
             if (Sign.MINUS.equals(nodeSign)) {
-                update.set(root.<Long>get(right(nodeClass)), cb.diff(root.get(right(nodeClass)), nodeDelta));
-                update.set(root.<Long>get(left(nodeClass)), cb.diff(root.get(left(nodeClass)), nodeDelta));
+                update.set(root.<Long>get(RIGHT), cb.diff(root.get(RIGHT), nodeDelta));
+                update.set(root.<Long>get(LEFT), cb.diff(root.get(LEFT), nodeDelta));
             } else if (Sign.PLUS.equals(nodeSign)) {
-                update.set(root.<Long>get(right(nodeClass)), cb.sum(root.get(right(nodeClass)), nodeDelta));
-                update.set(root.<Long>get(left(nodeClass)), cb.sum(root.get(left(nodeClass)), nodeDelta));
+                update.set(root.<Long>get(RIGHT), cb.sum(root.get(RIGHT), nodeDelta));
+                update.set(root.<Long>get(LEFT), cb.sum(root.get(LEFT), nodeDelta));
             }
-            update.where(getPredicates(cb, root, root.get(id(nodeClass)).in(nodeIds)));
+            update.where(getPredicates(cb, root, root.get(ID).in(nodeIds)));
 
             entityManager.createQuery(update).executeUpdate();
         }
@@ -135,27 +135,27 @@ public class JpaNestedNodeMover<ID extends Serializable, N extends NestedNode<ID
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Long> select = cb.createQuery(Long.class);
         Root<N> root = select.from(node.getNodeClass());
-        select.select(root.get(id(node.getNodeClass()))).where(
+        select.select(root.get(ID)).where(
                 getPredicates(cb, root,
-                        cb.greaterThanOrEqualTo(root.get(left(node.getNodeClass())), node.getLeft()),
-                        cb.lessThanOrEqualTo(root.get(right(node.getNodeClass())), node.getRight())
+                        cb.greaterThanOrEqualTo(root.get(LEFT), node.getLeft()),
+                        cb.lessThanOrEqualTo(root.get(RIGHT), node.getRight())
                 ));
         return entityManager.createQuery(select).getResultList();
     }
 
-    private Optional<N> getNewParent(NestedNodeInfo<ID, N> parent, Mode mode) {
+    private Optional<ID> getNewParentId(NestedNodeInfo<ID, N> parent, Mode mode) {
         switch (mode) {
             case NEXT_SIBLING:
             case PREV_SIBLING:
                 if (parent.getParentId() != null) {
-                    return Optional.of(entityManager.getReference(parent.getNodeClass(), parent.getParentId()));
+                    return Optional.of(parent.getParentId());
                 } else {
                     return Optional.empty();
                 }
             case FIRST_CHILD:
             case LAST_CHILD:
             default:
-                return Optional.of(entityManager.getReference(parent.getNodeClass(), parent.getId()));
+                return Optional.of(parent.getId());
         }
     }
 

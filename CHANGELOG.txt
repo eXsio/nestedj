@@ -1,0 +1,11 @@
+NestedJ Changelog:
+
+- 3.0.0
+
+    - Removed custom annotations (@LeftColumn/@RightColumn/etc)
+    - Updated the NestedNode interface - changed method names, JavaBean standard required (getters/setters/field names)
+    - Removed Parent JPA mapping from the NestedNode interface - replaced with parentId field - mapping had an inherent danger of a recursive Hibernate loading
+
+- 2.2.0
+    - Parametrized ID column - no requirements for the NestedNode's ID type
+    - updated Project dependencies

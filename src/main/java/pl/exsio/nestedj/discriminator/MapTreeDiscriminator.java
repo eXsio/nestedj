@@ -11,7 +11,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-public class MapTreeDiscriminator<ID extends Serializable, N extends NestedNode<ID, N>> implements TreeDiscriminator<ID, N> {
+public class MapTreeDiscriminator<ID extends Serializable, N extends NestedNode<ID>> implements TreeDiscriminator<ID, N> {
 
     private Map<String, ValueProvider> valueProviders;
 

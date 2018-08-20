@@ -27,9 +27,9 @@ import pl.exsio.nestedj.model.NestedNode;
 
 import java.io.Serializable;
 
-public interface NestedNodeRebuilder<ID extends Serializable, N extends NestedNode<ID, N>> {
+public interface NestedNodeRebuilder<ID extends Serializable, N extends NestedNode<ID>> {
 
-    void rebuildTree(Class<N> nodeClass);
+    void rebuildTree(Class<N> nodeClass, Class<ID> idClass);
 
     void destroyTree(Class<N> nodeClass);
 }

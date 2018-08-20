@@ -4,11 +4,11 @@ import com.google.common.base.MoreObjects;
 
 import java.io.Serializable;
 
-public class NestedNodeInfo<ID extends Serializable, N extends NestedNode<ID, N>> {
+public class NestedNodeInfo<ID extends Serializable, N extends NestedNode<ID>> {
 
     private final ID id;
 
-    private final Long parentId;
+    private final ID parentId;
 
     private final Long left;
 
@@ -18,7 +18,9 @@ public class NestedNodeInfo<ID extends Serializable, N extends NestedNode<ID, N>
 
     private Class<N> nodeClass;
 
-    public NestedNodeInfo(ID id, Long parentId, Long left, Long right, Long level) {
+    private Class<ID> idClass;
+
+    public NestedNodeInfo(ID id, ID parentId, Long left, Long right, Long level) {
         this.id = id;
         this.parentId = parentId;
         this.left = left;
@@ -30,7 +32,7 @@ public class NestedNodeInfo<ID extends Serializable, N extends NestedNode<ID, N>
         return id;
     }
 
-    public Long getParentId() {
+    public ID getParentId() {
         return parentId;
     }
 
@@ -54,6 +56,14 @@ public class NestedNodeInfo<ID extends Serializable, N extends NestedNode<ID, N>
         this.nodeClass = nodeClass;
     }
 
+    public Class<ID> getIdClass() {
+        return idClass;
+    }
+
+    public void setIdClass(Class<ID> idClass) {
+        this.idClass = idClass;
+    }
+
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
@@ -63,6 +73,7 @@ public class NestedNodeInfo<ID extends Serializable, N extends NestedNode<ID, N>
                 .add("right", right)
                 .add("level", level)
                 .add("nodeClass", nodeClass)
+                .add("idClass", idClass)
                 .toString();
     }
 }

@@ -28,7 +28,7 @@ import pl.exsio.nestedj.model.NestedNodeInfo;
 
 import java.io.Serializable;
 
-public interface NestedNodeMover<ID extends Serializable, N extends NestedNode<ID, N>> extends NestedNodeHierarchyManipulator {
+public interface NestedNodeMover<ID extends Serializable, N extends NestedNode<ID>> extends NestedNodeHierarchyManipulator {
 
     void move(NestedNodeInfo<ID, N> nodeInfo, NestedNodeInfo<ID, N> parentInfo, Mode mode);
 }

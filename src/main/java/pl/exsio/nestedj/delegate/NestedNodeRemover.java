@@ -28,7 +28,7 @@ import pl.exsio.nestedj.model.NestedNodeInfo;
 
 import java.io.Serializable;
 
-public interface NestedNodeRemover<ID extends Serializable, N extends NestedNode<ID, N>> {
+public interface NestedNodeRemover<ID extends Serializable, N extends NestedNode<ID>> {
 
     void removeSingle(NestedNodeInfo<ID, N> node);
 

@@ -28,7 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import pl.exsio.nestedj.model.TestNodeImpl;
+import pl.exsio.nestedj.model.TestNode;
 import pl.exsio.nestedj.repository.DelegatingNestedNodeRepository;
 
 import javax.persistence.EntityManager;
@@ -43,7 +43,7 @@ import javax.persistence.criteria.Root;
 public abstract class FunctionalNestedjTest {
 
     @Autowired
-    protected DelegatingNestedNodeRepository<Long, TestNodeImpl> nodeRepository;
+    protected DelegatingNestedNodeRepository<Long, TestNode> nodeRepository;
 
     @PersistenceContext
     protected EntityManager em;
@@ -66,37 +66,38 @@ public abstract class FunctionalNestedjTest {
      *                               \
      *                             12 H 13
      */
-    protected TestNodeImpl findNode(String symbol) {
+    protected TestNode findNode(String symbol) {
 
         CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<TestNodeImpl> select = cb.createQuery(TestNodeImpl.class);
-        Root<TestNodeImpl> root = select.from(TestNodeImpl.class);
+        CriteriaQuery<TestNode> select = cb.createQuery(TestNode.class);
+        Root<TestNode> root = select.from(TestNode.class);
         select.where(cb.equal(root.get("name"), symbol));
-        TestNodeImpl n = em.createQuery(select).getSingleResult();
+        TestNode n = em.createQuery(select).getSingleResult();
         printNode(symbol, n);
         this.em.refresh(n);
         return n;
     }
 
-    protected void printNode(String symbol, TestNodeImpl n) {
+    protected void printNode(String symbol, TestNode n) {
         if(n != null) {
-            System.out.println(String.format("Node %s: %d/%d/%d", symbol, n.getLeft(), n.getRight(), n.getLevel()));
+            System.out.println(String.format("Node %s: %d/%d/%d", symbol, n.getTreeLeft(), n.getTreeRight(), n.getTreeLevel()));
         }
     }
 
-    protected TestNodeImpl createTestNode(String symbol) {
+    protected TestNode createTestNode(String symbol) {
 
-        TestNodeImpl n = new TestNodeImpl();
+        TestNode n = new TestNode();
         n.setName(symbol);
         n.setDiscriminator("tree_1");
         return n;
     }
 
-    protected TestNodeImpl getParent(TestNodeImpl f) {
+    protected TestNode getParent(TestNode f) {
         this.em.refresh(f);
-        TestNodeImpl parent = f.getParent();
-        if (parent != null) {
-            this.em.refresh(parent);
+        TestNode parent = null;
+        Long parentId = f.getParentId();
+        if (parentId != null) {
+            parent = em.find(TestNode.class, parentId);
         }
         System.out.println(String.format("Parent of %s is %s", f.getName(), parent != null ? parent.getName() : "null"));
         return parent;

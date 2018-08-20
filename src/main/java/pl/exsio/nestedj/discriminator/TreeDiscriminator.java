@@ -8,7 +8,7 @@ import javax.persistence.criteria.Root;
 import java.io.Serializable;
 import java.util.List;
 
-public interface TreeDiscriminator<ID extends Serializable, N extends NestedNode<ID, N>> {
+public interface TreeDiscriminator<ID extends Serializable, N extends NestedNode<ID>> {
 
     List<Predicate> getPredicates(CriteriaBuilder cb, Root<N> root);
 

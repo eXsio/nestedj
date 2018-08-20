@@ -33,7 +33,7 @@ import javax.persistence.EntityManager;
 import java.io.Serializable;
 import java.util.Optional;
 
-public interface NestedNodeRepository<ID extends Serializable, N extends NestedNode<ID, N>> {
+public interface NestedNodeRepository<ID extends Serializable, N extends NestedNode<ID>> {
 
     void insertAsFirstChildOf(N node, N parent);
 
@@ -57,22 +57,25 @@ public interface NestedNodeRepository<ID extends Serializable, N extends NestedN
 
     Tree<ID, N> getTree(N node);
 
-    void rebuildTree(Class<N> nodeClass);
+    void rebuildTree();
 
-    void destroyTree(Class<N> nodeClass);
+    void destroyTree();
 
-    static <ID extends Serializable, N extends NestedNode<ID, N>> NestedNodeRepository<ID, N> createDefault(EntityManager entityManager) {
-        return createDiscriminated(entityManager, new MapTreeDiscriminator<ID, N>());
+    static <ID extends Serializable, N extends NestedNode<ID>> NestedNodeRepository<ID, N> createDefault(Class<ID> idClass, Class<N> nodeClass, EntityManager entityManager) {
+        return createDiscriminated(idClass, nodeClass, entityManager, new MapTreeDiscriminator<ID, N>());
     }
 
-    static <ID extends Serializable, N extends NestedNode<ID, N>> NestedNodeRepository<ID, N> createDiscriminated(EntityManager entityManager, TreeDiscriminator<ID, N> discriminator) {
+    static <ID extends Serializable, N extends NestedNode<ID>> NestedNodeRepository<ID, N> createDiscriminated(Class<ID> idClass, Class<N> nodeClass, EntityManager entityManager, TreeDiscriminator<ID, N> discriminator) {
         JpaNestedNodeInserter<ID, N> inserter = new JpaNestedNodeInserter<>(entityManager, discriminator);
         JpaNestedNodeRetriever<ID, N> retriever = new JpaNestedNodeRetriever<>(entityManager, discriminator);
-        return new DelegatingNestedNodeRepository<>(inserter,
+        return new DelegatingNestedNodeRepository<>(
+                idClass,
+                nodeClass,
                 new JpaNestedNodeMover<>(entityManager, discriminator),
                 new JpaNestedNodeRemover<>(entityManager, discriminator),
                 retriever,
-                new JpaNestedNodeRebuilder<>(entityManager, discriminator, inserter, retriever)
+                new JpaNestedNodeRebuilder<>(entityManager, discriminator, inserter, retriever),
+                inserter
         );
     }
 

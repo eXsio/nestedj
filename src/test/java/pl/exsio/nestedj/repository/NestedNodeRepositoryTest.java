@@ -27,7 +27,7 @@ import org.junit.Test;
 import org.springframework.transaction.annotation.Transactional;
 import pl.exsio.nestedj.FunctionalNestedjTest;
 import pl.exsio.nestedj.ex.InvalidNodesHierarchyException;
-import pl.exsio.nestedj.model.TestNodeImpl;
+import pl.exsio.nestedj.model.TestNode;
 import pl.exsio.nestedj.model.Tree;
 
 import java.util.List;
@@ -44,21 +44,21 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         try {
 
             this.removeTree();
-            TestNodeImpl x = this.createTestNode("x");
-            x.setLeft(0L);
-            x.setRight(0L);
-            x.setLevel(0L);
+            TestNode x = this.createTestNode("x");
+            x.setTreeLeft(0L);
+            x.setTreeRight(0L);
+            x.setTreeLevel(0L);
             this.em.persist(x);
             this.em.flush();
 
-            assertTrue(x.getLeft() == 0L);
-            assertTrue(x.getRight() == 0L);
+            assertTrue(x.getTreeLeft() == 0L);
+            assertTrue(x.getTreeRight() == 0L);
 
-            this.nodeRepository.rebuildTree(TestNodeImpl.class);
+            this.nodeRepository.rebuildTree();
             em.refresh(x);
             printNode("x", x);
-            assertTrue(x.getLeft() == 1);
-            assertTrue(x.getRight() == 2);
+            assertTrue(x.getTreeLeft() == 1);
+            assertTrue(x.getTreeRight() == 2);
 
         } catch (InvalidNodesHierarchyException ex) {
             fail("something went wrong:" + ex.getMessage());
@@ -68,35 +68,35 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
 
     @Test
     public void testDestroyTree() {
-        nodeRepository.destroyTree(TestNodeImpl.class);
+        nodeRepository.destroyTree();
         em.flush();
         em.clear();
 
-        TestNodeImpl a = this.findNode("a");
-        TestNodeImpl e = this.findNode("e");
-        TestNodeImpl b = this.findNode("b");
-        TestNodeImpl d = this.findNode("d");
-        TestNodeImpl g = this.findNode("g");
-        TestNodeImpl c = this.findNode("c");
-        TestNodeImpl h = this.findNode("h");
-        TestNodeImpl f = this.findNode("f");
+        TestNode a = this.findNode("a");
+        TestNode e = this.findNode("e");
+        TestNode b = this.findNode("b");
+        TestNode d = this.findNode("d");
+        TestNode g = this.findNode("g");
+        TestNode c = this.findNode("c");
+        TestNode h = this.findNode("h");
+        TestNode f = this.findNode("f");
 
-        assertTrue(a.getLeft() == 0);
-        assertTrue(a.getRight() == 0);
-        assertTrue(b.getLeft() == 0);
-        assertTrue(b.getRight() == 0);
-        assertTrue(c.getLeft() == 0);
-        assertTrue(c.getRight() == 0);
-        assertTrue(d.getLeft() == 0);
-        assertTrue(d.getRight() == 0);
-        assertTrue(e.getLeft() == 0);
-        assertTrue(e.getRight() == 0);
-        assertTrue(f.getLeft() == 0);
-        assertTrue(f.getRight() == 0);
-        assertTrue(g.getLeft() == 0);
-        assertTrue(g.getRight() == 0);
-        assertTrue(h.getLeft() == 0);
-        assertTrue(h.getRight() == 0);
+        assertTrue(a.getTreeLeft() == 0);
+        assertTrue(a.getTreeRight() == 0);
+        assertTrue(b.getTreeLeft() == 0);
+        assertTrue(b.getTreeRight() == 0);
+        assertTrue(c.getTreeLeft() == 0);
+        assertTrue(c.getTreeRight() == 0);
+        assertTrue(d.getTreeLeft() == 0);
+        assertTrue(d.getTreeRight() == 0);
+        assertTrue(e.getTreeLeft() == 0);
+        assertTrue(e.getTreeRight() == 0);
+        assertTrue(f.getTreeLeft() == 0);
+        assertTrue(f.getTreeRight() == 0);
+        assertTrue(g.getTreeLeft() == 0);
+        assertTrue(g.getTreeRight() == 0);
+        assertTrue(h.getTreeLeft() == 0);
+        assertTrue(h.getTreeRight() == 0);
 
         assertTrue(this.getParent(a) == null);
         assertTrue(this.getParent(b) == a);
@@ -107,14 +107,14 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         assertTrue(this.getParent(g) == c);
         assertTrue(this.getParent(h) == g);
 
-        assertTrue(e.getLevel() == 0);
-        assertTrue(f.getLevel() == 0);
-        assertTrue(g.getLevel() == 0);
-        assertTrue(b.getLevel() == 0);
-        assertTrue(c.getLevel() == 0);
-        assertTrue(h.getLevel() == 0);
-        assertTrue(a.getLevel() == 0);
-        assertTrue(d.getLevel() == 0);
+        assertTrue(e.getTreeLevel() == 0);
+        assertTrue(f.getTreeLevel() == 0);
+        assertTrue(g.getTreeLevel() == 0);
+        assertTrue(b.getTreeLevel() == 0);
+        assertTrue(c.getTreeLevel() == 0);
+        assertTrue(h.getTreeLevel() == 0);
+        assertTrue(a.getTreeLevel() == 0);
+        assertTrue(d.getTreeLevel() == 0);
 
         assertSecondTreeIntact();
 
@@ -125,19 +125,19 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         try {
 
             this.breakTree();
-            this.nodeRepository.rebuildTree(TestNodeImpl.class);
+            this.nodeRepository.rebuildTree();
 
             em.flush();
             em.clear();
 
-            TestNodeImpl a = this.findNode("a");
-            TestNodeImpl e = this.findNode("e");
-            TestNodeImpl b = this.findNode("b");
-            TestNodeImpl d = this.findNode("d");
-            TestNodeImpl g = this.findNode("g");
-            TestNodeImpl c = this.findNode("c");
-            TestNodeImpl h = this.findNode("h");
-            TestNodeImpl f = this.findNode("f");
+            TestNode a = this.findNode("a");
+            TestNode e = this.findNode("e");
+            TestNode b = this.findNode("b");
+            TestNode d = this.findNode("d");
+            TestNode g = this.findNode("g");
+            TestNode c = this.findNode("c");
+            TestNode h = this.findNode("h");
+            TestNode f = this.findNode("f");
 
             assertTrue(this.getParent(a) == null);
             assertTrue(this.getParent(b) == a);
@@ -148,12 +148,12 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
             assertTrue(this.getParent(g) == c);
             assertTrue(this.getParent(h) == g);
 
-            assertTrue(e.getLevel() == 2);
-            assertTrue(f.getLevel() == 1);
-            assertTrue(g.getLevel() == 1);
-            assertTrue(b.getLevel() == 1);
-            assertTrue(c.getLevel() == 0);
-            assertTrue(h.getLevel() == 2);
+            assertTrue(e.getTreeLevel() == 2);
+            assertTrue(f.getTreeLevel() == 1);
+            assertTrue(g.getTreeLevel() == 1);
+            assertTrue(b.getTreeLevel() == 1);
+            assertTrue(c.getTreeLevel() == 0);
+            assertTrue(h.getTreeLevel() == 2);
 
         } catch (InvalidNodesHierarchyException ex) {
             fail("something went wrong:" + ex.getMessage());
@@ -163,8 +163,8 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
 
     @Test
     public void testInsertParentToChildAsSibling() {
-        TestNodeImpl a = this.findNode("a");
-        TestNodeImpl e = this.findNode("e");
+        TestNode a = this.findNode("a");
+        TestNode e = this.findNode("e");
         try {
             this.nodeRepository.insertAsNextSiblingOf(a, e);
             fail("this action should have triggered an exception");
@@ -175,8 +175,8 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
 
     @Test
     public void testInsertParentToChildAsChild() {
-        TestNodeImpl a = this.findNode("a");
-        TestNodeImpl e = this.findNode("e");
+        TestNode a = this.findNode("a");
+        TestNode e = this.findNode("e");
         try {
             this.nodeRepository.insertAsLastChildOf(a, e);
             fail("this action should have triggered an exception");
@@ -187,8 +187,8 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
 
     @Test
     public void testGetParents() {
-        TestNodeImpl h = this.findNode("h");
-        List<TestNodeImpl> parents = (List<TestNodeImpl>) this.nodeRepository.getParents(h);
+        TestNode h = this.findNode("h");
+        List<TestNode> parents = (List<TestNode>) this.nodeRepository.getParents(h);
         assertTrue(parents.size() == 3);
         assertTrue(parents.get(0).getName().equals("g"));
         assertTrue(parents.get(1).getName().equals("c"));
@@ -198,7 +198,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
 
     @Test
     public void testGetTree() {
-        Tree<Long, TestNodeImpl> tree = this.nodeRepository.getTree(this.findNode("a"));
+        Tree<Long, TestNode> tree = this.nodeRepository.getTree(this.findNode("a"));
         assertTrue(tree.getNode().getName().equals("a"));
         assertTrue(tree.getChildren().get(0).getNode().getName().equals("b"));
         assertTrue(tree.getChildren().size() == 2);
@@ -212,17 +212,17 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
 
     @Test
     public void testGetTreeAsList() {
-        List<TestNodeImpl> list = (List<TestNodeImpl>) this.nodeRepository.getTreeAsList(this.findNode("a"));
+        List<TestNode> list = (List<TestNode>) this.nodeRepository.getTreeAsList(this.findNode("a"));
         assertTrue(list.size() == 8);
         assertSecondTreeIntact();
     }
 
     @Test
     public void testGetParent() {
-        TestNodeImpl b = this.findNode("b");
-        Optional<TestNodeImpl> parent = this.nodeRepository.getParent(b);
+        TestNode b = this.findNode("b");
+        Optional<TestNode> parent = this.nodeRepository.getParent(b);
         assertTrue(parent.isPresent());
-        assertTrue(parent.get() instanceof TestNodeImpl);
+        assertTrue(parent.get() instanceof TestNode);
         assertTrue(parent.get().getName().equals("a"));
         assertSecondTreeIntact();
     }
@@ -230,26 +230,26 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
     @Test
     public void testRemoveSubtreeWithoutChildren() {
 
-        TestNodeImpl d = this.findNode("d");
+        TestNode d = this.findNode("d");
         this.nodeRepository.removeSubtree(d);
-        TestNodeImpl a = this.findNode("a");
-        TestNodeImpl e = this.findNode("e");
-        TestNodeImpl b = this.findNode("b");
-        TestNodeImpl g = this.findNode("g");
-        TestNodeImpl c = this.findNode("c");
-        TestNodeImpl h = this.findNode("h");
-        TestNodeImpl f = this.findNode("f");
+        TestNode a = this.findNode("a");
+        TestNode e = this.findNode("e");
+        TestNode b = this.findNode("b");
+        TestNode g = this.findNode("g");
+        TestNode c = this.findNode("c");
+        TestNode h = this.findNode("h");
+        TestNode f = this.findNode("f");
 
-        assertTrue(e.getLeft() == 3);
-        assertTrue(e.getRight() == 4);
-        assertTrue(b.getRight() == 5);
-        assertTrue(h.getLeft() == 10);
-        assertTrue(h.getRight() == 11);
-        assertTrue(a.getRight() == 14);
-        assertTrue(c.getLeft() == 6);
-        assertTrue(c.getRight() == 13);
-        assertTrue(g.getLeft() == 9);
-        assertTrue(g.getRight() == 12);
+        assertTrue(e.getTreeLeft() == 3);
+        assertTrue(e.getTreeRight() == 4);
+        assertTrue(b.getTreeRight() == 5);
+        assertTrue(h.getTreeLeft() == 10);
+        assertTrue(h.getTreeRight() == 11);
+        assertTrue(a.getTreeRight() == 14);
+        assertTrue(c.getTreeLeft() == 6);
+        assertTrue(c.getTreeRight() == 13);
+        assertTrue(g.getTreeLeft() == 9);
+        assertTrue(g.getTreeRight() == 12);
         assertSecondTreeIntact();
 
     }
@@ -257,21 +257,21 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
     @Test
     public void testRemoveSubtree() {
 
-        TestNodeImpl b = this.findNode("b");
+        TestNode b = this.findNode("b");
         this.nodeRepository.removeSubtree(b);
-        TestNodeImpl a = this.findNode("a");
-        TestNodeImpl g = this.findNode("g");
-        TestNodeImpl c = this.findNode("c");
-        TestNodeImpl h = this.findNode("h");
-        TestNodeImpl f = this.findNode("f");
+        TestNode a = this.findNode("a");
+        TestNode g = this.findNode("g");
+        TestNode c = this.findNode("c");
+        TestNode h = this.findNode("h");
+        TestNode f = this.findNode("f");
 
-        assertTrue(h.getLeft() == 6);
-        assertTrue(h.getRight() == 7);
-        assertTrue(a.getRight() == 10);
-        assertTrue(c.getLeft() == 2);
-        assertTrue(c.getRight() == 9);
-        assertTrue(g.getLeft() == 5);
-        assertTrue(g.getRight() == 8);
+        assertTrue(h.getTreeLeft() == 6);
+        assertTrue(h.getTreeRight() == 7);
+        assertTrue(a.getTreeRight() == 10);
+        assertTrue(c.getTreeLeft() == 2);
+        assertTrue(c.getTreeRight() == 9);
+        assertTrue(g.getTreeLeft() == 5);
+        assertTrue(g.getTreeRight() == 8);
         assertSecondTreeIntact();
 
     }
@@ -279,56 +279,56 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
     @Test
     public void testRemoveSingleNodeThatHasChildren() {
 
-        TestNodeImpl b = this.findNode("b");
+        TestNode b = this.findNode("b");
         this.nodeRepository.removeSingle(b);
-        TestNodeImpl a = this.findNode("a");
-        TestNodeImpl e = this.findNode("e");
-        TestNodeImpl d = this.findNode("d");
-        TestNodeImpl g = this.findNode("g");
-        TestNodeImpl c = this.findNode("c");
-        TestNodeImpl h = this.findNode("h");
-        TestNodeImpl f = this.findNode("f");
+        TestNode a = this.findNode("a");
+        TestNode e = this.findNode("e");
+        TestNode d = this.findNode("d");
+        TestNode g = this.findNode("g");
+        TestNode c = this.findNode("c");
+        TestNode h = this.findNode("h");
+        TestNode f = this.findNode("f");
 
-        assertTrue(d.getLeft() == 2);
-        assertTrue(d.getRight() == 3);
-        assertTrue(e.getLeft() == 4);
-        assertTrue(e.getRight() == 5);
-        assertTrue(h.getLeft() == 10);
-        assertTrue(h.getRight() == 11);
-        assertTrue(a.getRight() == 14);
-        assertTrue(c.getLeft() == 6);
-        assertTrue(c.getRight() == 13);
-        assertTrue(g.getLeft() == 9);
-        assertTrue(g.getRight() == 12);
-        assertTrue(d.getLevel() == 1);
-        assertTrue(e.getLevel() == 1);
+        assertTrue(d.getTreeLeft() == 2);
+        assertTrue(d.getTreeRight() == 3);
+        assertTrue(e.getTreeLeft() == 4);
+        assertTrue(e.getTreeRight() == 5);
+        assertTrue(h.getTreeLeft() == 10);
+        assertTrue(h.getTreeRight() == 11);
+        assertTrue(a.getTreeRight() == 14);
+        assertTrue(c.getTreeLeft() == 6);
+        assertTrue(c.getTreeRight() == 13);
+        assertTrue(g.getTreeLeft() == 9);
+        assertTrue(g.getTreeRight() == 12);
+        assertTrue(d.getTreeLevel() == 1);
+        assertTrue(e.getTreeLevel() == 1);
         assertSecondTreeIntact();
     }
 
     @Test
     public void testRemoveSingleNode() {
 
-        TestNodeImpl d = this.findNode("d");
+        TestNode d = this.findNode("d");
         this.nodeRepository.removeSingle(d);
-        TestNodeImpl a = this.findNode("a");
-        TestNodeImpl g = this.findNode("g");
-        TestNodeImpl c = this.findNode("c");
-        TestNodeImpl e = this.findNode("e");
+        TestNode a = this.findNode("a");
+        TestNode g = this.findNode("g");
+        TestNode c = this.findNode("c");
+        TestNode e = this.findNode("e");
 
-        assertTrue(e.getLeft() == 3);
-        assertTrue(e.getRight() == 4);
-        assertTrue(a.getRight() == 14);
-        assertTrue(c.getLeft() == 6);
-        assertTrue(c.getRight() == 13);
-        assertTrue(g.getLeft() == 9);
-        assertTrue(g.getRight() == 12);
+        assertTrue(e.getTreeLeft() == 3);
+        assertTrue(e.getTreeRight() == 4);
+        assertTrue(a.getTreeRight() == 14);
+        assertTrue(c.getTreeLeft() == 6);
+        assertTrue(c.getTreeRight() == 13);
+        assertTrue(g.getTreeLeft() == 9);
+        assertTrue(g.getTreeRight() == 12);
         assertSecondTreeIntact();
 
     }
 
     @Test
     public void testInsertAsNextSiblingSameNode() {
-        TestNodeImpl a = this.findNode("a");
+        TestNode a = this.findNode("a");
         try {
             this.nodeRepository.insertAsNextSiblingOf(a, a);
             fail("this action should have triggered an exception");
@@ -339,7 +339,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
 
     @Test
     public void testInsertAsLastChildSameNode() {
-        TestNodeImpl b = this.findNode("b");
+        TestNode b = this.findNode("b");
         try {
             this.nodeRepository.insertAsLastChildOf(b, b);
             fail("this action should have triggered an exception");
@@ -350,7 +350,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
 
     @Test
     public void testInsertAsPrevSiblingSameNode() {
-        TestNodeImpl c = this.findNode("c");
+        TestNode c = this.findNode("c");
         try {
             this.nodeRepository.insertAsPrevSiblingOf(c, c);
             fail("this action should have triggered an exception");
@@ -361,7 +361,7 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
 
     @Test
     public void testInsertAsFirstChildSameNode() {
-        TestNodeImpl d = this.findNode("d");
+        TestNode d = this.findNode("d");
         try {
             this.nodeRepository.insertAsFirstChildOf(d, d);
             fail("this action should have triggered an exception");
@@ -372,136 +372,136 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
 
     @Test
     public void testInsertAsLastChildOfDeepMove() {
-        TestNodeImpl b = this.findNode("b");
-        TestNodeImpl a = this.findNode("a");
+        TestNode b = this.findNode("b");
+        TestNode a = this.findNode("a");
         this.nodeRepository.insertAsLastChildOf(b, a);
-        TestNodeImpl d = this.findNode("d");
-        TestNodeImpl g = this.findNode("g");
-        TestNodeImpl c = this.findNode("c");
+        TestNode d = this.findNode("d");
+        TestNode g = this.findNode("g");
+        TestNode c = this.findNode("c");
 
         em.refresh(b);
         em.refresh(a);
-        assertTrue(c.getLeft() == 2);
-        assertTrue(c.getRight() == 9);
-        assertTrue(b.getLeft() == 10);
-        assertTrue(b.getRight() == 15);
-        assertTrue(g.getLeft() == 5);
-        assertTrue(g.getRight() == 8);
-        assertTrue(d.getLeft() == 11);
-        assertTrue(d.getRight() == 12);
-        assertTrue(b.getLevel() == 1);
-        assertTrue(d.getLevel() == 2);
+        assertTrue(c.getTreeLeft() == 2);
+        assertTrue(c.getTreeRight() == 9);
+        assertTrue(b.getTreeLeft() == 10);
+        assertTrue(b.getTreeRight() == 15);
+        assertTrue(g.getTreeLeft() == 5);
+        assertTrue(g.getTreeRight() == 8);
+        assertTrue(d.getTreeLeft() == 11);
+        assertTrue(d.getTreeRight() == 12);
+        assertTrue(b.getTreeLevel() == 1);
+        assertTrue(d.getTreeLevel() == 2);
         assertTrue(this.getParent(b) == a);
         assertSecondTreeIntact();
     }
 
     @Test
     public void testInsertAsFirstChildOfDeepMove() {
-        TestNodeImpl c = this.findNode("c");
-        TestNodeImpl a = this.findNode("a");
+        TestNode c = this.findNode("c");
+        TestNode a = this.findNode("a");
         this.nodeRepository.insertAsFirstChildOf(c, a);
-        TestNodeImpl d = this.findNode("d");
-        TestNodeImpl g = this.findNode("g");
-        TestNodeImpl b = this.findNode("b");
+        TestNode d = this.findNode("d");
+        TestNode g = this.findNode("g");
+        TestNode b = this.findNode("b");
 
         em.refresh(c);
         em.refresh(a);
-        assertTrue(c.getLeft() == 2);
-        assertTrue(c.getRight() == 9);
-        assertTrue(b.getLeft() == 10);
-        assertTrue(b.getRight() == 15);
-        assertTrue(g.getLeft() == 5);
-        assertTrue(g.getRight() == 8);
-        assertTrue(d.getLeft() == 11);
-        assertTrue(d.getRight() == 12);
-        assertTrue(g.getLevel() == 2);
-        assertTrue(c.getLevel() == 1);
+        assertTrue(c.getTreeLeft() == 2);
+        assertTrue(c.getTreeRight() == 9);
+        assertTrue(b.getTreeLeft() == 10);
+        assertTrue(b.getTreeRight() == 15);
+        assertTrue(g.getTreeLeft() == 5);
+        assertTrue(g.getTreeRight() == 8);
+        assertTrue(d.getTreeLeft() == 11);
+        assertTrue(d.getTreeRight() == 12);
+        assertTrue(g.getTreeLevel() == 2);
+        assertTrue(c.getTreeLevel() == 1);
         assertTrue(this.getParent(c) == a);
         assertSecondTreeIntact();
     }
 
     @Test
     public void testInsertAsNextSiblingOfDeepMove() {
-        TestNodeImpl b = this.findNode("b");
-        TestNodeImpl a = this.findNode("a");
+        TestNode b = this.findNode("b");
+        TestNode a = this.findNode("a");
         this.nodeRepository.insertAsNextSiblingOf(b, a);
-        TestNodeImpl d = this.findNode("d");
-        TestNodeImpl g = this.findNode("g");
-        TestNodeImpl e = this.findNode("e");
+        TestNode d = this.findNode("d");
+        TestNode g = this.findNode("g");
+        TestNode e = this.findNode("e");
 
         em.refresh(b);
         em.refresh(a);
-        assertTrue(b.getLeft() == 11);
-        assertTrue(b.getRight() == 16);
-        assertTrue(a.getLeft() == 1);
-        assertTrue(a.getRight() == 10);
-        assertTrue(g.getLeft() == 5);
-        assertTrue(g.getRight() == 8);
-        assertTrue(d.getLeft() == 12);
-        assertTrue(d.getRight() == 13);
-        assertTrue(b.getLevel() == 0);
-        assertTrue(d.getLevel() == 1);
-        assertTrue(e.getLevel() == 1);
+        assertTrue(b.getTreeLeft() == 11);
+        assertTrue(b.getTreeRight() == 16);
+        assertTrue(a.getTreeLeft() == 1);
+        assertTrue(a.getTreeRight() == 10);
+        assertTrue(g.getTreeLeft() == 5);
+        assertTrue(g.getTreeRight() == 8);
+        assertTrue(d.getTreeLeft() == 12);
+        assertTrue(d.getTreeRight() == 13);
+        assertTrue(b.getTreeLevel() == 0);
+        assertTrue(d.getTreeLevel() == 1);
+        assertTrue(e.getTreeLevel() == 1);
         assertTrue(this.getParent(b) == null);
         assertSecondTreeIntact();
     }
 
     @Test
     public void testInsertAsPrevSiblingOfDeepMove() {
-        TestNodeImpl c = this.findNode("c");
-        TestNodeImpl a = this.findNode("a");
+        TestNode c = this.findNode("c");
+        TestNode a = this.findNode("a");
         this.nodeRepository.insertAsPrevSiblingOf(c, a);
-        TestNodeImpl d = this.findNode("d");
-        TestNodeImpl g = this.findNode("g");
-        TestNodeImpl f = this.findNode("f");
-        TestNodeImpl h = this.findNode("h");
+        TestNode d = this.findNode("d");
+        TestNode g = this.findNode("g");
+        TestNode f = this.findNode("f");
+        TestNode h = this.findNode("h");
 
         em.refresh(c);
         em.refresh(a);
-        assertTrue(c.getLeft() == 1);
-        assertTrue(c.getRight() == 8);
-        assertTrue(a.getLeft() == 9);
-        assertTrue(a.getRight() == 16);
-        assertTrue(g.getLeft() == 4);
-        assertTrue(g.getRight() == 7);
-        assertTrue(d.getLeft() == 11);
-        assertTrue(d.getRight() == 12);
-        assertTrue(c.getLevel() == 0);
-        assertTrue(f.getLevel() == 1);
-        assertTrue(g.getLevel() == 1);
-        assertTrue(h.getLevel() == 2);
+        assertTrue(c.getTreeLeft() == 1);
+        assertTrue(c.getTreeRight() == 8);
+        assertTrue(a.getTreeLeft() == 9);
+        assertTrue(a.getTreeRight() == 16);
+        assertTrue(g.getTreeLeft() == 4);
+        assertTrue(g.getTreeRight() == 7);
+        assertTrue(d.getTreeLeft() == 11);
+        assertTrue(d.getTreeRight() == 12);
+        assertTrue(c.getTreeLevel() == 0);
+        assertTrue(f.getTreeLevel() == 1);
+        assertTrue(g.getTreeLevel() == 1);
+        assertTrue(h.getTreeLevel() == 2);
         assertTrue(this.getParent(c) == null);
         assertSecondTreeIntact();
     }
 
     @Test
     public void testInsertAsPrevSiblingOfMoveRight() {
-        TestNodeImpl d = this.findNode("d");
-        TestNodeImpl g = this.findNode("g");
+        TestNode d = this.findNode("d");
+        TestNode g = this.findNode("g");
         this.nodeRepository.insertAsPrevSiblingOf(d, g);
-        TestNodeImpl f = this.findNode("f");
-        TestNodeImpl c = this.findNode("c");
-        TestNodeImpl a = this.findNode("a");
-        TestNodeImpl b = this.findNode("b");
-        TestNodeImpl e = this.findNode("e");
-        TestNodeImpl h = this.findNode("h");
+        TestNode f = this.findNode("f");
+        TestNode c = this.findNode("c");
+        TestNode a = this.findNode("a");
+        TestNode b = this.findNode("b");
+        TestNode e = this.findNode("e");
+        TestNode h = this.findNode("h");
 
         em.refresh(d);
         em.refresh(g);
-        assertTrue(e.getLeft() == 3);
-        assertTrue(e.getRight() == 4);
-        assertTrue(b.getRight() == 5);
-        assertTrue(f.getLeft() == 7);
-        assertTrue(f.getRight() == 8);
-        assertTrue(g.getLeft() == 11);
-        assertTrue(g.getRight() == 14);
-        assertTrue(d.getLeft() == 9);
-        assertTrue(d.getRight() == 10);
-        assertTrue(h.getLeft() == 12);
-        assertTrue(h.getRight() == 13);
-        assertTrue(c.getRight() == 15);
-        assertTrue(a.getRight() == 16);
-        assertTrue(d.getLevel() == 2);
+        assertTrue(e.getTreeLeft() == 3);
+        assertTrue(e.getTreeRight() == 4);
+        assertTrue(b.getTreeRight() == 5);
+        assertTrue(f.getTreeLeft() == 7);
+        assertTrue(f.getTreeRight() == 8);
+        assertTrue(g.getTreeLeft() == 11);
+        assertTrue(g.getTreeRight() == 14);
+        assertTrue(d.getTreeLeft() == 9);
+        assertTrue(d.getTreeRight() == 10);
+        assertTrue(h.getTreeLeft() == 12);
+        assertTrue(h.getTreeRight() == 13);
+        assertTrue(c.getTreeRight() == 15);
+        assertTrue(a.getTreeRight() == 16);
+        assertTrue(d.getTreeLevel() == 2);
 
         assertTrue(this.getParent(d) == c);
         assertSecondTreeIntact();
@@ -509,204 +509,204 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
 
     @Test
     public void testInsertAsPrevSiblingOfMoveLeft() {
-        TestNodeImpl g = this.findNode("g");
-        TestNodeImpl e = this.findNode("e");
+        TestNode g = this.findNode("g");
+        TestNode e = this.findNode("e");
         this.nodeRepository.insertAsPrevSiblingOf(g, e);
-        TestNodeImpl c = this.findNode("c");
-        TestNodeImpl a = this.findNode("a");
-        TestNodeImpl b = this.findNode("b");
-        TestNodeImpl h = this.findNode("h");
+        TestNode c = this.findNode("c");
+        TestNode a = this.findNode("a");
+        TestNode b = this.findNode("b");
+        TestNode h = this.findNode("h");
 
         em.refresh(g);
         em.refresh(e);
-        assertTrue(g.getLeft() == 5);
-        assertTrue(g.getRight() == 8);
-        assertTrue(h.getLeft() == 6);
-        assertTrue(h.getRight() == 7);
-        assertTrue(e.getLeft() == 9);
-        assertTrue(e.getRight() == 10);
-        assertTrue(b.getRight() == 11);
-        assertTrue(c.getLeft() == 12);
-        assertTrue(c.getRight() == 15);
-        assertTrue(a.getRight() == 16);
-        assertTrue(g.getLevel() == 2);
-        assertTrue(h.getLevel() == 3);
+        assertTrue(g.getTreeLeft() == 5);
+        assertTrue(g.getTreeRight() == 8);
+        assertTrue(h.getTreeLeft() == 6);
+        assertTrue(h.getTreeRight() == 7);
+        assertTrue(e.getTreeLeft() == 9);
+        assertTrue(e.getTreeRight() == 10);
+        assertTrue(b.getTreeRight() == 11);
+        assertTrue(c.getTreeLeft() == 12);
+        assertTrue(c.getTreeRight() == 15);
+        assertTrue(a.getTreeRight() == 16);
+        assertTrue(g.getTreeLevel() == 2);
+        assertTrue(h.getTreeLevel() == 3);
         assertTrue(this.getParent(g) == b);
         assertSecondTreeIntact();
     }
 
     @Test
     public void testInsertAsNextSiblingOfMoveRight() {
-        TestNodeImpl d = this.findNode("d");
-        TestNodeImpl f = this.findNode("f");
+        TestNode d = this.findNode("d");
+        TestNode f = this.findNode("f");
         this.nodeRepository.insertAsNextSiblingOf(d, f);
-        TestNodeImpl g = this.findNode("g");
-        TestNodeImpl c = this.findNode("c");
-        TestNodeImpl a = this.findNode("a");
-        TestNodeImpl b = this.findNode("b");
-        TestNodeImpl e = this.findNode("e");
-        TestNodeImpl h = this.findNode("h");
+        TestNode g = this.findNode("g");
+        TestNode c = this.findNode("c");
+        TestNode a = this.findNode("a");
+        TestNode b = this.findNode("b");
+        TestNode e = this.findNode("e");
+        TestNode h = this.findNode("h");
 
         em.refresh(d);
         em.refresh(f);
-        assertTrue(e.getLeft() == 3);
-        assertTrue(e.getRight() == 4);
-        assertTrue(b.getRight() == 5);
-        assertTrue(f.getLeft() == 7);
-        assertTrue(f.getRight() == 8);
-        assertTrue(g.getLeft() == 11);
-        assertTrue(g.getRight() == 14);
-        assertTrue(d.getLeft() == 9);
-        assertTrue(d.getRight() == 10);
-        assertTrue(h.getLeft() == 12);
-        assertTrue(h.getRight() == 13);
-        assertTrue(c.getRight() == 15);
-        assertTrue(a.getRight() == 16);
-        assertTrue(d.getLevel() == 2);
+        assertTrue(e.getTreeLeft() == 3);
+        assertTrue(e.getTreeRight() == 4);
+        assertTrue(b.getTreeRight() == 5);
+        assertTrue(f.getTreeLeft() == 7);
+        assertTrue(f.getTreeRight() == 8);
+        assertTrue(g.getTreeLeft() == 11);
+        assertTrue(g.getTreeRight() == 14);
+        assertTrue(d.getTreeLeft() == 9);
+        assertTrue(d.getTreeRight() == 10);
+        assertTrue(h.getTreeLeft() == 12);
+        assertTrue(h.getTreeRight() == 13);
+        assertTrue(c.getTreeRight() == 15);
+        assertTrue(a.getTreeRight() == 16);
+        assertTrue(d.getTreeLevel() == 2);
         assertTrue(this.getParent(d) == c);
         assertSecondTreeIntact();
     }
 
     @Test
     public void testInsertAsNextSiblingOfMoveLeft() {
-        TestNodeImpl g = this.findNode("g");
-        TestNodeImpl d = this.findNode("d");
+        TestNode g = this.findNode("g");
+        TestNode d = this.findNode("d");
         this.nodeRepository.insertAsNextSiblingOf(g, d);
-        TestNodeImpl c = this.findNode("c");
-        TestNodeImpl a = this.findNode("a");
-        TestNodeImpl b = this.findNode("b");
-        TestNodeImpl e = this.findNode("e");
-        TestNodeImpl h = this.findNode("h");
+        TestNode c = this.findNode("c");
+        TestNode a = this.findNode("a");
+        TestNode b = this.findNode("b");
+        TestNode e = this.findNode("e");
+        TestNode h = this.findNode("h");
 
         em.refresh(d);
         em.refresh(g);
-        assertTrue(g.getLeft() == 5);
-        assertTrue(g.getRight() == 8);
-        assertTrue(h.getLeft() == 6);
-        assertTrue(h.getRight() == 7);
-        assertTrue(e.getLeft() == 9);
-        assertTrue(e.getRight() == 10);
-        assertTrue(b.getRight() == 11);
-        assertTrue(c.getLeft() == 12);
-        assertTrue(c.getRight() == 15);
-        assertTrue(a.getRight() == 16);
-        assertTrue(g.getLevel() == 2);
-        assertTrue(h.getLevel() == 3);
+        assertTrue(g.getTreeLeft() == 5);
+        assertTrue(g.getTreeRight() == 8);
+        assertTrue(h.getTreeLeft() == 6);
+        assertTrue(h.getTreeRight() == 7);
+        assertTrue(e.getTreeLeft() == 9);
+        assertTrue(e.getTreeRight() == 10);
+        assertTrue(b.getTreeRight() == 11);
+        assertTrue(c.getTreeLeft() == 12);
+        assertTrue(c.getTreeRight() == 15);
+        assertTrue(a.getTreeRight() == 16);
+        assertTrue(g.getTreeLevel() == 2);
+        assertTrue(h.getTreeLevel() == 3);
         assertTrue(this.getParent(g) == b);
         assertSecondTreeIntact();
     }
 
     @Test
     public void testInsertAsLastChildOfMoveLeft() {
-        TestNodeImpl g = this.findNode("g");
-        TestNodeImpl b = this.findNode("b");
+        TestNode g = this.findNode("g");
+        TestNode b = this.findNode("b");
         this.nodeRepository.insertAsLastChildOf(g, b);
-        TestNodeImpl f = this.findNode("f");
-        TestNodeImpl c = this.findNode("c");
-        TestNodeImpl a = this.findNode("a");
-        TestNodeImpl d = this.findNode("d");
-        TestNodeImpl h = this.findNode("h");
+        TestNode f = this.findNode("f");
+        TestNode c = this.findNode("c");
+        TestNode a = this.findNode("a");
+        TestNode d = this.findNode("d");
+        TestNode h = this.findNode("h");
 
         em.refresh(g);
         em.refresh(b);
-        assertTrue(g.getLeft() == 7);
-        assertTrue(g.getRight() == 10);
-        assertTrue(h.getLeft() == 8);
-        assertTrue(h.getRight() == 9);
-        assertTrue(b.getRight() == 11);
-        assertTrue(f.getLeft() == 13);
-        assertTrue(f.getRight() == 14);
-        assertTrue(c.getLeft() == 12);
-        assertTrue(c.getRight() == 15);
-        assertTrue(a.getRight() == 16);
-        assertTrue(g.getLevel() == 2);
-        assertTrue(h.getLevel() == 3);
+        assertTrue(g.getTreeLeft() == 7);
+        assertTrue(g.getTreeRight() == 10);
+        assertTrue(h.getTreeLeft() == 8);
+        assertTrue(h.getTreeRight() == 9);
+        assertTrue(b.getTreeRight() == 11);
+        assertTrue(f.getTreeLeft() == 13);
+        assertTrue(f.getTreeRight() == 14);
+        assertTrue(c.getTreeLeft() == 12);
+        assertTrue(c.getTreeRight() == 15);
+        assertTrue(a.getTreeRight() == 16);
+        assertTrue(g.getTreeLevel() == 2);
+        assertTrue(h.getTreeLevel() == 3);
         assertTrue(this.getParent(g) == b);
         assertSecondTreeIntact();
     }
 
     @Test
     public void testInsertAsLastChildOfMoveRight() {
-        TestNodeImpl d = this.findNode("d");
-        TestNodeImpl g = this.findNode("g");
+        TestNode d = this.findNode("d");
+        TestNode g = this.findNode("g");
         this.nodeRepository.insertAsLastChildOf(d, g);
-        TestNodeImpl f = this.findNode("f");
-        TestNodeImpl c = this.findNode("c");
-        TestNodeImpl a = this.findNode("a");
-        TestNodeImpl b = this.findNode("b");
-        TestNodeImpl e = this.findNode("e");
-        TestNodeImpl h = this.findNode("h");
+        TestNode f = this.findNode("f");
+        TestNode c = this.findNode("c");
+        TestNode a = this.findNode("a");
+        TestNode b = this.findNode("b");
+        TestNode e = this.findNode("e");
+        TestNode h = this.findNode("h");
 
         em.refresh(d);
         em.refresh(g);
-        assertTrue(e.getLeft() == 3);
-        assertTrue(e.getRight() == 4);
-        assertTrue(b.getRight() == 5);
-        assertTrue(f.getLeft() == 7);
-        assertTrue(g.getLeft() == 9);
-        assertTrue(d.getLeft() == 12);
-        assertTrue(d.getRight() == 13);
-        assertTrue(h.getLeft() == 10);
-        assertTrue(h.getRight() == 11);
-        assertTrue(c.getRight() == 15);
-        assertTrue(a.getRight() == 16);
-        assertTrue(d.getLevel() == 3);
+        assertTrue(e.getTreeLeft() == 3);
+        assertTrue(e.getTreeRight() == 4);
+        assertTrue(b.getTreeRight() == 5);
+        assertTrue(f.getTreeLeft() == 7);
+        assertTrue(g.getTreeLeft() == 9);
+        assertTrue(d.getTreeLeft() == 12);
+        assertTrue(d.getTreeRight() == 13);
+        assertTrue(h.getTreeLeft() == 10);
+        assertTrue(h.getTreeRight() == 11);
+        assertTrue(c.getTreeRight() == 15);
+        assertTrue(a.getTreeRight() == 16);
+        assertTrue(d.getTreeLevel() == 3);
         assertTrue(this.getParent(d) == g);
         assertSecondTreeIntact();
     }
 
     @Test
     public void testInsertAsFirstChildOfMoveRight() {
-        TestNodeImpl d = findNode("d");
-        TestNodeImpl g = findNode("g");
+        TestNode d = findNode("d");
+        TestNode g = findNode("g");
         this.nodeRepository.insertAsFirstChildOf(d, g);
 
         em.refresh(d);
         em.refresh(g);
-        TestNodeImpl f = findNode("f");
-        TestNodeImpl c = findNode("c");
-        TestNodeImpl a = findNode("a");
-        TestNodeImpl b = findNode("b");
-        TestNodeImpl e = findNode("e");
-        TestNodeImpl h = findNode("h");
+        TestNode f = findNode("f");
+        TestNode c = findNode("c");
+        TestNode a = findNode("a");
+        TestNode b = findNode("b");
+        TestNode e = findNode("e");
+        TestNode h = findNode("h");
 
-        assertTrue(e.getLeft() == 3);
-        assertTrue(e.getRight() == 4);
-        assertTrue(b.getRight() == 5);
-        assertTrue(f.getLeft() == 7);
-        assertTrue(g.getLeft() == 9);
-        assertTrue(d.getLeft() == 10);
-        assertTrue(d.getRight() == 11);
-        assertTrue(h.getLeft() == 12);
-        assertTrue(h.getRight() == 13);
-        assertTrue(c.getRight() == 15);
-        assertTrue(a.getRight() == 16);
-        assertTrue(d.getLevel() == 3);
+        assertTrue(e.getTreeLeft() == 3);
+        assertTrue(e.getTreeRight() == 4);
+        assertTrue(b.getTreeRight() == 5);
+        assertTrue(f.getTreeLeft() == 7);
+        assertTrue(g.getTreeLeft() == 9);
+        assertTrue(d.getTreeLeft() == 10);
+        assertTrue(d.getTreeRight() == 11);
+        assertTrue(h.getTreeLeft() == 12);
+        assertTrue(h.getTreeRight() == 13);
+        assertTrue(c.getTreeRight() == 15);
+        assertTrue(a.getTreeRight() == 16);
+        assertTrue(d.getTreeLevel() == 3);
         assertTrue(this.getParent(d) == g);
         assertSecondTreeIntact();
     }
 
     @Test
     public void testInsertAsFirstChildOfMoveLeft() {
-        TestNodeImpl g = this.findNode("g");
-        TestNodeImpl b = this.findNode("b");
+        TestNode g = this.findNode("g");
+        TestNode b = this.findNode("b");
         this.nodeRepository.insertAsFirstChildOf(g, b);
-        TestNodeImpl f = this.findNode("f");
-        TestNodeImpl c = this.findNode("c");
-        TestNodeImpl a = this.findNode("a");
-        TestNodeImpl h = this.findNode("h");
+        TestNode f = this.findNode("f");
+        TestNode c = this.findNode("c");
+        TestNode a = this.findNode("a");
+        TestNode h = this.findNode("h");
 
         em.refresh(g);
         em.refresh(b);
-        assertTrue(g.getLeft() == 3);
-        assertTrue(g.getRight() == 6);
-        assertTrue(f.getLeft() == 13);
-        assertTrue(f.getRight() == 14);
-        assertTrue(c.getLeft() == 12);
-        assertTrue(c.getRight() == 15);
-        assertTrue(a.getRight() == 16);
-        assertTrue(g.getLevel() == 2);
-        assertTrue(h.getLevel() == 3);
+        assertTrue(g.getTreeLeft() == 3);
+        assertTrue(g.getTreeRight() == 6);
+        assertTrue(f.getTreeLeft() == 13);
+        assertTrue(f.getTreeRight() == 14);
+        assertTrue(c.getTreeLeft() == 12);
+        assertTrue(c.getTreeRight() == 15);
+        assertTrue(a.getTreeRight() == 16);
+        assertTrue(g.getTreeLevel() == 2);
+        assertTrue(h.getTreeLevel() == 3);
         assertTrue(this.getParent(g) == b);
         assertSecondTreeIntact();
     }
@@ -722,148 +722,148 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
     @Test
     public void testInsertAsFirstChildOfInsert() {
 
-        TestNodeImpl i = this.createTestNode("i");
-        TestNodeImpl e = this.findNode("e");
+        TestNode i = this.createTestNode("i");
+        TestNode e = this.findNode("e");
         this.nodeRepository.insertAsFirstChildOf(i, e);
-        TestNodeImpl a = this.findNode("a");
-        TestNodeImpl b = this.findNode("b");
-        TestNodeImpl h = this.findNode("h");
+        TestNode a = this.findNode("a");
+        TestNode b = this.findNode("b");
+        TestNode h = this.findNode("h");
 
-        assertTrue(i.getLeft() == 6);
-        assertTrue(i.getRight() == 7);
-        assertTrue(a.getRight() == 18);
-        assertTrue(b.getRight() == 9);
-        assertTrue(h.getLeft() == 14);
-        assertTrue(h.getRight() == 15);
-        assertTrue(i.getLevel().equals(e.getLevel() + 1));
+        assertTrue(i.getTreeLeft() == 6);
+        assertTrue(i.getTreeRight() == 7);
+        assertTrue(a.getTreeRight() == 18);
+        assertTrue(b.getTreeRight() == 9);
+        assertTrue(h.getTreeLeft() == 14);
+        assertTrue(h.getTreeRight() == 15);
+        assertTrue(i.getTreeLevel().equals(e.getTreeLevel() + 1));
         assertSecondTreeIntact();
     }
 
     @Test
     public void testInsertAsFirstChildOfInsertNextToSibling() {
 
-        TestNodeImpl i = this.createTestNode("i");
-        TestNodeImpl b = this.findNode("b");
+        TestNode i = this.createTestNode("i");
+        TestNode b = this.findNode("b");
         this.nodeRepository.insertAsFirstChildOf(i, b);
-        TestNodeImpl a = this.findNode("a");
+        TestNode a = this.findNode("a");
         em.flush();
         em.refresh(i);
         em.refresh(b);
         printNode("i", i);
         b = findNode("b");
-        TestNodeImpl h = this.findNode("h");
-        TestNodeImpl d = this.findNode("d");
-        TestNodeImpl e = this.findNode("e");
+        TestNode h = this.findNode("h");
+        TestNode d = this.findNode("d");
+        TestNode e = this.findNode("e");
 
-        assertTrue(i.getLeft() == 3);
-        assertTrue(i.getRight() == 4);
-        assertTrue(a.getRight() == 18);
-        assertTrue(b.getLeft() == 2);
-        assertTrue(b.getRight() == 9);
-        assertTrue(d.getLeft() == 5);
-        assertTrue(d.getRight() == 6);
-        assertTrue(e.getLeft() == 7);
-        assertTrue(e.getRight() == 8);
-        assertTrue(h.getLeft() == 14);
-        assertTrue(h.getRight() == 15);
-        assertTrue(i.getLevel().equals(b.getLevel() + 1));
+        assertTrue(i.getTreeLeft() == 3);
+        assertTrue(i.getTreeRight() == 4);
+        assertTrue(a.getTreeRight() == 18);
+        assertTrue(b.getTreeLeft() == 2);
+        assertTrue(b.getTreeRight() == 9);
+        assertTrue(d.getTreeLeft() == 5);
+        assertTrue(d.getTreeRight() == 6);
+        assertTrue(e.getTreeLeft() == 7);
+        assertTrue(e.getTreeRight() == 8);
+        assertTrue(h.getTreeLeft() == 14);
+        assertTrue(h.getTreeRight() == 15);
+        assertTrue(i.getTreeLevel().equals(b.getTreeLevel() + 1));
         assertSecondTreeIntact();
     }
 
     @Test
     public void testInsertAsLastChildOfInsert() {
 
-        TestNodeImpl j = this.createTestNode("j");
-        TestNodeImpl b = this.findNode("b");
+        TestNode j = this.createTestNode("j");
+        TestNode b = this.findNode("b");
         this.nodeRepository.insertAsLastChildOf(j, b);
-        TestNodeImpl a = this.findNode("a");
-        TestNodeImpl h = this.findNode("h");
-        TestNodeImpl c = this.findNode("c");
+        TestNode a = this.findNode("a");
+        TestNode h = this.findNode("h");
+        TestNode c = this.findNode("c");
 
-        assertTrue(j.getLeft() == 7);
-        assertTrue(j.getRight() == 8);
-        assertTrue(a.getRight() == 18);
-        assertTrue(h.getLeft() == 14);
-        assertTrue(h.getRight() == 15);
-        assertTrue(c.getLeft() == 10);
-        assertTrue(j.getLevel().equals(b.getLevel() + 1));
+        assertTrue(j.getTreeLeft() == 7);
+        assertTrue(j.getTreeRight() == 8);
+        assertTrue(a.getTreeRight() == 18);
+        assertTrue(h.getTreeLeft() == 14);
+        assertTrue(h.getTreeRight() == 15);
+        assertTrue(c.getTreeLeft() == 10);
+        assertTrue(j.getTreeLevel().equals(b.getTreeLevel() + 1));
         assertSecondTreeIntact();
     }
 
     @Test
     public void testInsertAsPrevSiblingOfInsert() {
 
-        TestNodeImpl k = this.createTestNode("k");
-        TestNodeImpl e = this.findNode("e");
+        TestNode k = this.createTestNode("k");
+        TestNode e = this.findNode("e");
         this.nodeRepository.insertAsPrevSiblingOf(k, e);
         em.flush();
         em.clear();
-        TestNodeImpl a = this.findNode("a");
-        TestNodeImpl h = this.findNode("h");
-        TestNodeImpl c = this.findNode("c");
+        TestNode a = this.findNode("a");
+        TestNode h = this.findNode("h");
+        TestNode c = this.findNode("c");
 
-        assertTrue(k.getLeft() == 5);
-        assertTrue(k.getRight() == 6);
-        assertTrue(a.getRight() == 18);
-        assertTrue(h.getLeft() == 14);
-        assertTrue(h.getRight() == 15);
-        assertTrue(c.getLeft() == 10);
-        assertTrue(k.getLevel().equals(e.getLevel()));
-        assertTrue(k.getParent().equals(e.getParent()));
+        assertTrue(k.getTreeLeft() == 5);
+        assertTrue(k.getTreeRight() == 6);
+        assertTrue(a.getTreeRight() == 18);
+        assertTrue(h.getTreeLeft() == 14);
+        assertTrue(h.getTreeRight() == 15);
+        assertTrue(c.getTreeLeft() == 10);
+        assertTrue(k.getTreeLevel().equals(e.getTreeLevel()));
+        assertTrue(k.getParentId().equals(e.getParentId()));
         assertSecondTreeIntact();
     }
 
     @Test
     public void testInsertAsNextSiblingOfInsert() {
 
-        TestNodeImpl m = this.createTestNode("m");
-        TestNodeImpl h = this.findNode("h");
+        TestNode m = this.createTestNode("m");
+        TestNode h = this.findNode("h");
         this.nodeRepository.insertAsNextSiblingOf(m, h);
-        TestNodeImpl a = this.findNode("a");
-        TestNodeImpl g = this.findNode("g");
-        TestNodeImpl c = this.findNode("c");
+        TestNode a = this.findNode("a");
+        TestNode g = this.findNode("g");
+        TestNode c = this.findNode("c");
 
-        assertTrue(m.getLeft() == 14);
-        assertTrue(m.getRight() == 15);
-        assertTrue(a.getRight() == 18);
-        assertTrue(g.getRight() == 16);
-        assertTrue(c.getRight() == 17);
-        assertTrue(m.getLevel().equals(h.getLevel()));
-        assertTrue(m.getParent().equals(h.getParent()));
+        assertTrue(m.getTreeLeft() == 14);
+        assertTrue(m.getTreeRight() == 15);
+        assertTrue(a.getTreeRight() == 18);
+        assertTrue(g.getTreeRight() == 16);
+        assertTrue(c.getTreeRight() == 17);
+        assertTrue(m.getTreeLevel().equals(h.getTreeLevel()));
+        assertTrue(m.getParentId().equals(h.getParentId()));
         assertSecondTreeIntact();
     }
 
     @Test
     public void testInsertAsNextSiblingOfMoveEdge() {
-        TestNodeImpl h = this.findNode("h");
-        TestNodeImpl c = this.findNode("c");
+        TestNode h = this.findNode("h");
+        TestNode c = this.findNode("c");
         this.nodeRepository.insertAsLastChildOf(h, c);
 
-        TestNodeImpl a = this.findNode("a");
-        TestNodeImpl b = this.findNode("b");
+        TestNode a = this.findNode("a");
+        TestNode b = this.findNode("b");
         c = this.findNode("c");
-        TestNodeImpl d = this.findNode("d");
-        TestNodeImpl e = this.findNode("e");
-        TestNodeImpl g = this.findNode("g");
-        TestNodeImpl f = this.findNode("f");
+        TestNode d = this.findNode("d");
+        TestNode e = this.findNode("e");
+        TestNode g = this.findNode("g");
+        TestNode f = this.findNode("f");
         h = this.findNode("h");
 
-        assertTrue(a.getLeft() == 1);
-        assertTrue(a.getRight() == 16);
-        assertTrue(b.getLeft() == 2);
-        assertTrue(b.getRight() == 7);
-        assertTrue(c.getLeft() == 8);
-        assertTrue(c.getRight() == 15);
-        assertTrue(d.getLeft() == 3);
-        assertTrue(d.getRight() == 4);
-        assertTrue(e.getLeft() == 5);
-        assertTrue(e.getRight() == 6);
-        assertTrue(f.getLeft() == 9);
-        assertTrue(f.getRight() == 10);
-        assertTrue(g.getLeft() == 11);
-        assertTrue(g.getRight() == 12);
-        assertTrue(h.getLeft() == 13);
-        assertTrue(h.getRight() == 14);
+        assertTrue(a.getTreeLeft() == 1);
+        assertTrue(a.getTreeRight() == 16);
+        assertTrue(b.getTreeLeft() == 2);
+        assertTrue(b.getTreeRight() == 7);
+        assertTrue(c.getTreeLeft() == 8);
+        assertTrue(c.getTreeRight() == 15);
+        assertTrue(d.getTreeLeft() == 3);
+        assertTrue(d.getTreeRight() == 4);
+        assertTrue(e.getTreeLeft() == 5);
+        assertTrue(e.getTreeRight() == 6);
+        assertTrue(f.getTreeLeft() == 9);
+        assertTrue(f.getTreeRight() == 10);
+        assertTrue(g.getTreeLeft() == 11);
+        assertTrue(g.getTreeRight() == 12);
+        assertTrue(h.getTreeLeft() == 13);
+        assertTrue(h.getTreeRight() == 14);
         assertTrue(this.getParent(h) == c);
         assertSecondTreeIntact();
     }
@@ -871,35 +871,35 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
     @Test
     public void testInsertAsNextSiblingOfMoveSecondRoot() {
 
-        TestNodeImpl c = this.findNode("c");
-        TestNodeImpl a = this.findNode("a");
+        TestNode c = this.findNode("c");
+        TestNode a = this.findNode("a");
         this.nodeRepository.insertAsNextSiblingOf(c, a);
 
         a = this.findNode("a");
-        TestNodeImpl b = this.findNode("b");
+        TestNode b = this.findNode("b");
         c = this.findNode("c");
-        TestNodeImpl d = this.findNode("d");
-        TestNodeImpl e = this.findNode("e");
-        TestNodeImpl g = this.findNode("g");
-        TestNodeImpl f = this.findNode("f");
-        TestNodeImpl h = this.findNode("h");
+        TestNode d = this.findNode("d");
+        TestNode e = this.findNode("e");
+        TestNode g = this.findNode("g");
+        TestNode f = this.findNode("f");
+        TestNode h = this.findNode("h");
 
-        assertTrue(a.getLeft() == 1);
-        assertTrue(a.getRight() == 8);
-        assertTrue(b.getLeft() == 2);
-        assertTrue(b.getRight() == 7);
-        assertTrue(c.getLeft() == 9);
-        assertTrue(c.getRight() == 16);
-        assertTrue(d.getLeft() == 3);
-        assertTrue(d.getRight() == 4);
-        assertTrue(e.getLeft() == 5);
-        assertTrue(e.getRight() == 6);
-        assertTrue(f.getLeft() == 10);
-        assertTrue(f.getRight() == 11);
-        assertTrue(g.getLeft() == 12);
-        assertTrue(g.getRight() == 15);
-        assertTrue(h.getLeft() == 13);
-        assertTrue(h.getRight() == 14);
+        assertTrue(a.getTreeLeft() == 1);
+        assertTrue(a.getTreeRight() == 8);
+        assertTrue(b.getTreeLeft() == 2);
+        assertTrue(b.getTreeRight() == 7);
+        assertTrue(c.getTreeLeft() == 9);
+        assertTrue(c.getTreeRight() == 16);
+        assertTrue(d.getTreeLeft() == 3);
+        assertTrue(d.getTreeRight() == 4);
+        assertTrue(e.getTreeLeft() == 5);
+        assertTrue(e.getTreeRight() == 6);
+        assertTrue(f.getTreeLeft() == 10);
+        assertTrue(f.getTreeRight() == 11);
+        assertTrue(g.getTreeLeft() == 12);
+        assertTrue(g.getTreeRight() == 15);
+        assertTrue(h.getTreeLeft() == 13);
+        assertTrue(h.getTreeRight() == 14);
         assertTrue(this.getParent(c) == null);
         assertSecondTreeIntact();
     }
@@ -907,40 +907,40 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
     @Test
     public void testMultipleOperations() {
 
-        TestNodeImpl i = this.createTestNode("i");
-        TestNodeImpl j = this.createTestNode("j");
-        TestNodeImpl k = this.createTestNode("k");
-        TestNodeImpl l = this.createTestNode("l");
-        TestNodeImpl m = this.createTestNode("m");
-        TestNodeImpl a = this.findNode("a");
+        TestNode i = this.createTestNode("i");
+        TestNode j = this.createTestNode("j");
+        TestNode k = this.createTestNode("k");
+        TestNode l = this.createTestNode("l");
+        TestNode m = this.createTestNode("m");
+        TestNode a = this.findNode("a");
 
         this.nodeRepository.insertAsNextSiblingOf(i, a);
         em.flush();
         em.clear();
 
-        i = em.find(TestNodeImpl.class, i.getId());
+        i = em.find(TestNode.class, i.getId());
         printNode("i", i);
         this.nodeRepository.insertAsLastChildOf(j, i);
         em.flush();
         em.clear();
 
-        i = em.find(TestNodeImpl.class, i.getId());
-        j = em.find(TestNodeImpl.class, j.getId());
+        i = em.find(TestNode.class, i.getId());
+        j = em.find(TestNode.class, j.getId());
         printNode("i", i);
         printNode("j", j);
         this.nodeRepository.insertAsFirstChildOf(k, i);
         em.flush();
         em.clear();
 
-        j = em.find(TestNodeImpl.class, j.getId());
-        k = em.find(TestNodeImpl.class, k.getId());
+        j = em.find(TestNode.class, j.getId());
+        k = em.find(TestNode.class, k.getId());
         this.nodeRepository.insertAsNextSiblingOf(l, k);
         em.flush();
         em.clear();
-        i = em.find(TestNodeImpl.class, i.getId());
-        j = em.find(TestNodeImpl.class, j.getId());
-        k = em.find(TestNodeImpl.class, k.getId());
-        l = em.find(TestNodeImpl.class, l.getId());
+        i = em.find(TestNode.class, i.getId());
+        j = em.find(TestNode.class, j.getId());
+        k = em.find(TestNode.class, k.getId());
+        l = em.find(TestNode.class, l.getId());
 
         this.nodeRepository.insertAsPrevSiblingOf(m, l);
         em.flush();
@@ -948,57 +948,57 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
 
         System.out.println("ASSERTS");
         a = this.findNode("a");
-        TestNodeImpl b = this.findNode("b");
-        TestNodeImpl c = this.findNode("c");
-        TestNodeImpl d = this.findNode("d");
-        TestNodeImpl e = this.findNode("e");
-        TestNodeImpl g = this.findNode("g");
-        TestNodeImpl f = this.findNode("f");
-        TestNodeImpl h = this.findNode("h");
+        TestNode b = this.findNode("b");
+        TestNode c = this.findNode("c");
+        TestNode d = this.findNode("d");
+        TestNode e = this.findNode("e");
+        TestNode g = this.findNode("g");
+        TestNode f = this.findNode("f");
+        TestNode h = this.findNode("h");
         i = this.findNode("i");
         j = this.findNode("j");
         k = this.findNode("k");
         l = this.findNode("l");
         m = this.findNode("m");
 
-        assertTrue(a.getLeft() == 1);
-        assertTrue(a.getRight() == 16);
-        assertTrue(b.getLeft() == 2);
-        assertTrue(b.getRight() == 7);
-        assertTrue(c.getLeft() == 8);
-        assertTrue(c.getRight() == 15);
-        assertTrue(d.getLeft() == 3);
-        assertTrue(d.getRight() == 4);
-        assertTrue(e.getLeft() == 5);
-        assertTrue(e.getRight() == 6);
-        assertTrue(f.getLeft() == 9);
-        assertTrue(f.getRight() == 10);
-        assertTrue(g.getLeft() == 11);
-        assertTrue(g.getRight() == 14);
-        assertTrue(h.getLeft() == 12);
-        assertTrue(h.getRight() == 13);
+        assertTrue(a.getTreeLeft() == 1);
+        assertTrue(a.getTreeRight() == 16);
+        assertTrue(b.getTreeLeft() == 2);
+        assertTrue(b.getTreeRight() == 7);
+        assertTrue(c.getTreeLeft() == 8);
+        assertTrue(c.getTreeRight() == 15);
+        assertTrue(d.getTreeLeft() == 3);
+        assertTrue(d.getTreeRight() == 4);
+        assertTrue(e.getTreeLeft() == 5);
+        assertTrue(e.getTreeRight() == 6);
+        assertTrue(f.getTreeLeft() == 9);
+        assertTrue(f.getTreeRight() == 10);
+        assertTrue(g.getTreeLeft() == 11);
+        assertTrue(g.getTreeRight() == 14);
+        assertTrue(h.getTreeLeft() == 12);
+        assertTrue(h.getTreeRight() == 13);
 
-        assertTrue(i.getLeft() == 17);
-        assertTrue(i.getRight() == 26);
-        assertTrue(j.getLeft() == 24);
-        assertTrue(j.getRight() == 25);
-        assertTrue(k.getLeft() == 18);
-        assertTrue(k.getRight() == 19);
-        assertTrue(l.getLeft() == 22);
-        assertTrue(l.getRight() == 23);
-        assertTrue(m.getLeft() == 20);
-        assertTrue(m.getRight() == 21);
+        assertTrue(i.getTreeLeft() == 17);
+        assertTrue(i.getTreeRight() == 26);
+        assertTrue(j.getTreeLeft() == 24);
+        assertTrue(j.getTreeRight() == 25);
+        assertTrue(k.getTreeLeft() == 18);
+        assertTrue(k.getTreeRight() == 19);
+        assertTrue(l.getTreeLeft() == 22);
+        assertTrue(l.getTreeRight() == 23);
+        assertTrue(m.getTreeLeft() == 20);
+        assertTrue(m.getTreeRight() == 21);
 
         assertTrue(this.getParent(i) == null);
         assertTrue(this.getParent(j) == i);
         assertTrue(this.getParent(k) == i);
         assertSecondTreeIntact();
 
-        this.em.createQuery("update TestNodeImpl set lft = 0, rgt = 0, lvl = 0 where discriminator = 'tree_1'").executeUpdate();
+        this.em.createQuery("update TestNode set treeLeft = 0, treeRight = 0, treeLevel = 0 where discriminator = 'tree_1'").executeUpdate();
         em.flush();
         em.clear();
 
-        nodeRepository.rebuildTree(TestNodeImpl.class);
+        nodeRepository.rebuildTree();
         em.flush();
         em.clear();
 
@@ -1020,33 +1020,33 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         l = this.findNode("l");
         m = this.findNode("m");
 
-        assertTrue(a.getLeft() == 1);
-        assertTrue(a.getRight() == 16);
-        assertTrue(b.getLeft() == 2);
-        assertTrue(b.getRight() == 7);
-        assertTrue(c.getLeft() == 8);
-        assertTrue(c.getRight() == 15);
-        assertTrue(d.getLeft() == 3);
-        assertTrue(d.getRight() == 4);
-        assertTrue(e.getLeft() == 5);
-        assertTrue(e.getRight() == 6);
-        assertTrue(f.getLeft() == 9);
-        assertTrue(f.getRight() == 10);
-        assertTrue(g.getLeft() == 11);
-        assertTrue(g.getRight() == 14);
-        assertTrue(h.getLeft() == 12);
-        assertTrue(h.getRight() == 13);
+        assertTrue(a.getTreeLeft() == 1);
+        assertTrue(a.getTreeRight() == 16);
+        assertTrue(b.getTreeLeft() == 2);
+        assertTrue(b.getTreeRight() == 7);
+        assertTrue(c.getTreeLeft() == 8);
+        assertTrue(c.getTreeRight() == 15);
+        assertTrue(d.getTreeLeft() == 3);
+        assertTrue(d.getTreeRight() == 4);
+        assertTrue(e.getTreeLeft() == 5);
+        assertTrue(e.getTreeRight() == 6);
+        assertTrue(f.getTreeLeft() == 9);
+        assertTrue(f.getTreeRight() == 10);
+        assertTrue(g.getTreeLeft() == 11);
+        assertTrue(g.getTreeRight() == 14);
+        assertTrue(h.getTreeLeft() == 12);
+        assertTrue(h.getTreeRight() == 13);
 
-        assertTrue(i.getLeft() == 17);
-        assertTrue(i.getRight() == 26);
-        assertTrue(j.getLeft() == 18);
-        assertTrue(j.getRight() == 19);
-        assertTrue(k.getLeft() == 20);
-        assertTrue(k.getRight() == 21);
-        assertTrue(l.getLeft() == 22);
-        assertTrue(l.getRight() == 23);
-        assertTrue(m.getLeft() == 24);
-        assertTrue(m.getRight() == 25);
+        assertTrue(i.getTreeLeft() == 17);
+        assertTrue(i.getTreeRight() == 26);
+        assertTrue(j.getTreeLeft() == 18);
+        assertTrue(j.getTreeRight() == 19);
+        assertTrue(k.getTreeLeft() == 20);
+        assertTrue(k.getTreeRight() == 21);
+        assertTrue(l.getTreeLeft() == 22);
+        assertTrue(l.getTreeRight() == 23);
+        assertTrue(m.getTreeLeft() == 24);
+        assertTrue(m.getTreeRight() == 25);
 
         nodeRepository.removeSingle(i);
 
@@ -1068,39 +1068,39 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
 
         System.out.println("ASSERTS AFTER REMOVE SINGLE");
 
-        assertTrue(a.getLeft() == 1);
-        assertTrue(a.getRight() == 16);
-        assertTrue(b.getLeft() == 2);
-        assertTrue(b.getRight() == 7);
-        assertTrue(c.getLeft() == 8);
-        assertTrue(c.getRight() == 15);
-        assertTrue(d.getLeft() == 3);
-        assertTrue(d.getRight() == 4);
-        assertTrue(e.getLeft() == 5);
-        assertTrue(e.getRight() == 6);
-        assertTrue(f.getLeft() == 9);
-        assertTrue(f.getRight() == 10);
-        assertTrue(g.getLeft() == 11);
-        assertTrue(g.getRight() == 14);
-        assertTrue(h.getLeft() == 12);
-        assertTrue(h.getRight() == 13);
+        assertTrue(a.getTreeLeft() == 1);
+        assertTrue(a.getTreeRight() == 16);
+        assertTrue(b.getTreeLeft() == 2);
+        assertTrue(b.getTreeRight() == 7);
+        assertTrue(c.getTreeLeft() == 8);
+        assertTrue(c.getTreeRight() == 15);
+        assertTrue(d.getTreeLeft() == 3);
+        assertTrue(d.getTreeRight() == 4);
+        assertTrue(e.getTreeLeft() == 5);
+        assertTrue(e.getTreeRight() == 6);
+        assertTrue(f.getTreeLeft() == 9);
+        assertTrue(f.getTreeRight() == 10);
+        assertTrue(g.getTreeLeft() == 11);
+        assertTrue(g.getTreeRight() == 14);
+        assertTrue(h.getTreeLeft() == 12);
+        assertTrue(h.getTreeRight() == 13);
 
-        assertTrue(j.getLeft() == 17);
-        assertTrue(j.getRight() == 18);
-        assertTrue(j.getLevel() == 0);
-        assertTrue(j.getParent() == null);
-        assertTrue(k.getLeft() == 19);
-        assertTrue(k.getRight() == 20);
-        assertTrue(k.getLevel() == 0);
-        assertTrue(k.getParent() == null);
-        assertTrue(l.getLeft() == 21);
-        assertTrue(l.getRight() == 22);
-        assertTrue(l.getLevel() == 0);
-        assertTrue(l.getParent() == null);
-        assertTrue(m.getLeft() == 23);
-        assertTrue(m.getRight() == 24);
-        assertTrue(m.getLevel() == 0);
-        assertTrue(m.getParent() == null);
+        assertTrue(j.getTreeLeft() == 17);
+        assertTrue(j.getTreeRight() == 18);
+        assertTrue(j.getTreeLevel() == 0);
+        assertTrue(j.getParentId() == null);
+        assertTrue(k.getTreeLeft() == 19);
+        assertTrue(k.getTreeRight() == 20);
+        assertTrue(k.getTreeLevel() == 0);
+        assertTrue(k.getParentId() == null);
+        assertTrue(l.getTreeLeft() == 21);
+        assertTrue(l.getTreeRight() == 22);
+        assertTrue(l.getTreeLevel() == 0);
+        assertTrue(l.getParentId() == null);
+        assertTrue(m.getTreeLeft() == 23);
+        assertTrue(m.getTreeRight() == 24);
+        assertTrue(m.getTreeLevel() == 0);
+        assertTrue(m.getParentId() == null);
 
         nodeRepository.removeSubtree(a);
         em.flush();
@@ -1113,52 +1113,52 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
 
         System.out.println("ASSERTS AFTER REMOVE SUBTREE");
 
-        assertTrue(j.getLeft() == 1);
-        assertTrue(j.getRight() == 2);
-        assertTrue(j.getLevel() == 0);
-        assertTrue(j.getParent() == null);
-        assertTrue(k.getLeft() == 3);
-        assertTrue(k.getRight() == 4);
-        assertTrue(k.getLevel() == 0);
-        assertTrue(k.getParent() == null);
-        assertTrue(l.getLeft() == 5);
-        assertTrue(l.getRight() == 6);
-        assertTrue(l.getLevel() == 0);
-        assertTrue(l.getParent() == null);
-        assertTrue(m.getLeft() == 7);
-        assertTrue(m.getRight() == 8);
-        assertTrue(m.getLevel() == 0);
-        assertTrue(m.getParent() == null);
+        assertTrue(j.getTreeLeft() == 1);
+        assertTrue(j.getTreeRight() == 2);
+        assertTrue(j.getTreeLevel() == 0);
+        assertTrue(j.getParentId() == null);
+        assertTrue(k.getTreeLeft() == 3);
+        assertTrue(k.getTreeRight() == 4);
+        assertTrue(k.getTreeLevel() == 0);
+        assertTrue(k.getParentId() == null);
+        assertTrue(l.getTreeLeft() == 5);
+        assertTrue(l.getTreeRight() == 6);
+        assertTrue(l.getTreeLevel() == 0);
+        assertTrue(l.getParentId() == null);
+        assertTrue(m.getTreeLeft() == 7);
+        assertTrue(m.getTreeRight() == 8);
+        assertTrue(m.getTreeLevel() == 0);
+        assertTrue(m.getParentId() == null);
     }
 
     @Test
     public void testRebuildWithSecondRoot() {
 
-        TestNodeImpl i = this.createTestNode("i");
-        TestNodeImpl j = this.createTestNode("j");
-        TestNodeImpl k = this.createTestNode("k");
-        TestNodeImpl a = this.findNode("a");
+        TestNode i = this.createTestNode("i");
+        TestNode j = this.createTestNode("j");
+        TestNode k = this.createTestNode("k");
+        TestNode a = this.findNode("a");
         this.nodeRepository.insertAsNextSiblingOf(i, a);
         this.nodeRepository.insertAsLastChildOf(j, i);
         this.nodeRepository.insertAsLastChildOf(k, i);
 
-        this.em.createQuery("update TestNodeImpl set lft = 0, rgt = 0, lvl = 0 where discriminator = 'tree_1'").executeUpdate();
+        this.em.createQuery("update TestNode set treeLeft = 0, treeRight = 0, treeLevel = 0 where discriminator = 'tree_1'").executeUpdate();
         em.flush();
         em.clear();
-        this.nodeRepository.rebuildTree(TestNodeImpl.class);
+        this.nodeRepository.rebuildTree();
 
         a = this.findNode("a");
-        TestNodeImpl b = this.findNode("b");
-        TestNodeImpl c = this.findNode("c");
-        TestNodeImpl d = this.findNode("d");
-        TestNodeImpl e = this.findNode("e");
-        TestNodeImpl g = this.findNode("g");
-        TestNodeImpl f = this.findNode("f");
-        TestNodeImpl h = this.findNode("h");
+        TestNode b = this.findNode("b");
+        TestNode c = this.findNode("c");
+        TestNode d = this.findNode("d");
+        TestNode e = this.findNode("e");
+        TestNode g = this.findNode("g");
+        TestNode f = this.findNode("f");
+        TestNode h = this.findNode("h");
 
-        i = em.find(TestNodeImpl.class, i.getId());
-        j = em.find(TestNodeImpl.class, j.getId());
-        k = em.find(TestNodeImpl.class, k.getId());
+        i = em.find(TestNode.class, i.getId());
+        j = em.find(TestNode.class, j.getId());
+        k = em.find(TestNode.class, k.getId());
 
         printNode("i", i);
         printNode("j", j);
@@ -1180,31 +1180,31 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
     }
 
     private void assertSecondTreeIntact() {
-        TestNodeImpl a2 = this.findNode("a2");
-        TestNodeImpl b2 = this.findNode("b2");
-        TestNodeImpl c2 = this.findNode("c2");
-        TestNodeImpl d2 = this.findNode("d2");
-        TestNodeImpl e2 = this.findNode("e2");
-        TestNodeImpl g2 = this.findNode("g2");
-        TestNodeImpl f2 = this.findNode("f2");
-        TestNodeImpl h2 = this.findNode("h2");
+        TestNode a2 = this.findNode("a2");
+        TestNode b2 = this.findNode("b2");
+        TestNode c2 = this.findNode("c2");
+        TestNode d2 = this.findNode("d2");
+        TestNode e2 = this.findNode("e2");
+        TestNode g2 = this.findNode("g2");
+        TestNode f2 = this.findNode("f2");
+        TestNode h2 = this.findNode("h2");
 
-        assertTrue(a2.getLeft() == 1);
-        assertTrue(a2.getRight() == 16);
-        assertTrue(b2.getLeft() == 2);
-        assertTrue(b2.getRight() == 7);
-        assertTrue(c2.getLeft() == 8);
-        assertTrue(c2.getRight() == 15);
-        assertTrue(d2.getLeft() == 3);
-        assertTrue(d2.getRight() == 4);
-        assertTrue(e2.getLeft() == 5);
-        assertTrue(e2.getRight() == 6);
-        assertTrue(f2.getLeft() == 9);
-        assertTrue(f2.getRight() == 10);
-        assertTrue(g2.getLeft() == 11);
-        assertTrue(g2.getRight() == 14);
-        assertTrue(h2.getLeft() == 12);
-        assertTrue(h2.getRight() == 13);
+        assertTrue(a2.getTreeLeft() == 1);
+        assertTrue(a2.getTreeRight() == 16);
+        assertTrue(b2.getTreeLeft() == 2);
+        assertTrue(b2.getTreeRight() == 7);
+        assertTrue(c2.getTreeLeft() == 8);
+        assertTrue(c2.getTreeRight() == 15);
+        assertTrue(d2.getTreeLeft() == 3);
+        assertTrue(d2.getTreeRight() == 4);
+        assertTrue(e2.getTreeLeft() == 5);
+        assertTrue(e2.getTreeRight() == 6);
+        assertTrue(f2.getTreeLeft() == 9);
+        assertTrue(f2.getTreeRight() == 10);
+        assertTrue(g2.getTreeLeft() == 11);
+        assertTrue(g2.getTreeRight() == 14);
+        assertTrue(h2.getTreeLeft() == 12);
+        assertTrue(h2.getTreeRight() == 13);
 
         assertTrue(this.getParent(a2) == null);
         assertTrue(this.getParent(b2) == a2);
@@ -1219,13 +1219,13 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
 
     private void breakTree() {
 
-        this.em.createQuery("update TestNodeImpl set parent = null where name='c' and discriminator = 'tree_1'").executeUpdate();
-        this.em.createQuery("update TestNodeImpl set lft = 0, rgt = 0, lvl = 0 where discriminator = 'tree_1'").executeUpdate();
+        this.em.createQuery("update TestNode set parentId = null where name='c' and discriminator = 'tree_1'").executeUpdate();
+        this.em.createQuery("update TestNode set treeLeft = 0, treeRight = 0, treeLevel = 0 where discriminator = 'tree_1'").executeUpdate();
 
     }
 
     private void removeTree() {
-        this.em.createQuery("delete from TestNodeImpl where discriminator = 'tree_1'").executeUpdate();
+        this.em.createQuery("delete from TestNode where discriminator = 'tree_1'").executeUpdate();
     }
 
 }

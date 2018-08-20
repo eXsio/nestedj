@@ -25,24 +25,30 @@ package pl.exsio.nestedj.model;
 
 import java.io.Serializable;
 
-public interface NestedNode<ID extends Serializable, N extends NestedNode<ID, N>> {
+public interface NestedNode<ID extends Serializable> {
+
+    String LEFT = "treeLeft";
+    String RIGHT = "treeRight";
+    String LEVEL = "treeLevel";
+    String PARENT_ID = "parentId";
+    String ID = "id";
 
     ID getId();
 
-    Long getLeft();
+    Long getTreeLeft();
 
-    Long getRight();
+    Long getTreeRight();
 
-    Long getLevel();
+    Long getTreeLevel();
 
-    N getParent();
+    ID getParentId();
 
-    void setLeft(Long left);
+    void setTreeLeft(Long treeLeft);
 
-    void setRight(Long right);
+    void setTreeRight(Long treeRight);
 
-    void setLevel(Long level);
+    void setTreeLevel(Long treeLevel);
 
-    void setParent(N parent);
+    void setParentId(ID parent);
 
 }

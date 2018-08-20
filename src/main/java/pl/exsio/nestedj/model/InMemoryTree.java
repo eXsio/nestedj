@@ -28,7 +28,7 @@ import com.google.common.collect.Lists;
 import java.io.Serializable;
 import java.util.List;
 
-public class InMemoryTree<ID extends Serializable, N extends NestedNode<ID, N>> implements Tree<ID, N> {
+public class InMemoryTree<ID extends Serializable, N extends NestedNode<ID>> implements Tree<ID, N> {
 
     private List<Tree<ID, N>> children;
 

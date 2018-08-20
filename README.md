@@ -10,7 +10,7 @@ NestedJ can automate the insertion/moving/removing of tree nodes. It can also re
 
 ### What is Nested Set?
 
-Nested Set is a RDBMS Tree implmentation. It allows to query for whole tree branches and finding ancestors and descendants using one simple query. As usual, there is no freee lunch, so the price to pay in this case is a slightly more complex logic for modifying the tree (inserting / moving / removing nodes and branches). Fortunately NestedJ makes it as easy as using a standard JPA EntityManager.
+Nested Set is a RDBMS Tree implementation. It allows to query for whole tree branches and finding ancestors and descendants using one simple query. As usual, there is no freee lunch, so the price to pay in this case is a slightly more complex logic for modifying the tree (inserting / moving / removing nodes and branches). Fortunately NestedJ makes it as easy as using a standard JPA EntityManager.
 
 ### Example
 
@@ -37,7 +37,7 @@ You can query for an entire tree branch of node ```C``` using a query similar to
  SELECT * FROM TREE_TABLE WHERE LEFT >=8 AND RIGHT <= 17
 ```
 
-You can query for a top level parent of a given (```H``` in this example) node using a query similar to this:
+You can query for a top treeLevel parent of a given (```H``` in this example) node using a query similar to this:
 
 ```
 SELECT * FROM TREE_TABLE WHERE LEFT < 12 AND RIGHT > 13 AND LEVEL = 0
@@ -52,7 +52,17 @@ SELECT * FROM TREE_TABLE WHERE LEFT < 3 AND RIGHT > 4 ORDER BY LEVEL ASC
 
 Using the traditional ```parant_id``` relationship would mean firing multiple queries for each child / parent relationship.
 
-##### Important: Nested Set is NOT a binary tree - the number of nodes on any level is unlimited. 
+##### Important: Nested Set is NOT a binary tree - the number of nodes on any treeLevel is unlimited. 
+
+### Advantages of NestedJ
+
+   - **No Reflection!** - no custom annotations, no additional boostrap logic
+   - **Best achievable performance** - all tree actions are performed using a minimal number of Criteria Queries, without loading any parts of the tree structure to the memory
+   - **No JPA mappings enforced** - no ManyToOne/OneToMany mappings needed for the lib to work
+   - **No ID/PK class enforced** - no hardwired requirements for any particular ID/Primary Key class
+   - **Fully customizable** - you can repimplement the parts you need and leave the rest intact
+   - **Fully tested** - integration tests created for all possible tree operations
+   - **Minimal number of Project dependencies** - only Guava and SLF4J
 
 ### Installation
 
@@ -68,7 +78,7 @@ Using the traditional ```parant_id``` relationship would mean firing multiple qu
 <dependency>
     <groupId>com.github.eXsio</groupId>
     <artifactId>nestedj</artifactId>
-    <version>2.2.0</version>
+    <version>3.0.0</version>
 </dependency>
 
 ```
@@ -80,9 +90,12 @@ In order to use NestedJ, You have to configure it. In 9 our of 10 cases you will
  
  Here's the full code:
 
-
-    NestedNodeRepository.createDefault(entityManager)
-    NestedNodeRepository.createDiscriminated(entityManager, new CustomTreeDiscriminator());
+    //ID and Node classes
+    Class<Long> idClass = Long.class;
+    Class<YourNode> nodeClass = YourNode.class;
+    
+    NestedNodeRepository.createDefault(idClass, nodeClass, entityManager)
+    NestedNodeRepository.createDiscriminated(idClass, nodeClass, entityManager, new CustomTreeDiscriminator());
  
 
 ```DelegatingNestedNodeRepository``` is a default, provided implementation of ```NestedNodeRepository```. If You need or want, You can implement your own inserter/mover/retriever/remover/rebuilder that fit your needs and configure the whole thing by hand:
@@ -90,7 +103,7 @@ In order to use NestedJ, You have to configure it. In 9 our of 10 cases you will
 ```
     CustomNestedNodeInserter<ID, N> inserter = new CustomNestedNodeInserter<>(entityManager, discriminator);
     CustomNestedNodeRetriever<ID, N> retriever = new CustomNestedNodeRetriever<>(entityManager, discriminator);
-    return new DelegatingNestedNodeRepository<>(inserter,
+    return new DelegatingNestedNodeRepository<>(idClass, nodeClass, inserter,
             new CustomNestedNodeMover<>(entityManager, discriminator),
             new CustomNestedNodeRemover<>(entityManager, discriminator),
             retriever,
@@ -107,34 +120,23 @@ Here is the example entity annotated with NestedJ - specific Annotations:
 
 @Entity
 @Table(name = "nested_nodes")
-public class TestNodeImpl extends DummyObject implements NestedNode<Long, TestNodeImpl> {
+public class TestNode implements NestedNode<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     protected Long id;
 
-    @Column(name = "node_name", nullable = false)
-    protected String name;
-
-    @LeftColumn
     @Column(name = "tree_left", nullable = false)
-    protected Long lft;
+    protected Long treeLeft;
 
-    @RightColumn
     @Column(name = "tree_right", nullable = false)
-    protected Long rgt;
+    protected Long treeRight;
 
-    @LevelColumn
     @Column(name = "tree_level", nullable = false)
-    protected Long lvl;
+    protected Long treeLevel;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "parent_id", nullable = true)
-    @ParentColumn
-    protected TestNodeImpl parent;
-
-    @Column(name = "discriminator", nullable = false)
-    protected String discriminator;
+    @Column(name = "parent_id")
+    protected Long parentId;
 }
 ```
 
@@ -144,11 +146,14 @@ I have ommited the getters and setters for shortage. As You see, there are 4 spe
 - Level
 - Parent
 
-Strictly speaking NestedSet doesn't need the parent mapping, but at the same time it's structure is so fragile, that this additional feature helps rebuild the tree if it becomes corrupted for some reason.
+Strictly speaking NestedSet doesn't need the parent id column, but at the same time it's structure is so fragile, that this additional feature helps rebuild the tree if it becomes corrupted for some reason.
 
-It is recommended that ```LeftColumn```, ```RightColumn``` and ```LevelColumn``` be non nullable. This will ensure better stability of the Nested Set structure.
+It is recommended that ```Left```, ```Right``` and ```Level``` be non nullable. This will ensure better stability of the Nested Set structure.
 
 The ID of the entity interface is a parametrized type, which allows for using Long as well as UUID or any other ```Serializable``` class.
+
+#####The ```NestedNode``` interface expects the implementing class to adhere to the JavaBean standard (field names should match getters and setters)
+
 
 ### Usage
 
@@ -190,7 +195,7 @@ You can have multiple independant trees in single Table/Entity. Just implement y
 
 ### Fixing / Initializing / Rebuilding the Tree
 
-Nested Set is a pretty fragile structure. One bad manual modification of the table can destroy it. Also inserting big number of records manually would be very hard if you'd have to insert them with the correct left/right/level values. Fortunately NestedJ can rebuild the Tree from scratch. Just use ```rebuild(Class<N> nodeClass)``` method on the ```NestedNodeRepository<ID, N>```.
+Nested Set is a pretty fragile structure. One bad manual modification of the table can destroy it. Also inserting big number of records manually would be very hard if you'd have to insert them with the correct treeLeft/treeRight/treeLevel values. Fortunately NestedJ can rebuild the Tree from scratch. Just use ```rebuild(Class<N> nodeClass)``` method on the ```NestedNodeRepository<ID, N>```.
 
 
 ### BUGS

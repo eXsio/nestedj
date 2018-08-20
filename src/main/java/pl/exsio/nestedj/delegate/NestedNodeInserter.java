@@ -28,8 +28,8 @@ import pl.exsio.nestedj.model.NestedNodeInfo;
 
 import java.io.Serializable;
 
-public interface NestedNodeInserter<ID extends Serializable, N extends NestedNode<ID, N>> extends NestedNodeHierarchyManipulator {
+public interface NestedNodeInserter<ID extends Serializable, N extends NestedNode<ID>> extends NestedNodeHierarchyManipulator {
 
-    void insert(N node, NestedNodeInfo<ID, N> parentInfo, Mode mode);
+    void insert(N node, NestedNodeInfo<ID, N> parentInfo, Mode mode, Class<N> nodeClass);
 
 }

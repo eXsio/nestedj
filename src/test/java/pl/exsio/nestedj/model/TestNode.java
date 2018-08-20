@@ -24,48 +24,35 @@
 package pl.exsio.nestedj.model;
 
 import com.google.common.base.MoreObjects;
-import pl.exsio.nestedj.annotation.LeftColumn;
-import pl.exsio.nestedj.annotation.LevelColumn;
-import pl.exsio.nestedj.annotation.ParentColumn;
-import pl.exsio.nestedj.annotation.RightColumn;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "nested_nodes")
-@Inheritance(strategy = InheritanceType.JOINED)
-public class TestNodeImpl extends DummyObject implements NestedNode<Long, TestNodeImpl> {
+public class TestNode implements NestedNode<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    protected Long id;
+    private Long id;
 
     @Column(name = "node_name", nullable = false)
-    protected String name;
+    private String name;
 
-    @LeftColumn
     @Column(name = "tree_left", nullable = false)
-    protected Long lft;
+    private Long treeLeft;
 
-    @RightColumn
     @Column(name = "tree_right", nullable = false)
-    protected Long rgt;
+    private Long treeRight;
 
-    @LevelColumn
     @Column(name = "tree_level", nullable = false)
-    protected Long lvl;
+    private Long treeLevel;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "parent_id", nullable = true)
-    @ParentColumn
-    protected TestNodeImpl parent;
+    @Column(name = "parent_id")
+    private Long parentId;
 
     @Column(name = "discriminator", nullable = false)
-    protected String discriminator;
-
-    public TestNodeImpl() {
-        super();
-    }
+    private String discriminator;
 
     @Override
     public Long getId() {
@@ -73,20 +60,24 @@ public class TestNodeImpl extends DummyObject implements NestedNode<Long, TestNo
     }
 
     @Override
-    public Long getLeft() {
-        return lft;
+    public Long getTreeLeft() {
+        return treeLeft;
     }
 
     @Override
-    public Long getRight() {
-        return rgt;
+    public Long getTreeRight() {
+        return treeRight;
     }
 
     @Override
-    public Long getLevel() {
-        return lvl;
+    public Long getTreeLevel() {
+        return treeLevel;
     }
 
+    @Override
+    public Long getParentId() {
+        return parentId;
+    }
 
     public String getDiscriminator() {
         return discriminator;
@@ -96,7 +87,7 @@ public class TestNodeImpl extends DummyObject implements NestedNode<Long, TestNo
         return name;
     }
 
-    public TestNodeImpl setName(String name) {
+    public TestNode setName(String name) {
         this.name = name;
         return this;
     }
@@ -106,28 +97,23 @@ public class TestNodeImpl extends DummyObject implements NestedNode<Long, TestNo
     }
 
     @Override
-    public TestNodeImpl getParent() {
-        return parent;
+    public void setTreeLeft(Long treeLeft) {
+        this.treeLeft = treeLeft;
     }
 
     @Override
-    public void setLeft(Long left) {
-        this.lft = left;
+    public void setTreeRight(Long treeRight) {
+        this.treeRight = treeRight;
     }
 
     @Override
-    public void setRight(Long right) {
-        this.rgt = right;
+    public void setTreeLevel(Long treeLevel) {
+        this.treeLevel = treeLevel;
     }
 
     @Override
-    public void setLevel(Long level) {
-        this.lvl = level;
-    }
-
-    @Override
-    public void setParent(TestNodeImpl parent) {
-        this.parent = parent;
+    public void setParentId(Long parentId) {
+        this.parentId = parentId;
     }
 
     @Override
@@ -135,25 +121,24 @@ public class TestNodeImpl extends DummyObject implements NestedNode<Long, TestNo
         return MoreObjects.toStringHelper(this)
                 .add("id", id)
                 .add("name", name)
-                .add("lft", lft)
-                .add("rgt", rgt)
-                .add("lvl", lvl)
-                .add("parent", parent != null ? parent.getId() : "null")
+                .add("treeLeft", treeLeft)
+                .add("treeRight", treeRight)
+                .add("treeLevel", treeLevel)
+                .add("parentId", parentId)
                 .add("discriminator", discriminator)
                 .toString();
     }
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof TestNodeImpl) {
-            return (this.hashCode() == o.hashCode());
-        } else {
-            return false;
-        }
+        if (this == o) return true;
+        if (!(o instanceof TestNode)) return false;
+        TestNode testNode = (TestNode) o;
+        return Objects.equals(getId(), testNode.getId());
     }
 
     @Override
     public int hashCode() {
-        return this.getId().intValue();
+        return Objects.hash(getId());
     }
 }

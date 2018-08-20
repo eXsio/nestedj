@@ -10,7 +10,7 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import pl.exsio.nestedj.discriminator.TestTreeDiscriminator;
-import pl.exsio.nestedj.model.TestNodeImpl;
+import pl.exsio.nestedj.model.TestNode;
 import pl.exsio.nestedj.repository.NestedNodeRepository;
 
 import javax.persistence.EntityManager;
@@ -70,8 +70,8 @@ public class TestConfiguration {
     }
 
     @Bean
-    public NestedNodeRepository<Long, TestNodeImpl> repository() {
-        return NestedNodeRepository.createDiscriminated(entityManager, new TestTreeDiscriminator());
+    public NestedNodeRepository<Long, TestNode> repository() {
+        return NestedNodeRepository.createDiscriminated(Long.class, TestNode.class, entityManager, new TestTreeDiscriminator());
     }
 
 }

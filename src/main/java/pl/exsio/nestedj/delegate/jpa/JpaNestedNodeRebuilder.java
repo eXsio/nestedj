@@ -42,9 +42,9 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
-import static pl.exsio.nestedj.util.NestedNodeUtil.*;
+import static pl.exsio.nestedj.model.NestedNode.*;
 
-public class JpaNestedNodeRebuilder<ID extends Serializable, N extends NestedNode<ID, N>> extends JpaNestedNodeDelegate<ID, N> implements NestedNodeRebuilder<ID, N> {
+public class JpaNestedNodeRebuilder<ID extends Serializable, N extends NestedNode<ID>> extends JpaNestedNodeDelegate<ID, N> implements NestedNodeRebuilder<ID, N> {
 
     private final NestedNodeInserter<ID, N> inserter;
 
@@ -57,13 +57,13 @@ public class JpaNestedNodeRebuilder<ID extends Serializable, N extends NestedNod
     }
 
     @Override
-    public void rebuildTree(Class<N> nodeClass) {
+    public void rebuildTree(Class<N> nodeClass, Class<ID> idClass) {
         N first = findFirstNestedNode(nodeClass);
         resetFirst(first, nodeClass);
-        restoreSiblings(first, nodeClass);
-        rebuildRecursively(first, nodeClass);
-        for (N node : getSiblings(first, nodeClass)) {
-            rebuildRecursively(node, nodeClass);
+        restoreSiblings(first, nodeClass, idClass);
+        rebuildRecursively(first, nodeClass, idClass);
+        for (N node : getSiblings(first.getId(), nodeClass)) {
+            rebuildRecursively(node, nodeClass, idClass);
         }
     }
 
@@ -73,18 +73,18 @@ public class JpaNestedNodeRebuilder<ID extends Serializable, N extends NestedNod
         CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
         Root<N> root = update.from(nodeClass);
         update
-                .set(root.<Long>get(left(nodeClass)), 0L)
-                .set(root.<Long>get(right(nodeClass)), 0L)
-                .set(root.<Long>get(level(nodeClass)), 0L)
+                .set(root.<Long>get(LEFT), 0L)
+                .set(root.<Long>get(RIGHT), 0L)
+                .set(root.<Long>get(LEVEL), 0L)
                 .where(getPredicates(cb, root));
 
         entityManager.createQuery(update).executeUpdate();
     }
 
-    private void rebuildRecursively(N parent, Class<N> nodeClass) {
+    private void rebuildRecursively(N parent, Class<N> nodeClass, Class<ID> idClass) {
         for (N child : getChildren(parent, nodeClass)) {
-            inserter.insert(child, getNodeInfo(parent, nodeClass), NestedNodeMover.Mode.LAST_CHILD);
-            rebuildRecursively(child, nodeClass);
+            inserter.insert(child, getNodeInfo(parent.getId(), nodeClass, idClass), NestedNodeMover.Mode.LAST_CHILD, nodeClass);
+            rebuildRecursively(child, nodeClass, idClass);
         }
     }
 
@@ -92,8 +92,8 @@ public class JpaNestedNodeRebuilder<ID extends Serializable, N extends NestedNod
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<N> select = cb.createQuery(nodeClass);
         Root<N> root = select.from(nodeClass);
-        select.where(getPredicates(cb, root, cb.isNull(root.get(parent(nodeClass)))))
-                .orderBy(cb.desc(root.get(id(nodeClass))));
+        select.where(getPredicates(cb, root, cb.isNull(root.get(PARENT_ID))))
+                .orderBy(cb.desc(root.get(ID)));
         return entityManager.createQuery(select).setMaxResults(1).getSingleResult();
     }
 
@@ -101,25 +101,25 @@ public class JpaNestedNodeRebuilder<ID extends Serializable, N extends NestedNod
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
         Root<N> root = update.from(nodeClass);
-        update.set(root.<Long>get(left(nodeClass)), 1L).set(root.<Long>get(right(nodeClass)), 2L)
-                .where(getPredicates(cb, root, cb.equal(update.getRoot().get(id(nodeClass)), first.getId())));
+        update.set(root.<Long>get(LEFT), 1L).set(root.<Long>get(RIGHT), 2L)
+                .where(getPredicates(cb, root, cb.equal(update.getRoot().get(ID), first.getId())));
         entityManager.createQuery(update).executeUpdate();
     }
 
-    private List<N> getSiblings(N first, Class<N> nodeClass) {
+    private List<N> getSiblings(ID first, Class<N> nodeClass) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<N> select = cb.createQuery(nodeClass);
         Root<N> root = select.from(nodeClass);
         select.where(getPredicates(cb, root,
-                cb.isNull(root.get(parent(nodeClass))),
-                cb.notEqual(root.get(id(nodeClass)), first.getId())
-        )).orderBy(cb.asc(root.get(id(nodeClass))));
+                cb.isNull(root.get(PARENT_ID)),
+                cb.notEqual(root.get(ID), first)
+        )).orderBy(cb.asc(root.get(ID)));
         return entityManager.createQuery(select).getResultList();
     }
 
-    private void restoreSiblings(N first, Class<N> nodeClass) {
-        for (N node : getSiblings(first, nodeClass)) {
-            inserter.insert(node, getNodeInfo(first, nodeClass), NestedNodeMover.Mode.NEXT_SIBLING);
+    private void restoreSiblings(N first, Class<N> nodeClass, Class<ID> idClass) {
+        for (N node : getSiblings(first.getId(), nodeClass)) {
+            inserter.insert(node, getNodeInfo(first.getId(), nodeClass, idClass), NestedNodeMover.Mode.NEXT_SIBLING, nodeClass);
         }
     }
 
@@ -127,15 +127,15 @@ public class JpaNestedNodeRebuilder<ID extends Serializable, N extends NestedNod
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<N> select = cb.createQuery(nodeClass);
         Root<N> root = select.from(nodeClass);
-        select.where(getPredicates(cb, root, cb.equal(root.get(parent(nodeClass)), parent))).orderBy(cb.asc(root.get(id(nodeClass))));
+        select.where(getPredicates(cb, root, cb.equal(root.get(PARENT_ID), parent.getId()))).orderBy(cb.asc(root.get(ID)));
         return entityManager.createQuery(select).getResultList();
     }
 
-    private NestedNodeInfo<ID, N> getNodeInfo(N node, Class<N> nodeClass) {
-        Preconditions.checkNotNull(node.getId());
-        Optional<NestedNodeInfo<ID, N>> nodeInfo = retriever.getNodeInfo(node.getId(), nodeClass);
+    private NestedNodeInfo<ID, N> getNodeInfo(ID nodeId, Class<N> nodeClass, Class<ID> idClass) {
+        Preconditions.checkNotNull(nodeId);
+        Optional<NestedNodeInfo<ID, N>> nodeInfo = retriever.getNodeInfo(nodeId, nodeClass, idClass);
         if (!nodeInfo.isPresent()) {
-            throw new InvalidNodeException(String.format("Couldn't find node with Id %s and class %s", node.getId(), nodeClass));
+            throw new InvalidNodeException(String.format("Couldn't find node with Id %s and class %s", nodeId, nodeClass));
         }
         return nodeInfo.get();
     }
