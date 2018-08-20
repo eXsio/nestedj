@@ -197,7 +197,7 @@ It is recommended that ```Left```, ```Right``` and ```Level``` be non nullable. 
 
 The ID of the entity interface is a parametrized type, which allows for using Long as well as UUID or any other ```Serializable``` class.
 
-#####The ```NestedNode``` interface expects the implementing class to adhere to the JavaBean standard (field names should match getters and setters)
+##### The ```NestedNode``` interface expects the implementing class to adhere to the JavaBean standard (field names should match getters and setters)
 
 
 ### Usage
