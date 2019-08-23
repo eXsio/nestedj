@@ -51,6 +51,10 @@ public interface NestedNodeRepository<ID extends Serializable, N extends NestedN
 
     Optional<N> getParent(N node);
 
+    Optional<N> getPrevSibling(N node);
+
+    Optional<N> getNextSibling(N node);
+
     Iterable<N> getParents(N node);
 
     Iterable<N> getTreeAsList(N node);

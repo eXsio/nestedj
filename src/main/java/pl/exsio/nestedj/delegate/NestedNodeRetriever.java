@@ -38,6 +38,10 @@ public interface NestedNodeRetriever<ID extends Serializable, N extends NestedNo
 
     Optional<N> getParent(N node, Class<N> nodeClass);
 
+    Optional<N> getPrevSibling(N node, Class<N> nodeClass);
+
+    Optional<N> getNextSibling(N node, Class<N> nodeClass);
+
     Tree<ID, N> getTree(N node, Class<N> nodeClass);
 
     Iterable<N> getParents(N node, Class<N> nodeClass);
