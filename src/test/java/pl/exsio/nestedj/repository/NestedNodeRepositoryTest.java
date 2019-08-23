@@ -33,8 +33,7 @@ import pl.exsio.nestedj.model.Tree;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 @Transactional
 public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
@@ -195,6 +194,78 @@ public class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         assertTrue(parents.get(2).getName().equals("a"));
         assertSecondTreeIntact();
     }
+
+    @Test
+    public void testGetPrevSibling() {
+        TestNode c = this.findNode("c");
+        Optional<TestNode> prevSibling = this.nodeRepository.getPrevSibling(c);
+        assertTrue(prevSibling.get().getName().equals("b"));
+    }
+
+    @Test
+    public void testGetNextSibling() {
+        TestNode b = this.findNode("b");
+        Optional<TestNode> nextSibling = this.nodeRepository.getNextSibling(b);
+        assertTrue(nextSibling.get().getName().equals("c"));
+    }
+
+    @Test
+    public void testGetPrevSiblingRoot() {
+
+      TestNode y = this.createTestNode("y");
+      try {
+          y.setTreeLeft(0L);
+          y.setTreeRight(0L);
+          y.setTreeLevel(0L);
+          this.em.persist(y);
+          this.em.flush();
+          this.nodeRepository.rebuildTree();
+          em.refresh(y);
+      } catch ( InvalidNodesHierarchyException ex) {
+          fail("something went wrong while creating a new root level node:" + ex.getMessage());
+      }
+
+      // ensure node y was built as a root level node
+      assertTrue(y.getTreeLevel() == 0);
+      assertTrue(y.getParentId() == null);
+      assertTrue(y.getTreeLeft() == 17);
+      assertTrue(y.getTreeRight() == 18);
+
+      Optional<TestNode> prevSiblingRoot = this.nodeRepository.getPrevSibling(y);
+      assertTrue(prevSiblingRoot.isPresent());
+      assertTrue(prevSiblingRoot.get().getName().equals("a"));
+      assertSecondTreeIntact();
+    }
+
+  @Test
+  public void testGetNextSiblingRoot() {
+
+    TestNode z = this.createTestNode("z");
+    try {
+        z.setTreeLeft(0L);
+        z.setTreeRight(0L);
+        z.setTreeLevel(0L);
+        this.em.persist(z);
+        this.em.flush();
+        this.nodeRepository.rebuildTree();
+        em.refresh(z);
+    } catch (InvalidNodesHierarchyException ex) {
+      fail("something went wrong while creating a new root level node:" + ex.getMessage());
+    }
+
+    // ensure node z was built as a root level node
+    assertTrue(z.getTreeLevel() == 0);
+    assertTrue(z.getParentId() == null);
+    assertTrue(z.getTreeLeft() == 17);
+    assertTrue(z.getTreeRight() == 18);
+
+    TestNode a = this.findNode("a");
+
+    Optional<TestNode> nextSiblingRoot = this.nodeRepository.getNextSibling(a);
+    assertTrue(nextSiblingRoot.isPresent());
+    assertTrue(nextSiblingRoot.get().getName().equals("z"));
+    assertSecondTreeIntact();
+  }
 
     @Test
     public void testGetTree() {

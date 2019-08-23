@@ -156,6 +156,16 @@ public class DelegatingNestedNodeRepository<ID extends Serializable, N extends N
     }
 
     @Override
+    public Optional<N> getPrevSibling(N node) {
+        return this.retriever.getPrevSibling(node, nodeClass);
+    }
+
+    @Override
+    public Optional<N> getNextSibling(N node) {
+        return this.retriever.getNextSibling(node, nodeClass);
+    }
+
+    @Override
     public Tree<ID, N> getTree(N node) {
         return this.retriever.getTree(node, nodeClass);
     }

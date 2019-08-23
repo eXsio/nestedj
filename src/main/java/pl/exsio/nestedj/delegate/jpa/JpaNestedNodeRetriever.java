@@ -117,6 +117,38 @@ public class JpaNestedNodeRetriever<ID extends Serializable, N extends NestedNod
     }
 
     @Override
+    public Optional<N> getPrevSibling(N node, Class<N> nodeClass) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<N> select = cb.createQuery(nodeClass);
+        Root<N> root = select.from(nodeClass);
+        select.where(getPredicates(cb, root,
+            cb.equal(root.<Long>get(RIGHT), node.getTreeLeft() - 1),
+            cb.equal(root.<Long>get(LEVEL), node.getTreeLevel())
+        )).orderBy(cb.asc(root.<Long>get(LEFT)));
+        try {
+            return Optional.of(entityManager.createQuery(select).setMaxResults(1).getSingleResult());
+        } catch (NoResultException ex) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Optional<N> getNextSibling(N node, Class<N> nodeClass) {
+      CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+      CriteriaQuery<N> select = cb.createQuery(nodeClass);
+      Root<N> root = select.from(nodeClass);
+      select.where(getPredicates(cb, root,
+          cb.equal(root.<Long>get(LEFT), node.getTreeRight() + 1),
+          cb.equal(root.<Long>get(LEVEL), node.getTreeLevel())
+      )).orderBy(cb.asc(root.<Long>get(LEFT)));
+      try {
+          return Optional.of(entityManager.createQuery(select).setMaxResults(1).getSingleResult());
+      } catch (NoResultException ex) {
+          return Optional.empty();
+      }
+    }
+
+    @Override
     public Optional<NestedNodeInfo<ID, N>> getNodeInfo(ID nodeId, Class<N> nodeClass, Class<ID> idClass) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<NestedNodeInfo> select = cb.createQuery(NestedNodeInfo.class);
