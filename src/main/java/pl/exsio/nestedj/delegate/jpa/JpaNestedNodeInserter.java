@@ -24,6 +24,7 @@
 package pl.exsio.nestedj.delegate.jpa;
 
 import pl.exsio.nestedj.delegate.NestedNodeInserter;
+import pl.exsio.nestedj.delegate.query.NestedNodeInsertingQueryDelegate;
 import pl.exsio.nestedj.discriminator.TreeDiscriminator;
 import pl.exsio.nestedj.model.NestedNode;
 import pl.exsio.nestedj.model.NestedNodeInfo;
@@ -39,15 +40,17 @@ import static pl.exsio.nestedj.model.NestedNode.LEFT;
 import static pl.exsio.nestedj.model.NestedNode.RIGHT;
 
 
-public class JpaNestedNodeInserter<ID extends Serializable, N extends NestedNode<ID>> extends JpaNestedNodeDelegate<ID, N> implements NestedNodeInserter<ID, N> {
+public class JpaNestedNodeInserter<ID extends Serializable, N extends NestedNode<ID>> implements NestedNodeInserter<ID, N> {
 
-    public JpaNestedNodeInserter(EntityManager entityManager, TreeDiscriminator<ID, N> treeDiscriminator) {
-        super(entityManager, treeDiscriminator);
+    private final NestedNodeInsertingQueryDelegate<ID, N> queryDelegate;
+
+    public JpaNestedNodeInserter(NestedNodeInsertingQueryDelegate<ID, N> queryDelegate) {
+        this.queryDelegate = queryDelegate;
     }
 
     @Override
-    public void insert(N node, NestedNodeInfo<ID, N> parentInfo, Mode mode, Class<N> nodeClass) {
-        makeSpaceForNewElement(getMoveFrom(parentInfo, mode), mode, nodeClass);
+    public void insert(N node, NestedNodeInfo<ID, N> parentInfo, Mode mode) {
+        makeSpaceForNewElement(getMoveFrom(parentInfo, mode), mode);
         insertNodeIntoTree(parentInfo, node, mode);
     }
 
@@ -59,26 +62,12 @@ public class JpaNestedNodeInserter<ID extends Serializable, N extends NestedNode
         node.setTreeRight(right);
         node.setTreeLevel(level);
         node.setParentId(this.getNodeParent(parent, mode).orElse(null));
-        entityManager.persist(node);
+        queryDelegate.saveNode(node);
     }
 
-    private void makeSpaceForNewElement(Long from, Mode mode, Class<N> nodeClass) {
-        this.updateFields(from, mode, nodeClass, RIGHT);
-        this.updateFields(from, mode, nodeClass, LEFT);
-    }
-
-    private void updateFields(Long from, Mode mode, Class<N> nodeClass, String fieldName) {
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
-        Root<N> root = update.from(nodeClass);
-
-        update.set(root.<Long>get(fieldName), cb.sum(root.get(fieldName), 2L));
-        if (applyGte(mode)) {
-            update.where(getPredicates(cb, root, cb.greaterThanOrEqualTo(root.get(fieldName), from)));
-        } else {
-            update.where(getPredicates(cb, root, cb.greaterThan(root.get(fieldName), from)));
-        }
-        entityManager.createQuery(update).executeUpdate();
+    private void makeSpaceForNewElement(Long from, Mode mode) {
+        queryDelegate.updateFields(from, mode, RIGHT, applyGte(mode));
+        queryDelegate.updateFields(from, mode, LEFT, applyGte(mode));
     }
 
     private Long getMoveFrom(NestedNodeInfo<ID, N> parent, Mode mode) {

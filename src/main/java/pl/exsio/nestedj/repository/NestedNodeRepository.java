@@ -70,7 +70,7 @@ public interface NestedNodeRepository<ID extends Serializable, N extends NestedN
     }
 
     static <ID extends Serializable, N extends NestedNode<ID>> NestedNodeRepository<ID, N> createDiscriminated(Class<ID> idClass, Class<N> nodeClass, EntityManager entityManager, TreeDiscriminator<ID, N> discriminator) {
-        JpaNestedNodeInserter<ID, N> inserter = new JpaNestedNodeInserter<>(entityManager, discriminator);
+        JpaNestedNodeInserter<ID, N> inserter = new JpaNestedNodeInserter<>(entityManager, discriminator, queryDelegate);
         JpaNestedNodeRetriever<ID, N> retriever = new JpaNestedNodeRetriever<>(entityManager, discriminator);
         return new DelegatingNestedNodeRepository<>(
                 idClass,
