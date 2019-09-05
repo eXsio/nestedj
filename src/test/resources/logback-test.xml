@@ -7,13 +7,13 @@
         </encoder>
     </appender>
 
-    <root treeLevel="OFF">
+    <root level="OFF">
         <appender-ref ref="STDOUT"/>
     </root>
 
-    <logger name="org.hibernate" treeLevel="INFO"/>
+    <logger name="org.hibernate" level="INFO"/>
     <!--<logger name="org.hibernate.tool.schema.internal" treeLevel="ERROR"/>-->
-    <logger name="org.springframework" treeLevel="INFO" />
-    <logger name="pl.exsio" treeLevel="INFO" />
+    <logger name="org.springframework" level="INFO" />
+    <logger name="pl.exsio" level="INFO" />
 
 </configuration>
