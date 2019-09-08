@@ -103,15 +103,15 @@ public class DelegatingNestedNodeRepository<ID extends Serializable, N extends N
                     this.mover.move(nodeInfo.get(), parentInfo.get(), mode);
                 } else if (allowNullableTreeFields) {
                     LOGGER.warn("Nullable tree fields allowed. Trying to perform an insert on an existing, invalid tree node: {}", nodeInfo.get());
-                    this.inserter.insert(node, parentInfo.get(), mode, nodeClass);
+                    this.inserter.insert(node, parentInfo.get(), mode);
                 } else {
                     throw new InvalidNodeException(String.format("Current configuration doesn't allow nullable tree fields: %s", nodeInfo.get()));
                 }
             } else {
-                this.inserter.insert(node, parentInfo.get(), mode, nodeClass);
+                this.inserter.insert(node, parentInfo.get(), mode);
             }
         } else {
-            this.inserter.insert(node, parentInfo.get(), mode, nodeClass);
+            this.inserter.insert(node, parentInfo.get(), mode);
         }
     }
 

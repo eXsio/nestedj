@@ -1,4 +1,4 @@
-/* 
+/*
  * The MIT License
  *
  * Copyright 2015 exsio.
@@ -24,123 +24,65 @@
 package pl.exsio.nestedj.delegate.jpa;
 
 import pl.exsio.nestedj.delegate.NestedNodeMover;
-import pl.exsio.nestedj.discriminator.TreeDiscriminator;
+import pl.exsio.nestedj.delegate.query.NestedNodeMovingQueryDelegate;
 import pl.exsio.nestedj.ex.InvalidNodesHierarchyException;
 import pl.exsio.nestedj.model.NestedNode;
 import pl.exsio.nestedj.model.NestedNodeInfo;
 
-import javax.persistence.EntityManager;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.CriteriaUpdate;
-import javax.persistence.criteria.Root;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
-import static pl.exsio.nestedj.model.NestedNode.*;
+import static pl.exsio.nestedj.model.NestedNode.LEFT;
+import static pl.exsio.nestedj.model.NestedNode.RIGHT;
 
-public class JpaNestedNodeMover<ID extends Serializable, N extends NestedNode<ID>> extends JpaNestedNodeDelegate<ID, N> implements NestedNodeMover<ID, N> {
+public class JpaNestedNodeMover<ID extends Serializable, N extends NestedNode<ID>> implements NestedNodeMover<ID, N> {
 
-    private enum Sign {
+    private final static long DELTA_MULTIPLIER = 2L;
+
+    public enum Sign {
         PLUS, MINUS
     }
 
-    public JpaNestedNodeMover(EntityManager entityManager, TreeDiscriminator<ID, N> treeDiscriminator) {
-        super(entityManager, treeDiscriminator);
+    private final NestedNodeMovingQueryDelegate<ID, N> queryDelegate;
+
+    public JpaNestedNodeMover(NestedNodeMovingQueryDelegate<ID, N> queryDelegate) {
+        this.queryDelegate = queryDelegate;
     }
 
     @Override
     public void move(NestedNodeInfo<ID, N> nodeInfo, NestedNodeInfo<ID, N> parentInfo, Mode mode) {
-        Class<N> nodeClass = nodeInfo.getNodeClass();
         if (!canMoveNodeToSelectedParent(nodeInfo, parentInfo)) {
             throw new InvalidNodesHierarchyException("You cannot move a parent node to it's child or move a node to itself");
         }
-        List<Long> nodeIds = getNodeIds(nodeInfo);
+        List<ID> nodeIds = queryDelegate.getNodeIds(nodeInfo);
 
         Sign sign = getSign(nodeInfo, parentInfo, mode);
         Long start = getStart(nodeInfo, parentInfo, mode, sign);
         Long stop = getStop(nodeInfo, parentInfo, mode, sign);
         Long delta = getDelta(nodeIds);
-        makeSpaceForMovedElement(sign, delta, start, stop, nodeClass);
+        makeSpaceForMovedElement(sign, delta, start, stop);
 
         Long nodeDelta = getNodeDelta(start, stop);
         Sign nodeSign = getNodeSign(sign);
         Long levelModificator = getLevelModificator(nodeInfo, parentInfo, mode);
-        performMove(nodeSign, nodeDelta, nodeIds, levelModificator, nodeClass);
+        queryDelegate.performMove(nodeSign, nodeDelta, nodeIds, levelModificator);
 
         Optional<ID> newParent = getNewParentId(parentInfo, mode);
-        updateParentField(newParent, nodeInfo);
-    }
-
-    private void makeSpaceForMovedElement(Sign sign, Long delta, Long start, Long stop, Class<N> nodeClass) {
-        updateFields(sign, delta, start, stop, nodeClass, RIGHT);
-        updateFields(sign, delta, start, stop, nodeClass, LEFT);
-    }
-
-    private void updateParentField(Optional<ID> newParent, NestedNodeInfo<ID, N> node) {
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaUpdate<N> update = cb.createCriteriaUpdate(node.getNodeClass());
-        Root<N> root = update.from(node.getNodeClass());
-
-        update.set(root.get(PARENT_ID), newParent.orElse(null))
-                .where(getPredicates(cb, root, cb.equal(root.get(ID), node.getId())));
-
-        entityManager.createQuery(update).executeUpdate();
-    }
-
-    private void performMove(Sign nodeSign, Long nodeDelta, List nodeIds, Long levelModificator, Class<N> nodeClass) {
-        if (!nodeIds.isEmpty()) {
-            CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-            CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
-            Root<N> root = update.from(nodeClass);
-
-            update.set(root.<Long>get(LEVEL), cb.sum(root.get(LEVEL), levelModificator));
-            if (Sign.MINUS.equals(nodeSign)) {
-                update.set(root.<Long>get(RIGHT), cb.diff(root.get(RIGHT), nodeDelta));
-                update.set(root.<Long>get(LEFT), cb.diff(root.get(LEFT), nodeDelta));
-            } else if (Sign.PLUS.equals(nodeSign)) {
-                update.set(root.<Long>get(RIGHT), cb.sum(root.get(RIGHT), nodeDelta));
-                update.set(root.<Long>get(LEFT), cb.sum(root.get(LEFT), nodeDelta));
-            }
-            update.where(getPredicates(cb, root, root.get(ID).in(nodeIds)));
-
-            entityManager.createQuery(update).executeUpdate();
+        if (newParent.isPresent()) {
+            queryDelegate.updateParentField(newParent.get(), nodeInfo);
+        } else {
+            queryDelegate.clearParentField(nodeInfo);
         }
     }
 
-    private void updateFields(Sign sign, Long delta, Long start, Long stop, Class<N> nodeClass, String field) {
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
-        Root<N> root = update.from(nodeClass);
-
-        if (Sign.MINUS.equals(sign)) {
-            update.set(root.<Long>get(field), cb.diff(root.get(field), delta));
-        } else if (Sign.PLUS.equals(sign)) {
-            update.set(root.<Long>get(field), cb.sum(root.get(field), delta));
-        }
-        update.where(getPredicates(cb, root,
-                cb.greaterThan(root.get(field), start),
-                cb.lessThan(root.get(field), stop)
-        ));
-
-        entityManager.createQuery(update).executeUpdate();
+    private void makeSpaceForMovedElement(Sign sign, Long delta, Long start, Long stop) {
+        queryDelegate.updateFields(sign, delta, start, stop, RIGHT);
+        queryDelegate.updateFields(sign, delta, start, stop, LEFT);
     }
 
     private boolean canMoveNodeToSelectedParent(NestedNodeInfo<ID, N> node, NestedNodeInfo<ID, N> parent) {
         return !node.getId().equals(parent.getId()) && (node.getLeft() >= parent.getLeft() || node.getRight() <= parent.getRight());
-    }
-
-    private List<Long> getNodeIds(NestedNodeInfo<ID, N> node) {
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Long> select = cb.createQuery(Long.class);
-        Root<N> root = select.from(node.getNodeClass());
-        select.select(root.get(ID)).where(
-                getPredicates(cb, root,
-                        cb.greaterThanOrEqualTo(root.get(LEFT), node.getLeft()),
-                        cb.lessThanOrEqualTo(root.get(RIGHT), node.getRight())
-                ));
-        return entityManager.createQuery(select).getResultList();
     }
 
     private Optional<ID> getNewParentId(NestedNodeInfo<ID, N> parent, Mode mode) {
@@ -175,8 +117,8 @@ public class JpaNestedNodeMover<ID extends Serializable, N extends NestedNode<ID
         return stop - start - 1;
     }
 
-    private Long getDelta(List<Long> nodeIds) {
-        return (long) nodeIds.size() * 2;
+    private Long getDelta(List<ID> nodeIds) {
+        return nodeIds.size() * DELTA_MULTIPLIER;
     }
 
     private Sign getNodeSign(Sign sign) {

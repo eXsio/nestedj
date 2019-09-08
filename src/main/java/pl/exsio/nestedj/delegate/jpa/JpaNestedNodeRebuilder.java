@@ -83,7 +83,7 @@ public class JpaNestedNodeRebuilder<ID extends Serializable, N extends NestedNod
 
     private void rebuildRecursively(N parent, Class<N> nodeClass, Class<ID> idClass) {
         for (N child : getChildren(parent, nodeClass)) {
-            inserter.insert(child, getNodeInfo(parent.getId(), nodeClass, idClass), NestedNodeMover.Mode.LAST_CHILD, nodeClass);
+            inserter.insert(child, getNodeInfo(parent.getId(), nodeClass, idClass), NestedNodeMover.Mode.LAST_CHILD);
             rebuildRecursively(child, nodeClass, idClass);
         }
     }
@@ -119,7 +119,7 @@ public class JpaNestedNodeRebuilder<ID extends Serializable, N extends NestedNod
 
     private void restoreSiblings(N first, Class<N> nodeClass, Class<ID> idClass) {
         for (N node : getSiblings(first.getId(), nodeClass)) {
-            inserter.insert(node, getNodeInfo(first.getId(), nodeClass, idClass), NestedNodeMover.Mode.NEXT_SIBLING, nodeClass);
+            inserter.insert(node, getNodeInfo(first.getId(), nodeClass, idClass), NestedNodeMover.Mode.NEXT_SIBLING);
         }
     }
 

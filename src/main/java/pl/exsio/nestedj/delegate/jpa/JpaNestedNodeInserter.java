@@ -25,14 +25,9 @@ package pl.exsio.nestedj.delegate.jpa;
 
 import pl.exsio.nestedj.delegate.NestedNodeInserter;
 import pl.exsio.nestedj.delegate.query.NestedNodeInsertingQueryDelegate;
-import pl.exsio.nestedj.discriminator.TreeDiscriminator;
 import pl.exsio.nestedj.model.NestedNode;
 import pl.exsio.nestedj.model.NestedNodeInfo;
 
-import javax.persistence.EntityManager;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaUpdate;
-import javax.persistence.criteria.Root;
 import java.io.Serializable;
 import java.util.Optional;
 
@@ -62,12 +57,18 @@ public class JpaNestedNodeInserter<ID extends Serializable, N extends NestedNode
         node.setTreeRight(right);
         node.setTreeLevel(level);
         node.setParentId(this.getNodeParent(parent, mode).orElse(null));
-        queryDelegate.saveNode(node);
+        queryDelegate.insert(node);
     }
 
     private void makeSpaceForNewElement(Long from, Mode mode) {
-        queryDelegate.updateFields(from, mode, RIGHT, applyGte(mode));
-        queryDelegate.updateFields(from, mode, LEFT, applyGte(mode));
+        if(applyGte(mode)) {
+            queryDelegate.updateFieldsGreaterThanOrEqualTo(from, RIGHT);
+            queryDelegate.updateFieldsGreaterThanOrEqualTo(from, LEFT);
+        } else {
+            queryDelegate.updateFieldsGreaterThan(from, RIGHT);
+            queryDelegate.updateFieldsGreaterThan(from, LEFT);
+        }
+
     }
 
     private Long getMoveFrom(NestedNodeInfo<ID, N> parent, Mode mode) {

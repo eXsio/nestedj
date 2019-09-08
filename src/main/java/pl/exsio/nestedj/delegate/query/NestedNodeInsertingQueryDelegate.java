@@ -4,11 +4,11 @@ import pl.exsio.nestedj.model.NestedNode;
 
 import java.io.Serializable;
 
-import static pl.exsio.nestedj.delegate.NestedNodeHierarchyManipulator.Mode;
-
 public interface NestedNodeInsertingQueryDelegate<ID extends Serializable, N extends NestedNode<ID>> {
 
-    void saveNode(N node);
+    void insert(N node);
 
-    void updateFields(Long from, Mode mode, String fieldName, boolean applyGte);
+    void updateFieldsGreaterThan(Long from, String fieldName);
+
+    void updateFieldsGreaterThanOrEqualTo(Long from, String fieldName);
 }
