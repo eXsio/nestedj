@@ -1,7 +1,6 @@
 package pl.exsio.nestedj.delegate.query.jpa;
 
 import com.google.common.base.Preconditions;
-import pl.exsio.nestedj.delegate.jpa.JpaNestedNodeMover;
 import pl.exsio.nestedj.delegate.query.NestedNodeMovingQueryDelegate;
 import pl.exsio.nestedj.discriminator.TreeDiscriminator;
 import pl.exsio.nestedj.model.NestedNode;
@@ -21,37 +20,12 @@ public class JpaNestedNodeMovingQueryDelegateImpl<ID extends Serializable, N ext
         extends JpaNestedNodeQueryDelegate<ID, N>
         implements NestedNodeMovingQueryDelegate<ID, N> {
 
+    private enum Mode {
+        UP, DOWN
+    }
+
     public JpaNestedNodeMovingQueryDelegateImpl(EntityManager entityManager, TreeDiscriminator<ID, N> treeDiscriminator, Class<N> nodeClass, Class<ID> idClass) {
         super(entityManager, treeDiscriminator, nodeClass, idClass);
-    }
-
-    @Override
-    public void updateParentField(ID newParentId, NestedNodeInfo<ID, N> node) {
-        Preconditions.checkNotNull(newParentId);
-        doUpdateParentField(newParentId, node);
-    }
-
-    @Override
-    public void clearParentField(NestedNodeInfo<ID, N> node) {
-        doUpdateParentField(null, node);
-    }
-
-    @Override
-    public void updateFields(JpaNestedNodeMover.Sign sign, Long delta, Long start, Long stop, String field) {
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
-        Root<N> root = update.from(nodeClass);
-
-        if (JpaNestedNodeMover.Sign.MINUS.equals(sign)) {
-            update.set(root.<Long>get(field), cb.diff(root.get(field), delta));
-        } else if (JpaNestedNodeMover.Sign.PLUS.equals(sign)) {
-            update.set(root.<Long>get(field), cb.sum(root.get(field), delta));
-        }
-        update.where(getPredicates(cb, root,
-                cb.greaterThan(root.get(field), start),
-                cb.lessThan(root.get(field), stop)
-        ));
-        entityManager.createQuery(update).executeUpdate();
     }
 
     @Override
@@ -68,16 +42,63 @@ public class JpaNestedNodeMovingQueryDelegateImpl<ID extends Serializable, N ext
     }
 
     @Override
-    public void performMove(JpaNestedNodeMover.Sign nodeSign, Long nodeDelta, List<ID> nodeIds, Long levelModificator) {
+    public void updateFieldsUp(Long delta, Long start, Long stop, String field) {
+        updateFields(Mode.UP, delta, start, stop, field);
+    }
+
+    @Override
+    public void updateFieldsDown(Long delta, Long start, Long stop, String field) {
+        updateFields(Mode.DOWN, delta, start, stop, field);
+    }
+
+    @Override
+    public void performMoveUp(Long nodeDelta, List<ID> nodeIds, Long levelModificator) {
+        performMove(Mode.UP, nodeDelta, nodeIds, levelModificator);
+    }
+
+    @Override
+    public void performMoveDown(Long nodeDelta, List<ID> nodeIds, Long levelModificator) {
+        performMove(Mode.DOWN, nodeDelta, nodeIds, levelModificator);
+    }
+
+    @Override
+    public void updateParentField(ID newParentId, NestedNodeInfo<ID, N> node) {
+        Preconditions.checkNotNull(newParentId);
+        doUpdateParentField(newParentId, node);
+    }
+
+    @Override
+    public void clearParentField(NestedNodeInfo<ID, N> node) {
+        doUpdateParentField(null, node);
+    }
+
+    private void updateFields(Mode mode, Long delta, Long start, Long stop, String field) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
+        Root<N> root = update.from(nodeClass);
+
+        if (Mode.DOWN.equals(mode)) {
+            update.set(root.<Long>get(field), cb.diff(root.get(field), delta));
+        } else if (Mode.UP.equals(mode)) {
+            update.set(root.<Long>get(field), cb.sum(root.get(field), delta));
+        }
+        update.where(getPredicates(cb, root,
+                cb.greaterThan(root.get(field), start),
+                cb.lessThan(root.get(field), stop)
+        ));
+        entityManager.createQuery(update).executeUpdate();
+    }
+
+    private void performMove(Mode mode, Long nodeDelta, List<ID> nodeIds, Long levelModificator) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
         Root<N> root = update.from(nodeClass);
 
         update.set(root.<Long>get(LEVEL), cb.sum(root.get(LEVEL), levelModificator));
-        if (JpaNestedNodeMover.Sign.MINUS.equals(nodeSign)) {
+        if (Mode.DOWN.equals(mode)) {
             update.set(root.<Long>get(RIGHT), cb.diff(root.get(RIGHT), nodeDelta));
             update.set(root.<Long>get(LEFT), cb.diff(root.get(LEFT), nodeDelta));
-        } else if (JpaNestedNodeMover.Sign.PLUS.equals(nodeSign)) {
+        } else if (Mode.UP.equals(mode)) {
             update.set(root.<Long>get(RIGHT), cb.sum(root.get(RIGHT), nodeDelta));
             update.set(root.<Long>get(LEFT), cb.sum(root.get(LEFT), nodeDelta));
         }

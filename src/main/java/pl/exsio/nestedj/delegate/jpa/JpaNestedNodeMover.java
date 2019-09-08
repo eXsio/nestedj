@@ -40,7 +40,7 @@ public class JpaNestedNodeMover<ID extends Serializable, N extends NestedNode<ID
 
     private final static long DELTA_MULTIPLIER = 2L;
 
-    public enum Sign {
+    private enum Sign {
         PLUS, MINUS
     }
 
@@ -66,8 +66,11 @@ public class JpaNestedNodeMover<ID extends Serializable, N extends NestedNode<ID
         Long nodeDelta = getNodeDelta(start, stop);
         Sign nodeSign = getNodeSign(sign);
         Long levelModificator = getLevelModificator(nodeInfo, parentInfo, mode);
-        queryDelegate.performMove(nodeSign, nodeDelta, nodeIds, levelModificator);
+        performMove(nodeIds, nodeDelta, nodeSign, levelModificator);
+        updateParent(nodeInfo, parentInfo, mode);
+    }
 
+    private void updateParent(NestedNodeInfo<ID, N> nodeInfo, NestedNodeInfo<ID, N> parentInfo, Mode mode) {
         Optional<ID> newParent = getNewParentId(parentInfo, mode);
         if (newParent.isPresent()) {
             queryDelegate.updateParentField(newParent.get(), nodeInfo);
@@ -76,9 +79,22 @@ public class JpaNestedNodeMover<ID extends Serializable, N extends NestedNode<ID
         }
     }
 
+    private void performMove(List<ID> nodeIds, Long nodeDelta, Sign nodeSign, Long levelModificator) {
+        if(Sign.PLUS.equals(nodeSign)) {
+            queryDelegate.performMoveUp(nodeDelta, nodeIds, levelModificator);
+        } else if(Sign.MINUS.equals(nodeSign)) {
+            queryDelegate.performMoveDown(nodeDelta, nodeIds, levelModificator);
+        }
+    }
+
     private void makeSpaceForMovedElement(Sign sign, Long delta, Long start, Long stop) {
-        queryDelegate.updateFields(sign, delta, start, stop, RIGHT);
-        queryDelegate.updateFields(sign, delta, start, stop, LEFT);
+        if(Sign.PLUS.equals(sign)) {
+            queryDelegate.updateFieldsUp(delta, start, stop, RIGHT);
+            queryDelegate.updateFieldsUp(delta, start, stop, LEFT);
+        } else if(Sign.MINUS.equals(sign)) {
+            queryDelegate.updateFieldsDown(delta, start, stop, RIGHT);
+            queryDelegate.updateFieldsDown(delta, start, stop, LEFT);
+        }
     }
 
     private boolean canMoveNodeToSelectedParent(NestedNodeInfo<ID, N> node, NestedNodeInfo<ID, N> parent) {
