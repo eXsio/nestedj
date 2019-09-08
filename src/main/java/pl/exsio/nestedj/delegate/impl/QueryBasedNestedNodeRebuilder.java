@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package pl.exsio.nestedj.delegate.jpa;
+package pl.exsio.nestedj.delegate.impl;
 
 import com.google.common.base.Preconditions;
 import pl.exsio.nestedj.delegate.NestedNodeInserter;
@@ -44,13 +44,13 @@ import java.util.Optional;
 
 import static pl.exsio.nestedj.model.NestedNode.*;
 
-public class JpaNestedNodeRebuilder<ID extends Serializable, N extends NestedNode<ID>> extends JpaNestedNodeDelegate<ID, N> implements NestedNodeRebuilder<ID, N> {
+public class QueryBasedNestedNodeRebuilder<ID extends Serializable, N extends NestedNode<ID>> extends QueryBasedNestedNodeDelegate<ID, N> implements NestedNodeRebuilder<ID, N> {
 
     private final NestedNodeInserter<ID, N> inserter;
 
     private final NestedNodeRetriever<ID, N> retriever;
 
-    public JpaNestedNodeRebuilder(EntityManager entityManager, TreeDiscriminator<ID, N> treeDiscriminator, NestedNodeInserter<ID, N> inserter, NestedNodeRetriever<ID, N> retriever) {
+    public QueryBasedNestedNodeRebuilder(EntityManager entityManager, TreeDiscriminator<ID, N> treeDiscriminator, NestedNodeInserter<ID, N> inserter, NestedNodeRetriever<ID, N> retriever) {
         super(entityManager, treeDiscriminator);
         this.inserter = inserter;
         this.retriever = retriever;

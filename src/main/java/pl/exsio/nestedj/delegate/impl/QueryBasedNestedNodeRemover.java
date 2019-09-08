@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package pl.exsio.nestedj.delegate.jpa;
+package pl.exsio.nestedj.delegate.impl;
 
 import pl.exsio.nestedj.delegate.NestedNodeRemover;
 import pl.exsio.nestedj.discriminator.TreeDiscriminator;
@@ -37,9 +37,9 @@ import java.util.Optional;
 
 import static pl.exsio.nestedj.model.NestedNode.*;
 
-public class JpaNestedNodeRemover<ID extends Serializable, N extends NestedNode<ID>> extends JpaNestedNodeDelegate<ID, N> implements NestedNodeRemover<ID, N> {
+public class QueryBasedNestedNodeRemover<ID extends Serializable, N extends NestedNode<ID>> extends QueryBasedNestedNodeDelegate<ID, N> implements NestedNodeRemover<ID, N> {
 
-    public JpaNestedNodeRemover(EntityManager entityManager, TreeDiscriminator<ID, N> treeDiscriminator) {
+    public QueryBasedNestedNodeRemover(EntityManager entityManager, TreeDiscriminator<ID, N> treeDiscriminator) {
         super(entityManager, treeDiscriminator);
     }
 

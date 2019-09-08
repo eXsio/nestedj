@@ -12,6 +12,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import pl.exsio.nestedj.discriminator.TestTreeDiscriminator;
 import pl.exsio.nestedj.model.TestNode;
 import pl.exsio.nestedj.repository.NestedNodeRepository;
+import pl.exsio.nestedj.repository.factory.JpaNestedNodeRepositoryFactory;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -71,7 +72,7 @@ public class TestConfiguration {
 
     @Bean
     public NestedNodeRepository<Long, TestNode> repository() {
-        return NestedNodeRepository.createDiscriminated(Long.class, TestNode.class, entityManager, new TestTreeDiscriminator());
+        return JpaNestedNodeRepositoryFactory.createDiscriminated(Long.class, TestNode.class, entityManager, new TestTreeDiscriminator());
     }
 
 }

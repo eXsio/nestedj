@@ -21,7 +21,7 @@
  * OUN OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package pl.exsio.nestedj.delegate.jpa;
+package pl.exsio.nestedj.delegate.impl;
 
 import pl.exsio.nestedj.delegate.NestedNodeRetriever;
 import pl.exsio.nestedj.discriminator.TreeDiscriminator;
@@ -41,9 +41,9 @@ import java.util.Optional;
 
 import static pl.exsio.nestedj.model.NestedNode.*;
 
-public class JpaNestedNodeRetriever<ID extends Serializable, N extends NestedNode<ID>> extends JpaNestedNodeDelegate<ID, N> implements NestedNodeRetriever<ID, N> {
+public class QueryBasedNestedNodeRetriever<ID extends Serializable, N extends NestedNode<ID>> extends QueryBasedNestedNodeDelegate<ID, N> implements NestedNodeRetriever<ID, N> {
 
-    public JpaNestedNodeRetriever(EntityManager entityManager, TreeDiscriminator<ID, N> treeDiscriminator) {
+    public QueryBasedNestedNodeRetriever(EntityManager entityManager, TreeDiscriminator<ID, N> treeDiscriminator) {
         super(entityManager, treeDiscriminator);
     }
 

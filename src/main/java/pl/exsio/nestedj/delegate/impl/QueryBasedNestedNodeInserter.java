@@ -21,7 +21,7 @@
  * OUN OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package pl.exsio.nestedj.delegate.jpa;
+package pl.exsio.nestedj.delegate.impl;
 
 import pl.exsio.nestedj.delegate.NestedNodeInserter;
 import pl.exsio.nestedj.delegate.query.NestedNodeInsertingQueryDelegate;
@@ -35,11 +35,11 @@ import static pl.exsio.nestedj.model.NestedNode.LEFT;
 import static pl.exsio.nestedj.model.NestedNode.RIGHT;
 
 
-public class JpaNestedNodeInserter<ID extends Serializable, N extends NestedNode<ID>> implements NestedNodeInserter<ID, N> {
+public class QueryBasedNestedNodeInserter<ID extends Serializable, N extends NestedNode<ID>> implements NestedNodeInserter<ID, N> {
 
     private final NestedNodeInsertingQueryDelegate<ID, N> queryDelegate;
 
-    public JpaNestedNodeInserter(NestedNodeInsertingQueryDelegate<ID, N> queryDelegate) {
+    public QueryBasedNestedNodeInserter(NestedNodeInsertingQueryDelegate<ID, N> queryDelegate) {
         this.queryDelegate = queryDelegate;
     }
 

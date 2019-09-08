@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package pl.exsio.nestedj.delegate.jpa;
+package pl.exsio.nestedj.delegate.impl;
 
 import pl.exsio.nestedj.delegate.NestedNodeMover;
 import pl.exsio.nestedj.delegate.query.NestedNodeMovingQueryDelegate;
@@ -36,7 +36,7 @@ import java.util.Optional;
 import static pl.exsio.nestedj.model.NestedNode.LEFT;
 import static pl.exsio.nestedj.model.NestedNode.RIGHT;
 
-public class JpaNestedNodeMover<ID extends Serializable, N extends NestedNode<ID>> implements NestedNodeMover<ID, N> {
+public class QueryBasedNestedNodeMover<ID extends Serializable, N extends NestedNode<ID>> implements NestedNodeMover<ID, N> {
 
     private final static long DELTA_MULTIPLIER = 2L;
 
@@ -46,7 +46,7 @@ public class JpaNestedNodeMover<ID extends Serializable, N extends NestedNode<ID
 
     private final NestedNodeMovingQueryDelegate<ID, N> queryDelegate;
 
-    public JpaNestedNodeMover(NestedNodeMovingQueryDelegate<ID, N> queryDelegate) {
+    public QueryBasedNestedNodeMover(NestedNodeMovingQueryDelegate<ID, N> queryDelegate) {
         this.queryDelegate = queryDelegate;
     }
 
