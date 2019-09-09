@@ -30,7 +30,6 @@ import pl.exsio.nestedj.model.NestedNode;
 import pl.exsio.nestedj.model.NestedNodeInfo;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Optional;
 
 import static pl.exsio.nestedj.model.NestedNode.LEFT;
@@ -55,18 +54,18 @@ public class QueryBasedNestedNodeMover<ID extends Serializable, N extends Nested
         if (!canMoveNodeToSelectedParent(nodeInfo, parentInfo)) {
             throw new InvalidNodesHierarchyException("You cannot move a parent node to it's child or move a node to itself");
         }
-        List<ID> nodeIds = queryDelegate.getNodeIds(nodeInfo);
+        Integer nodeCount = queryDelegate.markNodeIds(nodeInfo);
 
         Sign sign = getSign(nodeInfo, parentInfo, mode);
         Long start = getStart(nodeInfo, parentInfo, mode, sign);
         Long stop = getStop(nodeInfo, parentInfo, mode, sign);
-        Long delta = getDelta(nodeIds);
+        Long delta = getDelta(nodeCount);
         makeSpaceForMovedElement(sign, delta, start, stop);
 
         Long nodeDelta = getNodeDelta(start, stop);
         Sign nodeSign = getNodeSign(sign);
         Long levelModificator = getLevelModificator(nodeInfo, parentInfo, mode);
-        performMove(nodeIds, nodeDelta, nodeSign, levelModificator);
+        performMove(nodeDelta, nodeSign, levelModificator);
         updateParent(nodeInfo, parentInfo, mode);
     }
 
@@ -79,11 +78,11 @@ public class QueryBasedNestedNodeMover<ID extends Serializable, N extends Nested
         }
     }
 
-    private void performMove(List<ID> nodeIds, Long nodeDelta, Sign nodeSign, Long levelModificator) {
+    private void performMove(Long nodeDelta, Sign nodeSign, Long levelModificator) {
         if(Sign.PLUS.equals(nodeSign)) {
-            queryDelegate.performMoveUp(nodeDelta, nodeIds, levelModificator);
+            queryDelegate.performMoveUp(nodeDelta, levelModificator);
         } else if(Sign.MINUS.equals(nodeSign)) {
-            queryDelegate.performMoveDown(nodeDelta, nodeIds, levelModificator);
+            queryDelegate.performMoveDown(nodeDelta, levelModificator);
         }
     }
 
@@ -133,8 +132,8 @@ public class QueryBasedNestedNodeMover<ID extends Serializable, N extends Nested
         return stop - start - 1;
     }
 
-    private Long getDelta(List<ID> nodeIds) {
-        return nodeIds.size() * DELTA_MULTIPLIER;
+    private Long getDelta(Integer nodeCount) {
+        return nodeCount * DELTA_MULTIPLIER;
     }
 
     private Sign getNodeSign(Sign sign) {
