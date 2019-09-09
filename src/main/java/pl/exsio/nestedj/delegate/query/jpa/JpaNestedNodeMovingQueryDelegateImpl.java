@@ -35,8 +35,7 @@ public class JpaNestedNodeMovingQueryDelegateImpl<ID extends Serializable, N ext
         CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
         Root<N> root = update.from(node.getNodeClass());
         update
-                .set(root.<Long>get(LEFT), doMarking(root, LEFT))
-                .set(root.<Long>get(RIGHT), doMarking(root, RIGHT))
+                .set(root.<Long>get(RIGHT), markRightField(root))
                 .where(
                         getPredicates(cb, root,
                                 cb.greaterThanOrEqualTo(root.get(LEFT), node.getLeft()),
@@ -101,11 +100,11 @@ public class JpaNestedNodeMovingQueryDelegateImpl<ID extends Serializable, N ext
 
         update.set(root.<Long>get(LEVEL), cb.sum(root.get(LEVEL), levelModificator));
         if (Mode.DOWN.equals(mode)) {
-            update.set(root.<Long>get(RIGHT), cb.diff(undoMarking(root, RIGHT), nodeDelta));
-            update.set(root.<Long>get(LEFT), cb.diff(undoMarking(root, LEFT), nodeDelta));
+            update.set(root.<Long>get(RIGHT), cb.diff(unMarkRightField(root), nodeDelta));
+            update.set(root.<Long>get(LEFT), cb.diff(root.get(LEFT), nodeDelta));
         } else if (Mode.UP.equals(mode)) {
-            update.set(root.<Long>get(RIGHT), cb.sum(undoMarking(root, RIGHT), nodeDelta));
-            update.set(root.<Long>get(LEFT), cb.sum(undoMarking(root, LEFT), nodeDelta));
+            update.set(root.<Long>get(RIGHT), cb.sum(unMarkRightField(root), nodeDelta));
+            update.set(root.<Long>get(LEFT), cb.sum(root.get(LEFT), nodeDelta));
         }
         update.where(
                 getPredicates(cb, root, cb.lessThan(root.get(RIGHT), 0))
@@ -113,14 +112,14 @@ public class JpaNestedNodeMovingQueryDelegateImpl<ID extends Serializable, N ext
         entityManager.createQuery(update).executeUpdate();
     }
 
-    private Expression<Long> doMarking(Root<N> root, String left) {
+    private Expression<Long> markRightField(Root<N> root) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        return cb.diff(cb.neg(root.get(left)), MARKING_MODIFIER);
+        return cb.diff(cb.neg(root.get(RIGHT)), MARKING_MODIFIER);
     }
 
-    private Expression<Long> undoMarking(Root<N> root, String left) {
+    private Expression<Long> unMarkRightField(Root<N> root) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        return cb.neg(cb.sum(root.get(left), MARKING_MODIFIER));
+        return cb.neg(cb.sum(root.get(RIGHT), MARKING_MODIFIER));
     }
 
     private void doUpdateParentField(ID newParentId, NestedNodeInfo<ID, N> node) {
