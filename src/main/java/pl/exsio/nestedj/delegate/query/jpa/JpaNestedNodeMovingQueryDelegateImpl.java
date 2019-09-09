@@ -33,7 +33,7 @@ public class JpaNestedNodeMovingQueryDelegateImpl<ID extends Serializable, N ext
     public Integer markNodeIds(NestedNodeInfo<ID, N> node) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
-        Root<N> root = update.from(node.getNodeClass());
+        Root<N> root = update.from(nodeClass);
         update
                 .set(root.<Long>get(RIGHT), markRightField(root))
                 .where(
@@ -124,8 +124,8 @@ public class JpaNestedNodeMovingQueryDelegateImpl<ID extends Serializable, N ext
 
     private void doUpdateParentField(ID newParentId, NestedNodeInfo<ID, N> node) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaUpdate<N> update = cb.createCriteriaUpdate(node.getNodeClass());
-        Root<N> root = update.from(node.getNodeClass());
+        CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
+        Root<N> root = update.from(nodeClass);
 
         update.set(root.get(PARENT_ID), newParentId)
                 .where(getPredicates(cb, root, cb.equal(root.get(ID), node.getId())));
