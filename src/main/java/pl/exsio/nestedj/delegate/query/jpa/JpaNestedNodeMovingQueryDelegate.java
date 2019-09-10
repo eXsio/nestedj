@@ -1,12 +1,11 @@
 package pl.exsio.nestedj.delegate.query.jpa;
 
 import com.google.common.base.Preconditions;
+import pl.exsio.nestedj.config.jpa.JpaNestedNodeRepositoryConfiguration;
 import pl.exsio.nestedj.delegate.query.NestedNodeMovingQueryDelegate;
-import pl.exsio.nestedj.jpa.discriminator.JpaTreeDiscriminator;
 import pl.exsio.nestedj.model.NestedNode;
 import pl.exsio.nestedj.model.NestedNodeInfo;
 
-import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Expression;
@@ -25,8 +24,8 @@ public class JpaNestedNodeMovingQueryDelegate<ID extends Serializable, N extends
 
     private final static Long MARKING_MODIFIER = 1000L;
 
-    public JpaNestedNodeMovingQueryDelegate(EntityManager entityManager, JpaTreeDiscriminator<ID, N> treeDiscriminator, Class<N> nodeClass, Class<ID> idClass) {
-        super(entityManager, treeDiscriminator, nodeClass, idClass);
+    public JpaNestedNodeMovingQueryDelegate(JpaNestedNodeRepositoryConfiguration<ID, N> configuration) {
+        super(configuration);
     }
 
     @Override

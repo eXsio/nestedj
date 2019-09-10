@@ -2,13 +2,11 @@ package pl.exsio.nestedj.jpa.repository.factory;
 
 import pl.exsio.nestedj.DelegatingNestedNodeRepository;
 import pl.exsio.nestedj.NestedNodeRepository;
+import pl.exsio.nestedj.config.jpa.JpaNestedNodeRepositoryConfiguration;
 import pl.exsio.nestedj.delegate.control.*;
 import pl.exsio.nestedj.delegate.query.jpa.*;
-import pl.exsio.nestedj.jpa.discriminator.JpaTreeDiscriminator;
-import pl.exsio.nestedj.jpa.discriminator.MapJpaTreeDiscriminator;
 import pl.exsio.nestedj.model.NestedNode;
 
-import javax.persistence.EntityManager;
 import java.io.Serializable;
 
 public final class JpaNestedNodeRepositoryFactory {
@@ -16,18 +14,15 @@ public final class JpaNestedNodeRepositoryFactory {
     private JpaNestedNodeRepositoryFactory() {
     }
 
-    public static <ID extends Serializable, N extends NestedNode<ID>> NestedNodeRepository<ID, N> createDefault(Class<ID> idClass, Class<N> nodeClass, EntityManager entityManager) {
-        return createDiscriminated(idClass, nodeClass, entityManager, new MapJpaTreeDiscriminator<ID, N>());
-    }
 
-    public static <ID extends Serializable, N extends NestedNode<ID>> NestedNodeRepository<ID, N> createDiscriminated(Class<ID> idClass, Class<N> nodeClass, EntityManager entityManager, JpaTreeDiscriminator<ID, N> discriminator) {
-        QueryBasedNestedNodeInserter<ID, N> inserter = new QueryBasedNestedNodeInserter<>(new JpaNestedNodeInsertingQueryDelegate<>(entityManager, discriminator, nodeClass, idClass));
-        QueryBasedNestedNodeRetriever<ID, N> retriever = new QueryBasedNestedNodeRetriever<>(new JpaNestedNodeRetrievingQueryDelegate<>(entityManager, discriminator, nodeClass, idClass));
+    public static <ID extends Serializable, N extends NestedNode<ID>> NestedNodeRepository<ID, N> create(JpaNestedNodeRepositoryConfiguration<ID, N> configuration) {
+        QueryBasedNestedNodeInserter<ID, N> inserter = new QueryBasedNestedNodeInserter<>(new JpaNestedNodeInsertingQueryDelegate<>(configuration));
+        QueryBasedNestedNodeRetriever<ID, N> retriever = new QueryBasedNestedNodeRetriever<>(new JpaNestedNodeRetrievingQueryDelegate<>(configuration));
         return new DelegatingNestedNodeRepository<>(
-                new QueryBasedNestedNodeMover<>(new JpaNestedNodeMovingQueryDelegate<>(entityManager, discriminator, nodeClass, idClass)),
-                new QueryBasedNestedNodeRemover<>(new JpaNestedNodeIRemovingQueryDelegate<>(entityManager, discriminator, nodeClass, idClass)),
+                new QueryBasedNestedNodeMover<>(new JpaNestedNodeMovingQueryDelegate<>(configuration)),
+                new QueryBasedNestedNodeRemover<>(new JpaNestedNodeIRemovingQueryDelegate<>(configuration)),
                 retriever,
-                new QueryBasedNestedNodeRebuilder<>(inserter, retriever, new JpaNestedNodeRebuildingQueryDelegate<>(entityManager, discriminator, nodeClass, idClass)),
+                new QueryBasedNestedNodeRebuilder<>(inserter, retriever, new JpaNestedNodeRebuildingQueryDelegate<>(configuration)),
                 inserter
         );
     }
