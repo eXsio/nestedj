@@ -39,10 +39,6 @@ public class DelegatingNestedNodeRepository<ID extends Serializable, N extends N
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DelegatingNestedNodeRepository.class);
 
-    private final Class<ID> idClass;
-
-    private final Class<N> nodeClass;
-
     private final NestedNodeInserter<ID, N> inserter;
 
     private final NestedNodeMover<ID, N> mover;
@@ -56,9 +52,11 @@ public class DelegatingNestedNodeRepository<ID extends Serializable, N extends N
     private boolean allowNullableTreeFields = false;
 
 
-    public DelegatingNestedNodeRepository(Class<ID> idClass, Class<N> nodeClass, NestedNodeMover<ID, N> mover, NestedNodeRemover<ID, N> remover, NestedNodeRetriever<ID, N> retriever, NestedNodeRebuilder<ID, N> rebuilder, NestedNodeInserter<ID, N> inserter) {
-        this.idClass = idClass;
-        this.nodeClass = nodeClass;
+    public DelegatingNestedNodeRepository(NestedNodeMover<ID, N> mover,
+                                          NestedNodeRemover<ID, N> remover,
+                                          NestedNodeRetriever<ID, N> retriever,
+                                          NestedNodeRebuilder<ID, N> rebuilder,
+                                          NestedNodeInserter<ID, N> inserter) {
         this.inserter = inserter;
         this.mover = mover;
         this.remover = remover;
@@ -177,12 +175,12 @@ public class DelegatingNestedNodeRepository<ID extends Serializable, N extends N
 
     @Override
     public void rebuildTree() {
-        this.rebuilder.rebuildTree(nodeClass, idClass);
+        this.rebuilder.rebuildTree();
     }
 
     @Override
     public void destroyTree() {
-        rebuilder.destroyTree(nodeClass);
+        rebuilder.destroyTree();
     }
 
     public boolean isAllowNullableTreeFields() {

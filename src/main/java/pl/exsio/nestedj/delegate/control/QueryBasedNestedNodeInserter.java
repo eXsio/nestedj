@@ -21,7 +21,7 @@
  * OUN OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package pl.exsio.nestedj.delegate.impl;
+package pl.exsio.nestedj.delegate.control;
 
 import pl.exsio.nestedj.delegate.NestedNodeInserter;
 import pl.exsio.nestedj.delegate.query.NestedNodeInsertingQueryDelegate;

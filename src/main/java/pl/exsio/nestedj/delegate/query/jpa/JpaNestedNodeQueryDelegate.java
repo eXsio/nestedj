@@ -33,6 +33,6 @@ public abstract class JpaNestedNodeQueryDelegate<ID extends Serializable, N exte
     protected Predicate[] getPredicates(CriteriaBuilder cb, Root<N> root, Predicate... predicates) {
         List<Predicate> predicateList = new ArrayList<>(treeDiscriminator.getPredicates(cb, root));
         Collections.addAll(predicateList, predicates);
-        return predicateList.toArray(new Predicate[predicateList.size()]);
+        return predicateList.toArray(new Predicate[0]);
     }
 }

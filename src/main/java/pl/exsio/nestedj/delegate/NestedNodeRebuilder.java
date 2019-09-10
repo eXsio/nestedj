@@ -29,7 +29,7 @@ import java.io.Serializable;
 
 public interface NestedNodeRebuilder<ID extends Serializable, N extends NestedNode<ID>> {
 
-    void rebuildTree(Class<N> nodeClass, Class<ID> idClass);
+    void rebuildTree();
 
-    void destroyTree(Class<N> nodeClass);
+    void destroyTree();
 }
