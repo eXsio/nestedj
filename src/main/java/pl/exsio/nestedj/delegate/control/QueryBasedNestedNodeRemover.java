@@ -44,10 +44,10 @@ public class QueryBasedNestedNodeRemover<ID extends Serializable, N extends Nest
     @Override
     public void removeSingle(NestedNodeInfo<ID> nodeInfo) {
         Long from = nodeInfo.getRight();
-        queryDelegate.updateNodesParent(nodeInfo);
-        queryDelegate.updateSideFieldsBeforeSingleNodeRemoval(from, RIGHT);
-        queryDelegate.updateSideFieldsBeforeSingleNodeRemoval(from, LEFT);
-        queryDelegate.updateDeletedNodesChildren(nodeInfo);
+        queryDelegate.setNewParentForDeletedNodesChildren(nodeInfo);
+        queryDelegate.decrementSideFieldsBeforeSingleNodeRemoval(from, RIGHT);
+        queryDelegate.decrementSideFieldsBeforeSingleNodeRemoval(from, LEFT);
+        queryDelegate.pushUpDeletedNodesChildren(nodeInfo);
         queryDelegate.performSingleDeletion(nodeInfo);
     }
 
@@ -56,7 +56,7 @@ public class QueryBasedNestedNodeRemover<ID extends Serializable, N extends Nest
         Long delta = nodeInfo.getRight() - nodeInfo.getLeft() + 1;
         Long from = nodeInfo.getRight();
         queryDelegate.performBatchDeletion(nodeInfo);
-        queryDelegate.updateSideFieldsAfterSubtreeRemoval(from, delta, RIGHT);
-        queryDelegate.updateSideFieldsAfterSubtreeRemoval(from, delta, LEFT);
+        queryDelegate.decrementSideFieldsAfterSubtreeRemoval(from, delta, RIGHT);
+        queryDelegate.decrementSideFieldsAfterSubtreeRemoval(from, delta, LEFT);
     }
 }

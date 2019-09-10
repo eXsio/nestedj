@@ -88,11 +88,11 @@ public class QueryBasedNestedNodeMover<ID extends Serializable, N extends Nested
 
     private void makeSpaceForMovedElement(Sign sign, Long delta, Long start, Long stop) {
         if(Sign.PLUS.equals(sign)) {
-            queryDelegate.updateFieldsUp(delta, start, stop, RIGHT);
-            queryDelegate.updateFieldsUp(delta, start, stop, LEFT);
+            queryDelegate.updateSideFieldsUp(delta, start, stop, RIGHT);
+            queryDelegate.updateSideFieldsUp(delta, start, stop, LEFT);
         } else if(Sign.MINUS.equals(sign)) {
-            queryDelegate.updateFieldsDown(delta, start, stop, RIGHT);
-            queryDelegate.updateFieldsDown(delta, start, stop, LEFT);
+            queryDelegate.updateSideFieldsDown(delta, start, stop, RIGHT);
+            queryDelegate.updateSideFieldsDown(delta, start, stop, LEFT);
         }
     }
 

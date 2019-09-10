@@ -7,15 +7,17 @@ import java.io.Serializable;
 
 public interface NestedNodeRemovingQueryDelegate<ID extends Serializable, N extends NestedNode<ID>> {
 
-    void updateNodesParent(NestedNodeInfo<ID> node);
+    Long DECREMENT_BY = 2L;
+
+    void setNewParentForDeletedNodesChildren(NestedNodeInfo<ID> node);
 
     void performSingleDeletion(NestedNodeInfo<ID> node);
 
-    void updateSideFieldsBeforeSingleNodeRemoval(Long from, String field);
+    void decrementSideFieldsBeforeSingleNodeRemoval(Long from, String field);
 
-    void updateDeletedNodesChildren(NestedNodeInfo<ID> node);
+    void pushUpDeletedNodesChildren(NestedNodeInfo<ID> node);
 
-    void updateSideFieldsAfterSubtreeRemoval(Long from, Long delta, String field);
+    void decrementSideFieldsAfterSubtreeRemoval(Long from, Long delta, String field);
 
     void performBatchDeletion(NestedNodeInfo<ID> node);
 }

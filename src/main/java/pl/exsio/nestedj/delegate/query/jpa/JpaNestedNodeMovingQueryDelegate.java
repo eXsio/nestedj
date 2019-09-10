@@ -46,12 +46,12 @@ public class JpaNestedNodeMovingQueryDelegate<ID extends Serializable, N extends
 
 
     @Override
-    public void updateFieldsUp(Long delta, Long start, Long stop, String field) {
+    public void updateSideFieldsUp(Long delta, Long start, Long stop, String field) {
         updateFields(Mode.UP, delta, start, stop, field);
     }
 
     @Override
-    public void updateFieldsDown(Long delta, Long start, Long stop, String field) {
+    public void updateSideFieldsDown(Long delta, Long start, Long stop, String field) {
         updateFields(Mode.DOWN, delta, start, stop, field);
     }
 

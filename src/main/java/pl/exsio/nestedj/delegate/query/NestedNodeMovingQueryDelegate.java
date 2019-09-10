@@ -9,9 +9,9 @@ public interface NestedNodeMovingQueryDelegate<ID extends Serializable, N extend
 
     Integer markNodeIds(NestedNodeInfo<ID> node);
 
-    void updateFieldsUp(Long delta, Long start, Long stop, String field);
+    void updateSideFieldsUp(Long delta, Long start, Long stop, String field);
 
-    void updateFieldsDown(Long delta, Long start, Long stop, String field);
+    void updateSideFieldsDown(Long delta, Long start, Long stop, String field);
 
     void performMoveUp(Long nodeDelta, Long levelModificator);
 

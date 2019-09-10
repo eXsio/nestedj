@@ -6,9 +6,11 @@ import java.io.Serializable;
 
 public interface NestedNodeInsertingQueryDelegate<ID extends Serializable, N extends NestedNode<ID>> {
 
+    Long INCREMENT_BY = 2L;
+
     void insert(N node);
 
-    void updateFieldsGreaterThan(Long from, String fieldName);
+    void incrementSideFieldsGreaterThan(Long from, String fieldName);
 
-    void updateFieldsGreaterThanOrEqualTo(Long from, String fieldName);
+    void incermentSideFieldsGreaterThanOrEqualTo(Long from, String fieldName);
 }

@@ -26,7 +26,7 @@ public class JpaNestedNodeIRemovingQueryDelegate<ID extends Serializable, N exte
     }
 
     @Override
-    public void updateNodesParent(NestedNodeInfo<ID> node) {
+    public void setNewParentForDeletedNodesChildren(NestedNodeInfo<ID> node) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
         Root<N> root = update.from(nodeClass);
@@ -70,12 +70,12 @@ public class JpaNestedNodeIRemovingQueryDelegate<ID extends Serializable, N exte
     }
 
     @Override
-    public void updateSideFieldsBeforeSingleNodeRemoval(Long from, String field) {
+    public void decrementSideFieldsBeforeSingleNodeRemoval(Long from, String field) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
         Root<N> root = update.from(nodeClass);
 
-        update.set(root.<Long>get(field), cb.diff(root.get(field), 2L))
+        update.set(root.<Long>get(field), cb.diff(root.get(field), DECREMENT_BY))
                 .where(getPredicates(cb, root, cb.greaterThan(root.get(field), from)));
 
         entityManager.createQuery(update).executeUpdate();
@@ -83,7 +83,7 @@ public class JpaNestedNodeIRemovingQueryDelegate<ID extends Serializable, N exte
 
 
     @Override
-    public void updateDeletedNodesChildren(NestedNodeInfo<ID> node) {
+    public void pushUpDeletedNodesChildren(NestedNodeInfo<ID> node) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
         Root<N> root = update.from(nodeClass);
@@ -100,7 +100,7 @@ public class JpaNestedNodeIRemovingQueryDelegate<ID extends Serializable, N exte
     }
 
     @Override
-    public void updateSideFieldsAfterSubtreeRemoval(Long from, Long delta, String field) {
+    public void decrementSideFieldsAfterSubtreeRemoval(Long from, Long delta, String field) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
         Root<N> root = update.from(nodeClass);

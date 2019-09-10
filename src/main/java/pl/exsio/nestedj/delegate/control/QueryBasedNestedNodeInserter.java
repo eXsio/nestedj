@@ -62,11 +62,11 @@ public class QueryBasedNestedNodeInserter<ID extends Serializable, N extends Nes
 
     private void makeSpaceForNewElement(Long from, Mode mode) {
         if(applyGte(mode)) {
-            queryDelegate.updateFieldsGreaterThanOrEqualTo(from, RIGHT);
-            queryDelegate.updateFieldsGreaterThanOrEqualTo(from, LEFT);
+            queryDelegate.incermentSideFieldsGreaterThanOrEqualTo(from, RIGHT);
+            queryDelegate.incermentSideFieldsGreaterThanOrEqualTo(from, LEFT);
         } else {
-            queryDelegate.updateFieldsGreaterThan(from, RIGHT);
-            queryDelegate.updateFieldsGreaterThan(from, LEFT);
+            queryDelegate.incrementSideFieldsGreaterThan(from, RIGHT);
+            queryDelegate.incrementSideFieldsGreaterThan(from, LEFT);
         }
 
     }
