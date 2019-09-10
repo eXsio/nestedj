@@ -54,6 +54,10 @@ public class TestNode implements NestedNode<Long> {
     @Column(name = "discriminator", nullable = false)
     private String discriminator;
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     @Override
     public Long getId() {
         return id;

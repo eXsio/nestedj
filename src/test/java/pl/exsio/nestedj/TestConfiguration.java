@@ -89,12 +89,38 @@ public class TestConfiguration {
     @Bean
     @Jdbc
     public NestedNodeRepository<Long, TestNode> jdbcRepository(DataSource dataSource) {
-        RowMapper<TestNode> mapper = (resultSet, i) -> null;
-        String insertQuery = "";
-        Function<TestNode, Object[]> insertValuesProvider = testNode -> new Object[0];
+        //ROW MAPPER FOR CREATING INSTANCES OF THE NODE OBJECT
+        RowMapper<TestNode> mapper = (resultSet, i) -> {
+            TestNode n = new TestNode();
+            n.setId(resultSet.getLong(0));
+            n.setTreeLeft(resultSet.getLong(1));
+            n.setTreeLevel(resultSet.getLong(2));
+            n.setTreeRight(resultSet.getLong(3));
+            n.setName(resultSet.getString(4));
+            n.setParentId(resultSet.getLong(5));
+            n.setDiscriminator(resultSet.getString(6));
+            return n;
+        };
+
+        //TABLE NAME
+        String tableName = "nested_nodes";
+
+        // QUERY USED FOR INSERTING NEW NODES
+        String insertQuery = "insert into nested_nodes(id, tree_left, tree_level, tree_right, node_name, parent_id, discriminator) values(?,?,?,?,?,?,?)";
+
+        // INSERT QUERY VALUES PROVIDER, CONVERTS NODE OBJECT INTO AN OBJECT ARRAY
+        Function<TestNode, Object[]> insertValuesProvider = n -> new Object[]{null, n.getTreeLeft(), n.getTreeLevel(), n.getTreeRight(), n.getName(), n.getParentId(), n.getDiscriminator()};
+
         JdbcNestedNodeRepositoryConfiguration<Long, TestNode> configuration = new JdbcNestedNodeRepositoryConfiguration<>(
-                new JdbcTemplate(dataSource), "nested_nodes", mapper, insertQuery, insertValuesProvider
+                new JdbcTemplate(dataSource), tableName, mapper, insertQuery, insertValuesProvider
         );
+
+        configuration.setIdColumnName("id");
+        configuration.setParentIdColumnName("parent_id");
+        configuration.setLeftColumnName("tree_left");
+        configuration.setRighColumnName("tree_right");
+        configuration.setLevelColumnName("tree_level");
+
         return JdbcNestedNodeRepositoryFactory.create(configuration);
     }
 

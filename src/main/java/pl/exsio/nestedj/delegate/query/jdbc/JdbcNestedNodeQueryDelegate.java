@@ -1,6 +1,5 @@
 package pl.exsio.nestedj.delegate.query.jdbc;
 
-import com.google.common.collect.Maps;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import pl.exsio.nestedj.config.jdbc.JdbcNestedNodeRepositoryConfiguration;
@@ -8,7 +7,6 @@ import pl.exsio.nestedj.jdbc.discriminator.JdbcTreeDiscriminator;
 import pl.exsio.nestedj.model.NestedNode;
 
 import java.io.Serializable;
-import java.util.Map;
 import java.util.function.Function;
 
 public abstract class JdbcNestedNodeQueryDelegate<ID extends Serializable, N extends NestedNode<ID>> {
@@ -25,7 +23,17 @@ public abstract class JdbcNestedNodeQueryDelegate<ID extends Serializable, N ext
 
     protected final JdbcTreeDiscriminator treeDiscriminator;
 
-    protected Map<String, String> treeColumnNames = Maps.newHashMap();
+    protected final String selectQuery;
+
+    protected final String id;
+
+    protected final String parentId;
+
+    protected final String left;
+
+    protected final String right;
+
+    protected final String level;
 
     public JdbcNestedNodeQueryDelegate(JdbcNestedNodeRepositoryConfiguration<ID, N> configuration) {
         this.jdbcTemplate = configuration.getJdbcTemplate();
@@ -34,7 +42,11 @@ public abstract class JdbcNestedNodeQueryDelegate<ID extends Serializable, N ext
         this.insertQuery = configuration.getInsertQuery();
         this.insertValuesProvider = configuration.getInsertValuesProvider();
         this.treeDiscriminator = configuration.getTreeDiscriminator();
-
+        this.selectQuery = configuration.getSelectQuery();
+        this.id = configuration.getTreeColumnNames().get(NestedNode.ID);
+        this.parentId = configuration.getTreeColumnNames().get(NestedNode.PARENT_ID);
+        this.left = configuration.getTreeColumnNames().get(NestedNode.LEFT);
+        this.right = configuration.getTreeColumnNames().get(NestedNode.RIGHT);
+        this.level = configuration.getTreeColumnNames().get(NestedNode.LEVEL);
     }
-
 }

@@ -24,6 +24,8 @@ public class JdbcNestedNodeRepositoryConfiguration<ID extends Serializable, N ex
 
     private final JdbcTreeDiscriminator treeDiscriminator;
 
+    private String selectQuery;
+
     private Map<String, String> treeColumnNames = Maps.newHashMap();
 
     public JdbcNestedNodeRepositoryConfiguration(JdbcTemplate jdbcTemplate, String tableName,
@@ -41,6 +43,7 @@ public class JdbcNestedNodeRepositoryConfiguration<ID extends Serializable, N ex
         treeColumnNames.put(NestedNode.RIGHT, NestedNode.RIGHT);
         treeColumnNames.put(NestedNode.LEVEL, NestedNode.LEVEL);
         treeColumnNames.put(NestedNode.PARENT_ID, NestedNode.PARENT_ID);
+        this.selectQuery = String.format("select * from %s", tableName);
     }
 
     public JdbcNestedNodeRepositoryConfiguration(JdbcTemplate jdbcTemplate, String tableName,
@@ -102,10 +105,11 @@ public class JdbcNestedNodeRepositoryConfiguration<ID extends Serializable, N ex
         return this;
     }
 
-    public JdbcNestedNodeRepositoryConfiguration<ID, N> setIdField(String field) {
-        treeColumnNames.put(NestedNode.ID, field);
-        return this;
+    public String getSelectQuery() {
+        return selectQuery;
     }
 
-
+    public void setSelectQuery(String selectQuery) {
+        this.selectQuery = selectQuery;
+    }
 }
