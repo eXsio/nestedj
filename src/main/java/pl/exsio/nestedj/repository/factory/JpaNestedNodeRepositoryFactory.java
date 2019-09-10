@@ -1,8 +1,9 @@
 package pl.exsio.nestedj.repository.factory;
 
 import pl.exsio.nestedj.delegate.impl.*;
+import pl.exsio.nestedj.delegate.query.jpa.JpaNestedNodeIRemovingQueryDelegate;
 import pl.exsio.nestedj.delegate.query.jpa.JpaNestedNodeInsertingQueryDelegate;
-import pl.exsio.nestedj.delegate.query.jpa.JpaNestedNodeMovingQueryDelegateImpl;
+import pl.exsio.nestedj.delegate.query.jpa.JpaNestedNodeMovingQueryDelegate;
 import pl.exsio.nestedj.discriminator.MapTreeDiscriminator;
 import pl.exsio.nestedj.discriminator.TreeDiscriminator;
 import pl.exsio.nestedj.model.NestedNode;
@@ -27,8 +28,8 @@ public final class JpaNestedNodeRepositoryFactory {
         return new DelegatingNestedNodeRepository<>(
                 idClass,
                 nodeClass,
-                new QueryBasedNestedNodeMover<>(new JpaNestedNodeMovingQueryDelegateImpl<>(entityManager, discriminator, nodeClass, idClass)),
-                new QueryBasedNestedNodeRemover<>(entityManager, discriminator),
+                new QueryBasedNestedNodeMover<>(new JpaNestedNodeMovingQueryDelegate<>(entityManager, discriminator, nodeClass, idClass)),
+                new QueryBasedNestedNodeRemover<>(new JpaNestedNodeIRemovingQueryDelegate<>(entityManager, discriminator, nodeClass, idClass)),
                 retriever,
                 new QueryBasedNestedNodeRebuilder<>(entityManager, discriminator, inserter, retriever),
                 inserter

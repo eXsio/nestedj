@@ -15,7 +15,7 @@ import java.io.Serializable;
 
 import static pl.exsio.nestedj.model.NestedNode.*;
 
-public class JpaNestedNodeMovingQueryDelegateImpl<ID extends Serializable, N extends NestedNode<ID>>
+public class JpaNestedNodeMovingQueryDelegate<ID extends Serializable, N extends NestedNode<ID>>
         extends JpaNestedNodeQueryDelegate<ID, N>
         implements NestedNodeMovingQueryDelegate<ID, N> {
 
@@ -25,7 +25,7 @@ public class JpaNestedNodeMovingQueryDelegateImpl<ID extends Serializable, N ext
 
     private final static Long MARKING_MODIFIER = 1000L;
 
-    public JpaNestedNodeMovingQueryDelegateImpl(EntityManager entityManager, TreeDiscriminator<ID, N> treeDiscriminator, Class<N> nodeClass, Class<ID> idClass) {
+    public JpaNestedNodeMovingQueryDelegate(EntityManager entityManager, TreeDiscriminator<ID, N> treeDiscriminator, Class<N> nodeClass, Class<ID> idClass) {
         super(entityManager, treeDiscriminator, nodeClass, idClass);
     }
 
