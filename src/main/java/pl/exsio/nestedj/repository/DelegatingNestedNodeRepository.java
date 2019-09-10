@@ -91,12 +91,12 @@ public class DelegatingNestedNodeRepository<ID extends Serializable, N extends N
         if (parent.getId() == null) {
             throw new InvalidParentException("Cannot insert or move to a parent that has null id");
         }
-        Optional<NestedNodeInfo<ID, N>> parentInfo = retriever.getNodeInfo(parent.getId(), nodeClass, idClass);
+        Optional<NestedNodeInfo<ID>> parentInfo = retriever.getNodeInfo(parent.getId());
         if (!parentInfo.isPresent()) {
             throw new InvalidParentException(String.format("Cannot insert or move to non existent parent. Parent id: %s", parent.getId()));
         }
         if (node.getId() != null) {
-            Optional<NestedNodeInfo<ID, N>> nodeInfo = retriever.getNodeInfo(node.getId(), nodeClass, idClass);
+            Optional<NestedNodeInfo<ID>> nodeInfo = retriever.getNodeInfo(node.getId());
             if (nodeInfo.isPresent()) {
                 boolean nodeInfoValid = isNodeInfoValid(nodeInfo.get());
                 if (nodeInfoValid) {
@@ -115,13 +115,13 @@ public class DelegatingNestedNodeRepository<ID extends Serializable, N extends N
         }
     }
 
-    private boolean isNodeInfoValid(NestedNodeInfo<ID, N> nodeInfo) {
+    private boolean isNodeInfoValid(NestedNodeInfo<ID> nodeInfo) {
         return (nodeInfo.getLeft() != null && nodeInfo.getRight() != null);
     }
 
     @Override
     public void removeSingle(N node) {
-        Optional<NestedNodeInfo<ID, N>> nodeInfo = retriever.getNodeInfo(node.getId(), nodeClass, idClass);
+        Optional<NestedNodeInfo<ID>> nodeInfo = retriever.getNodeInfo(node.getId());
         if (nodeInfo.isPresent()) {
             this.remover.removeSingle(nodeInfo.get());
         } else {
@@ -132,7 +132,7 @@ public class DelegatingNestedNodeRepository<ID extends Serializable, N extends N
 
     @Override
     public void removeSubtree(N node) {
-        Optional<NestedNodeInfo<ID, N>> nodeInfo = retriever.getNodeInfo(node.getId(), nodeClass, idClass);
+        Optional<NestedNodeInfo<ID>> nodeInfo = retriever.getNodeInfo(node.getId());
         if (nodeInfo.isPresent()) {
             this.remover.removeSubtree(nodeInfo.get());
         } else {
@@ -142,37 +142,37 @@ public class DelegatingNestedNodeRepository<ID extends Serializable, N extends N
 
     @Override
     public Iterable<N> getTreeAsList(N node) {
-        return this.retriever.getTreeAsList(node, nodeClass);
+        return this.retriever.getTreeAsList(node);
     }
 
     @Override
     public Iterable<N> getChildren(N node) {
-        return this.retriever.getChildren(node, nodeClass);
+        return this.retriever.getChildren(node);
     }
 
     @Override
     public Optional<N> getParent(N node) {
-        return this.retriever.getParent(node, nodeClass);
+        return this.retriever.getParent(node);
     }
 
     @Override
     public Optional<N> getPrevSibling(N node) {
-        return this.retriever.getPrevSibling(node, nodeClass);
+        return this.retriever.getPrevSibling(node);
     }
 
     @Override
     public Optional<N> getNextSibling(N node) {
-        return this.retriever.getNextSibling(node, nodeClass);
+        return this.retriever.getNextSibling(node);
     }
 
     @Override
     public Tree<ID, N> getTree(N node) {
-        return this.retriever.getTree(node, nodeClass);
+        return this.retriever.getTree(node);
     }
 
     @Override
     public Iterable<N> getParents(N node) {
-        return this.retriever.getParents(node, nodeClass);
+        return this.retriever.getParents(node);
     }
 
     @Override

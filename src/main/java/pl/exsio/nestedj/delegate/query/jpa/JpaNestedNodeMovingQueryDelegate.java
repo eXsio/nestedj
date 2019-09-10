@@ -30,7 +30,7 @@ public class JpaNestedNodeMovingQueryDelegate<ID extends Serializable, N extends
     }
 
     @Override
-    public Integer markNodeIds(NestedNodeInfo<ID, N> node) {
+    public Integer markNodeIds(NestedNodeInfo<ID> node) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
         Root<N> root = update.from(nodeClass);
@@ -66,13 +66,13 @@ public class JpaNestedNodeMovingQueryDelegate<ID extends Serializable, N extends
     }
 
     @Override
-    public void updateParentField(ID newParentId, NestedNodeInfo<ID, N> node) {
+    public void updateParentField(ID newParentId, NestedNodeInfo<ID> node) {
         Preconditions.checkNotNull(newParentId);
         doUpdateParentField(newParentId, node);
     }
 
     @Override
-    public void clearParentField(NestedNodeInfo<ID, N> node) {
+    public void clearParentField(NestedNodeInfo<ID> node) {
         doUpdateParentField(null, node);
     }
 
@@ -122,7 +122,7 @@ public class JpaNestedNodeMovingQueryDelegate<ID extends Serializable, N extends
         return cb.neg(cb.sum(root.get(RIGHT), MARKING_MODIFIER));
     }
 
-    private void doUpdateParentField(ID newParentId, NestedNodeInfo<ID, N> node) {
+    private void doUpdateParentField(ID newParentId, NestedNodeInfo<ID> node) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
         Root<N> root = update.from(nodeClass);

@@ -60,10 +60,10 @@ public class QueryBasedNestedNodeRebuilder<ID extends Serializable, N extends Ne
     public void rebuildTree(Class<N> nodeClass, Class<ID> idClass) {
         N first = findFirstNestedNode(nodeClass);
         resetFirst(first, nodeClass);
-        restoreSiblings(first, nodeClass, idClass);
-        rebuildRecursively(first, nodeClass, idClass);
+        restoreSiblings(first, nodeClass);
+        rebuildRecursively(first, nodeClass);
         for (N node : getSiblings(first.getId(), nodeClass)) {
-            rebuildRecursively(node, nodeClass, idClass);
+            rebuildRecursively(node, nodeClass);
         }
     }
 
@@ -81,10 +81,10 @@ public class QueryBasedNestedNodeRebuilder<ID extends Serializable, N extends Ne
         entityManager.createQuery(update).executeUpdate();
     }
 
-    private void rebuildRecursively(N parent, Class<N> nodeClass, Class<ID> idClass) {
+    private void rebuildRecursively(N parent, Class<N> nodeClass) {
         for (N child : getChildren(parent, nodeClass)) {
-            inserter.insert(child, getNodeInfo(parent.getId(), nodeClass, idClass), NestedNodeMover.Mode.LAST_CHILD);
-            rebuildRecursively(child, nodeClass, idClass);
+            inserter.insert(child, getNodeInfo(parent.getId()), NestedNodeMover.Mode.LAST_CHILD);
+            rebuildRecursively(child, nodeClass);
         }
     }
 
@@ -117,9 +117,9 @@ public class QueryBasedNestedNodeRebuilder<ID extends Serializable, N extends Ne
         return entityManager.createQuery(select).getResultList();
     }
 
-    private void restoreSiblings(N first, Class<N> nodeClass, Class<ID> idClass) {
+    private void restoreSiblings(N first, Class<N> nodeClass) {
         for (N node : getSiblings(first.getId(), nodeClass)) {
-            inserter.insert(node, getNodeInfo(first.getId(), nodeClass, idClass), NestedNodeMover.Mode.NEXT_SIBLING);
+            inserter.insert(node, getNodeInfo(first.getId()), NestedNodeMover.Mode.NEXT_SIBLING);
         }
     }
 
@@ -131,11 +131,11 @@ public class QueryBasedNestedNodeRebuilder<ID extends Serializable, N extends Ne
         return entityManager.createQuery(select).getResultList();
     }
 
-    private NestedNodeInfo<ID, N> getNodeInfo(ID nodeId, Class<N> nodeClass, Class<ID> idClass) {
+    private NestedNodeInfo<ID> getNodeInfo(ID nodeId) {
         Preconditions.checkNotNull(nodeId);
-        Optional<NestedNodeInfo<ID, N>> nodeInfo = retriever.getNodeInfo(nodeId, nodeClass, idClass);
+        Optional<NestedNodeInfo<ID>> nodeInfo = retriever.getNodeInfo(nodeId);
         if (!nodeInfo.isPresent()) {
-            throw new InvalidNodeException(String.format("Couldn't find node with Id %s and class %s", nodeId, nodeClass));
+            throw new InvalidNodeException(String.format("Couldn't find node with Id %s", nodeId));
         }
         return nodeInfo.get();
     }

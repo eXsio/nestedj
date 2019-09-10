@@ -44,12 +44,12 @@ public class QueryBasedNestedNodeInserter<ID extends Serializable, N extends Nes
     }
 
     @Override
-    public void insert(N node, NestedNodeInfo<ID, N> parentInfo, Mode mode) {
+    public void insert(N node, NestedNodeInfo<ID> parentInfo, Mode mode) {
         makeSpaceForNewElement(getMoveFrom(parentInfo, mode), mode);
         insertNodeIntoTree(parentInfo, node, mode);
     }
 
-    private void insertNodeIntoTree(NestedNodeInfo<ID, N> parent, N node, Mode mode) {
+    private void insertNodeIntoTree(NestedNodeInfo<ID> parent, N node, Mode mode) {
         Long left = this.getNodeLeft(parent, mode);
         Long right = left + 1;
         Long level = this.getNodeLevel(parent, mode);
@@ -71,7 +71,7 @@ public class QueryBasedNestedNodeInserter<ID extends Serializable, N extends Nes
 
     }
 
-    private Long getMoveFrom(NestedNodeInfo<ID, N> parent, Mode mode) {
+    private Long getMoveFrom(NestedNodeInfo<ID> parent, Mode mode) {
         switch (mode) {
             case PREV_SIBLING:
             case FIRST_CHILD:
@@ -83,7 +83,7 @@ public class QueryBasedNestedNodeInserter<ID extends Serializable, N extends Nes
         }
     }
 
-    private Long getNodeLevel(NestedNodeInfo<ID, N> parent, Mode mode) {
+    private Long getNodeLevel(NestedNodeInfo<ID> parent, Mode mode) {
         switch (mode) {
             case NEXT_SIBLING:
             case PREV_SIBLING:
@@ -95,7 +95,7 @@ public class QueryBasedNestedNodeInserter<ID extends Serializable, N extends Nes
         }
     }
 
-    private Optional<ID> getNodeParent(NestedNodeInfo<ID, N> parent, Mode mode) {
+    private Optional<ID> getNodeParent(NestedNodeInfo<ID> parent, Mode mode) {
         switch (mode) {
             case NEXT_SIBLING:
             case PREV_SIBLING:
@@ -111,7 +111,7 @@ public class QueryBasedNestedNodeInserter<ID extends Serializable, N extends Nes
         }
     }
 
-    private Long getNodeLeft(NestedNodeInfo<ID, N> parent, Mode mode) {
+    private Long getNodeLeft(NestedNodeInfo<ID> parent, Mode mode) {
         switch (mode) {
             case NEXT_SIBLING:
                 return parent.getRight() + 1;

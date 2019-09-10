@@ -50,7 +50,7 @@ public class QueryBasedNestedNodeMover<ID extends Serializable, N extends Nested
     }
 
     @Override
-    public void move(NestedNodeInfo<ID, N> nodeInfo, NestedNodeInfo<ID, N> parentInfo, Mode mode) {
+    public void move(NestedNodeInfo<ID> nodeInfo, NestedNodeInfo<ID> parentInfo, Mode mode) {
         if (!canMoveNodeToSelectedParent(nodeInfo, parentInfo)) {
             throw new InvalidNodesHierarchyException("You cannot move a parent node to it's child or move a node to itself");
         }
@@ -69,7 +69,7 @@ public class QueryBasedNestedNodeMover<ID extends Serializable, N extends Nested
         updateParent(nodeInfo, parentInfo, mode);
     }
 
-    private void updateParent(NestedNodeInfo<ID, N> nodeInfo, NestedNodeInfo<ID, N> parentInfo, Mode mode) {
+    private void updateParent(NestedNodeInfo<ID> nodeInfo, NestedNodeInfo<ID> parentInfo, Mode mode) {
         Optional<ID> newParent = getNewParentId(parentInfo, mode);
         if (newParent.isPresent()) {
             queryDelegate.updateParentField(newParent.get(), nodeInfo);
@@ -96,11 +96,11 @@ public class QueryBasedNestedNodeMover<ID extends Serializable, N extends Nested
         }
     }
 
-    private boolean canMoveNodeToSelectedParent(NestedNodeInfo<ID, N> node, NestedNodeInfo<ID, N> parent) {
+    private boolean canMoveNodeToSelectedParent(NestedNodeInfo<ID> node, NestedNodeInfo<ID> parent) {
         return !node.getId().equals(parent.getId()) && (node.getLeft() >= parent.getLeft() || node.getRight() <= parent.getRight());
     }
 
-    private Optional<ID> getNewParentId(NestedNodeInfo<ID, N> parent, Mode mode) {
+    private Optional<ID> getNewParentId(NestedNodeInfo<ID> parent, Mode mode) {
         switch (mode) {
             case NEXT_SIBLING:
             case PREV_SIBLING:
@@ -116,7 +116,7 @@ public class QueryBasedNestedNodeMover<ID extends Serializable, N extends Nested
         }
     }
 
-    private Long getLevelModificator(NestedNodeInfo<ID, N> node, NestedNodeInfo<ID, N> parent, Mode mode) {
+    private Long getLevelModificator(NestedNodeInfo<ID> node, NestedNodeInfo<ID> parent, Mode mode) {
         switch (mode) {
             case NEXT_SIBLING:
             case PREV_SIBLING:
@@ -140,7 +140,7 @@ public class QueryBasedNestedNodeMover<ID extends Serializable, N extends Nested
         return (sign.equals(Sign.PLUS)) ? Sign.MINUS : Sign.PLUS;
     }
 
-    private Sign getSign(NestedNodeInfo<ID, N> node, NestedNodeInfo<ID, N> parent, Mode mode) {
+    private Sign getSign(NestedNodeInfo<ID> node, NestedNodeInfo<ID> parent, Mode mode) {
         switch (mode) {
             case PREV_SIBLING:
             case FIRST_CHILD:
@@ -152,7 +152,7 @@ public class QueryBasedNestedNodeMover<ID extends Serializable, N extends Nested
         }
     }
 
-    private Long getStart(NestedNodeInfo<ID, N> node, NestedNodeInfo<ID, N> parent, Mode mode, Sign sign) {
+    private Long getStart(NestedNodeInfo<ID> node, NestedNodeInfo<ID> parent, Mode mode, Sign sign) {
         switch (mode) {
             case PREV_SIBLING:
                 return sign.equals(Sign.PLUS) ? parent.getLeft() - 1 : node.getRight();
@@ -167,7 +167,7 @@ public class QueryBasedNestedNodeMover<ID extends Serializable, N extends Nested
         }
     }
 
-    private Long getStop(NestedNodeInfo<ID, N> node, NestedNodeInfo<ID, N> parent, Mode mode, Sign sign) {
+    private Long getStop(NestedNodeInfo<ID> node, NestedNodeInfo<ID> parent, Mode mode, Sign sign) {
         switch (mode) {
             case PREV_SIBLING:
                 return sign.equals(Sign.PLUS) ? node.getLeft() : parent.getLeft();

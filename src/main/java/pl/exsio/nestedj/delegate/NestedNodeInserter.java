@@ -30,6 +30,6 @@ import java.io.Serializable;
 
 public interface NestedNodeInserter<ID extends Serializable, N extends NestedNode<ID>> extends NestedNodeHierarchyManipulator {
 
-    void insert(N node, NestedNodeInfo<ID, N> parentInfo, Mode mode);
+    void insert(N node, NestedNodeInfo<ID> parentInfo, Mode mode);
 
 }

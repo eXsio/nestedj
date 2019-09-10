@@ -32,19 +32,19 @@ import java.util.Optional;
 
 public interface NestedNodeRetriever<ID extends Serializable, N extends NestedNode<ID>> {
 
-    Iterable<N> getTreeAsList(N node, Class<N> nodeClass);
+    Iterable<N> getTreeAsList(N node);
 
-    Iterable<N> getChildren(N node, Class<N> nodeClass);
+    Iterable<N> getChildren(N node);
 
-    Optional<N> getParent(N node, Class<N> nodeClass);
+    Optional<N> getParent(N nodes);
 
-    Optional<N> getPrevSibling(N node, Class<N> nodeClass);
+    Optional<N> getPrevSibling(N node);
 
-    Optional<N> getNextSibling(N node, Class<N> nodeClass);
+    Optional<N> getNextSibling(N node);
 
-    Tree<ID, N> getTree(N node, Class<N> nodeClass);
+    Tree<ID, N> getTree(N node);
 
-    Iterable<N> getParents(N node, Class<N> nodeClass);
+    Iterable<N> getParents(N node);
 
-    Optional<NestedNodeInfo<ID, N>> getNodeInfo(ID nodeId, Class<N> nodeClass, Class<ID> idClass);
+    Optional<NestedNodeInfo<ID>> getNodeInfo(ID nodeIds);
 }

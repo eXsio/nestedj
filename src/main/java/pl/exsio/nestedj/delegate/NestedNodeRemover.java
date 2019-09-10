@@ -30,7 +30,7 @@ import java.io.Serializable;
 
 public interface NestedNodeRemover<ID extends Serializable, N extends NestedNode<ID>> {
 
-    void removeSingle(NestedNodeInfo<ID, N> node);
+    void removeSingle(NestedNodeInfo<ID> node);
 
-    void removeSubtree(NestedNodeInfo<ID, N> node);
+    void removeSubtree(NestedNodeInfo<ID> node);
 }

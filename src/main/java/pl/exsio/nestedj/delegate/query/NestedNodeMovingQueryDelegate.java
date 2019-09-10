@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 public interface NestedNodeMovingQueryDelegate<ID extends Serializable, N extends NestedNode<ID>> {
 
-    Integer markNodeIds(NestedNodeInfo<ID, N> node);
+    Integer markNodeIds(NestedNodeInfo<ID> node);
 
     void updateFieldsUp(Long delta, Long start, Long stop, String field);
 
@@ -17,7 +17,7 @@ public interface NestedNodeMovingQueryDelegate<ID extends Serializable, N extend
 
     void performMoveDown(Long nodeDelta, Long levelModificator);
 
-    void updateParentField(ID newParentId, NestedNodeInfo<ID, N> node);
+    void updateParentField(ID newParentId, NestedNodeInfo<ID> node);
 
-    void clearParentField(NestedNodeInfo<ID, N> node);
+    void clearParentField(NestedNodeInfo<ID> node);
 }
