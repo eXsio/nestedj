@@ -1,7 +1,7 @@
 package pl.exsio.nestedj.delegate.query.jpa;
 
 import pl.exsio.nestedj.delegate.query.NestedNodeInsertingQueryDelegate;
-import pl.exsio.nestedj.jpa.discriminator.TreeDiscriminator;
+import pl.exsio.nestedj.jpa.discriminator.JpaTreeDiscriminator;
 import pl.exsio.nestedj.model.NestedNode;
 
 import javax.persistence.EntityManager;
@@ -14,7 +14,7 @@ public class JpaNestedNodeInsertingQueryDelegate<ID extends Serializable, N exte
         extends JpaNestedNodeQueryDelegate<ID, N>
         implements NestedNodeInsertingQueryDelegate<ID, N> {
 
-    public JpaNestedNodeInsertingQueryDelegate(EntityManager entityManager, TreeDiscriminator<ID, N> treeDiscriminator,
+    public JpaNestedNodeInsertingQueryDelegate(EntityManager entityManager, JpaTreeDiscriminator<ID, N> treeDiscriminator,
                                                Class<N> nodeClass, Class<ID> idClass) {
         super(entityManager, treeDiscriminator, nodeClass, idClass);
     }

@@ -10,28 +10,29 @@ import javax.persistence.criteria.Root;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
-public class MapTreeDiscriminator<ID extends Serializable, N extends NestedNode<ID>> implements TreeDiscriminator<ID, N> {
+public class MapJpaTreeDiscriminator<ID extends Serializable, N extends NestedNode<ID>> implements JpaTreeDiscriminator<ID, N> {
 
-    private Map<String, ValueProvider> valueProviders;
+    private Map<String, Supplier<Object>> valueProviders;
 
-    public MapTreeDiscriminator(Map<String, ValueProvider> valueProviders) {
+    public MapJpaTreeDiscriminator(Map<String, Supplier<Object>> valueProviders) {
         this.valueProviders = valueProviders;
     }
 
-    public MapTreeDiscriminator() {
+    public MapJpaTreeDiscriminator() {
         this.valueProviders = Maps.newHashMap();
     }
 
-    public void setValueProviders(Map<String, ValueProvider> valueProviders) {
+    public void setValueProviders(Map<String, Supplier<Object>> valueProviders) {
         this.valueProviders = valueProviders;
     }
 
     @Override
     public List<Predicate> getPredicates(CriteriaBuilder cb, Root<N> root) {
         List<Predicate> predicates = Lists.newArrayList();
-        for (Map.Entry<String, ValueProvider> providerEntry : valueProviders.entrySet()) {
-            predicates.add(cb.equal(root.get(providerEntry.getKey()), providerEntry.getValue().getDiscriminatorValue()));
+        for (Map.Entry<String, Supplier<Object>> providerEntry : valueProviders.entrySet()) {
+            predicates.add(cb.equal(root.get(providerEntry.getKey()), providerEntry.getValue().get()));
         }
         return predicates;
     }

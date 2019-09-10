@@ -21,7 +21,7 @@
  * OUN OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package pl.exsio.nestedj.jpa.repository;
+package pl.exsio.nestedj;
 
 import pl.exsio.nestedj.model.NestedNode;
 import pl.exsio.nestedj.model.Tree;

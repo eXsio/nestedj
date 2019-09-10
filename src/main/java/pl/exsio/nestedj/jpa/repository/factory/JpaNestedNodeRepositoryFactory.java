@@ -1,11 +1,11 @@
 package pl.exsio.nestedj.jpa.repository.factory;
 
+import pl.exsio.nestedj.DelegatingNestedNodeRepository;
+import pl.exsio.nestedj.NestedNodeRepository;
 import pl.exsio.nestedj.delegate.control.*;
 import pl.exsio.nestedj.delegate.query.jpa.*;
-import pl.exsio.nestedj.jpa.discriminator.MapTreeDiscriminator;
-import pl.exsio.nestedj.jpa.discriminator.TreeDiscriminator;
-import pl.exsio.nestedj.jpa.repository.DelegatingNestedNodeRepository;
-import pl.exsio.nestedj.jpa.repository.NestedNodeRepository;
+import pl.exsio.nestedj.jpa.discriminator.JpaTreeDiscriminator;
+import pl.exsio.nestedj.jpa.discriminator.MapJpaTreeDiscriminator;
 import pl.exsio.nestedj.model.NestedNode;
 
 import javax.persistence.EntityManager;
@@ -17,10 +17,10 @@ public final class JpaNestedNodeRepositoryFactory {
     }
 
     public static <ID extends Serializable, N extends NestedNode<ID>> NestedNodeRepository<ID, N> createDefault(Class<ID> idClass, Class<N> nodeClass, EntityManager entityManager) {
-        return createDiscriminated(idClass, nodeClass, entityManager, new MapTreeDiscriminator<ID, N>());
+        return createDiscriminated(idClass, nodeClass, entityManager, new MapJpaTreeDiscriminator<ID, N>());
     }
 
-    public static <ID extends Serializable, N extends NestedNode<ID>> NestedNodeRepository<ID, N> createDiscriminated(Class<ID> idClass, Class<N> nodeClass, EntityManager entityManager, TreeDiscriminator<ID, N> discriminator) {
+    public static <ID extends Serializable, N extends NestedNode<ID>> NestedNodeRepository<ID, N> createDiscriminated(Class<ID> idClass, Class<N> nodeClass, EntityManager entityManager, JpaTreeDiscriminator<ID, N> discriminator) {
         QueryBasedNestedNodeInserter<ID, N> inserter = new QueryBasedNestedNodeInserter<>(new JpaNestedNodeInsertingQueryDelegate<>(entityManager, discriminator, nodeClass, idClass));
         QueryBasedNestedNodeRetriever<ID, N> retriever = new QueryBasedNestedNodeRetriever<>(new JpaNestedNodeRetrievingQueryDelegate<>(entityManager, discriminator, nodeClass, idClass));
         return new DelegatingNestedNodeRepository<>(

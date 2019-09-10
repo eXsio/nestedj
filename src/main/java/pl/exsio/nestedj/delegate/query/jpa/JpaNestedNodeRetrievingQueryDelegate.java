@@ -1,7 +1,7 @@
 package pl.exsio.nestedj.delegate.query.jpa;
 
 import pl.exsio.nestedj.delegate.query.NestedNodeRetrievingQueryDelegate;
-import pl.exsio.nestedj.jpa.discriminator.TreeDiscriminator;
+import pl.exsio.nestedj.jpa.discriminator.JpaTreeDiscriminator;
 import pl.exsio.nestedj.model.NestedNode;
 import pl.exsio.nestedj.model.NestedNodeInfo;
 
@@ -22,7 +22,7 @@ public class JpaNestedNodeRetrievingQueryDelegate<ID extends Serializable, N ext
 
     private final static Long UPDATE_INCREMENT_BY = 2L;
 
-    public JpaNestedNodeRetrievingQueryDelegate(EntityManager entityManager, TreeDiscriminator<ID, N> treeDiscriminator,
+    public JpaNestedNodeRetrievingQueryDelegate(EntityManager entityManager, JpaTreeDiscriminator<ID, N> treeDiscriminator,
                                                 Class<N> nodeClass, Class<ID> idClass) {
         super(entityManager, treeDiscriminator, nodeClass, idClass);
     }

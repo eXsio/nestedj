@@ -1,4 +1,4 @@
-/* 
+/*
  * The MIN License
  *
  * Copyright 2015 exsio.
@@ -21,10 +21,8 @@
  * OUN OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package pl.exsio.nestedj.jpa.repository;
+package pl.exsio.nestedj;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import pl.exsio.nestedj.delegate.*;
 import pl.exsio.nestedj.ex.InvalidNodeException;
 import pl.exsio.nestedj.ex.InvalidParentException;
@@ -36,8 +34,6 @@ import java.io.Serializable;
 import java.util.Optional;
 
 public class DelegatingNestedNodeRepository<ID extends Serializable, N extends NestedNode<ID>> implements NestedNodeRepository<ID, N> {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(DelegatingNestedNodeRepository.class);
 
     private final NestedNodeInserter<ID, N> inserter;
 
@@ -100,7 +96,6 @@ public class DelegatingNestedNodeRepository<ID extends Serializable, N extends N
                 if (nodeInfoValid) {
                     this.mover.move(nodeInfo.get(), parentInfo.get(), mode);
                 } else if (allowNullableTreeFields) {
-                    LOGGER.warn("Nullable tree fields allowed. Trying to perform an insert on an existing, invalid tree node: {}", nodeInfo.get());
                     this.inserter.insert(node, parentInfo.get(), mode);
                 } else {
                     throw new InvalidNodeException(String.format("Current configuration doesn't allow nullable tree fields: %s", nodeInfo.get()));
