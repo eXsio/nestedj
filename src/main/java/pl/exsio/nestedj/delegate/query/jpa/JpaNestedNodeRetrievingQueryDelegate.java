@@ -1,7 +1,7 @@
 package pl.exsio.nestedj.delegate.query.jpa;
 
 import pl.exsio.nestedj.delegate.query.NestedNodeRetrievingQueryDelegate;
-import pl.exsio.nestedj.discriminator.TreeDiscriminator;
+import pl.exsio.nestedj.jpa.discriminator.TreeDiscriminator;
 import pl.exsio.nestedj.model.NestedNode;
 import pl.exsio.nestedj.model.NestedNodeInfo;
 

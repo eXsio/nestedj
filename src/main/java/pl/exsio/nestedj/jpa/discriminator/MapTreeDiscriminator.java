@@ -1,4 +1,4 @@
-package pl.exsio.nestedj.discriminator;
+package pl.exsio.nestedj.jpa.discriminator;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;

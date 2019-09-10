@@ -1,12 +1,12 @@
-package pl.exsio.nestedj.repository.factory;
+package pl.exsio.nestedj.jpa.repository.factory;
 
 import pl.exsio.nestedj.delegate.control.*;
 import pl.exsio.nestedj.delegate.query.jpa.*;
-import pl.exsio.nestedj.discriminator.MapTreeDiscriminator;
-import pl.exsio.nestedj.discriminator.TreeDiscriminator;
+import pl.exsio.nestedj.jpa.discriminator.MapTreeDiscriminator;
+import pl.exsio.nestedj.jpa.discriminator.TreeDiscriminator;
+import pl.exsio.nestedj.jpa.repository.DelegatingNestedNodeRepository;
+import pl.exsio.nestedj.jpa.repository.NestedNodeRepository;
 import pl.exsio.nestedj.model.NestedNode;
-import pl.exsio.nestedj.repository.DelegatingNestedNodeRepository;
-import pl.exsio.nestedj.repository.NestedNodeRepository;
 
 import javax.persistence.EntityManager;
 import java.io.Serializable;

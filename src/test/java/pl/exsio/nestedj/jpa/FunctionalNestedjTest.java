@@ -21,21 +21,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package pl.exsio.nestedj;
+package pl.exsio.nestedj.jpa;
 
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import pl.exsio.nestedj.TestConfiguration;
+import pl.exsio.nestedj.jpa.repository.DelegatingNestedNodeRepository;
 import pl.exsio.nestedj.model.TestNode;
-import pl.exsio.nestedj.repository.DelegatingNestedNodeRepository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+
+import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {TestConfiguration.class})
@@ -101,6 +104,56 @@ public abstract class FunctionalNestedjTest {
         }
         System.out.println(String.format("Parent of %s is %s", f.getName(), parent != null ? parent.getName() : "null"));
         return parent;
+    }
+
+
+    protected void assertSecondTreeIntact() {
+        TestNode a2 = this.findNode("a2");
+        TestNode b2 = this.findNode("b2");
+        TestNode c2 = this.findNode("c2");
+        TestNode d2 = this.findNode("d2");
+        TestNode e2 = this.findNode("e2");
+        TestNode g2 = this.findNode("g2");
+        TestNode f2 = this.findNode("f2");
+        TestNode h2 = this.findNode("h2");
+
+        assertEquals(1, (long) a2.getTreeLeft());
+        assertEquals(16, (long) a2.getTreeRight());
+        assertEquals(2, (long) b2.getTreeLeft());
+        assertEquals(7, (long) b2.getTreeRight());
+        assertEquals(8, (long) c2.getTreeLeft());
+        assertEquals(15, (long) c2.getTreeRight());
+        assertEquals(3, (long) d2.getTreeLeft());
+        assertEquals(4, (long) d2.getTreeRight());
+        assertEquals(5, (long) e2.getTreeLeft());
+        assertEquals(6, (long) e2.getTreeRight());
+        assertEquals(9, (long) f2.getTreeLeft());
+        assertEquals(10, (long) f2.getTreeRight());
+        assertEquals(11, (long) g2.getTreeLeft());
+        assertEquals(14, (long) g2.getTreeRight());
+        assertEquals(12, (long) h2.getTreeLeft());
+        assertEquals(13, (long) h2.getTreeRight());
+
+        assertNull(this.getParent(a2));
+        assertSame(this.getParent(b2), a2);
+        assertSame(this.getParent(c2), a2);
+        assertSame(this.getParent(d2), b2);
+        assertSame(this.getParent(e2), b2);
+        assertSame(this.getParent(f2), c2);
+        assertSame(this.getParent(g2), c2);
+        assertSame(this.getParent(h2), g2);
+
+    }
+
+    protected void breakTree() {
+
+        this.em.createQuery("update TestNode set parentId = null where name='c' and discriminator = 'tree_1'").executeUpdate();
+        this.em.createQuery("update TestNode set treeLeft = 0, treeRight = 0, treeLevel = 0 where discriminator = 'tree_1'").executeUpdate();
+
+    }
+
+    protected void removeTree() {
+        this.em.createQuery("delete from TestNode where discriminator = 'tree_1'").executeUpdate();
     }
 
 }

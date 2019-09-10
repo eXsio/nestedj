@@ -21,7 +21,7 @@
  * OUN OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package pl.exsio.nestedj.repository;
+package pl.exsio.nestedj.jpa.repository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

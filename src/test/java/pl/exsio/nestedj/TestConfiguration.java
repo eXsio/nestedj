@@ -9,10 +9,10 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
-import pl.exsio.nestedj.discriminator.TestTreeDiscriminator;
+import pl.exsio.nestedj.jpa.discriminator.TestTreeDiscriminator;
+import pl.exsio.nestedj.jpa.repository.NestedNodeRepository;
+import pl.exsio.nestedj.jpa.repository.factory.JpaNestedNodeRepositoryFactory;
 import pl.exsio.nestedj.model.TestNode;
-import pl.exsio.nestedj.repository.NestedNodeRepository;
-import pl.exsio.nestedj.repository.factory.JpaNestedNodeRepositoryFactory;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;

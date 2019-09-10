@@ -1,4 +1,4 @@
-package pl.exsio.nestedj.discriminator;
+package pl.exsio.nestedj.jpa.discriminator;
 
 import pl.exsio.nestedj.model.TestNode;
 
