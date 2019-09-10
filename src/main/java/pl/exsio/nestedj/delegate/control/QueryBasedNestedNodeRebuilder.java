@@ -28,7 +28,7 @@ import pl.exsio.nestedj.delegate.NestedNodeInserter;
 import pl.exsio.nestedj.delegate.NestedNodeMover;
 import pl.exsio.nestedj.delegate.NestedNodeRebuilder;
 import pl.exsio.nestedj.delegate.NestedNodeRetriever;
-import pl.exsio.nestedj.delegate.query.jpa.JpaNestedNodeRebuildingQueryDelegate;
+import pl.exsio.nestedj.delegate.query.NestedNodeRebuildingQueryDelegate;
 import pl.exsio.nestedj.ex.InvalidNodeException;
 import pl.exsio.nestedj.model.NestedNode;
 import pl.exsio.nestedj.model.NestedNodeInfo;
@@ -42,10 +42,10 @@ public class QueryBasedNestedNodeRebuilder<ID extends Serializable, N extends Ne
 
     private final NestedNodeRetriever<ID, N> retriever;
 
-    private final JpaNestedNodeRebuildingQueryDelegate<ID, N> queryDelegate;
+    private final NestedNodeRebuildingQueryDelegate<ID, N> queryDelegate;
 
     public QueryBasedNestedNodeRebuilder(NestedNodeInserter<ID, N> inserter, NestedNodeRetriever<ID, N> retriever,
-                                         JpaNestedNodeRebuildingQueryDelegate<ID, N> queryDelegate) {
+                                         NestedNodeRebuildingQueryDelegate<ID, N> queryDelegate) {
         this.inserter = inserter;
         this.retriever = retriever;
         this.queryDelegate = queryDelegate;

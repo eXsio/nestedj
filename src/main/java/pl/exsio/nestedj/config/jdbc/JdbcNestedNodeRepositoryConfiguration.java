@@ -20,7 +20,7 @@ public class JdbcNestedNodeRepositoryConfiguration<ID extends Serializable, N ex
 
     private final String insertQuery;
 
-    private final Function<Object[], N> insertValuesProvider;
+    private final Function<N, Object[]> insertValuesProvider;
 
     private final JdbcTreeDiscriminator treeDiscriminator;
 
@@ -28,7 +28,7 @@ public class JdbcNestedNodeRepositoryConfiguration<ID extends Serializable, N ex
 
     public JdbcNestedNodeRepositoryConfiguration(JdbcTemplate jdbcTemplate, String tableName,
                                                   RowMapper<N> rowMapper, String insertQuery,
-                                                  Function<Object[], N> insertValuesProvider,
+                                                  Function<N, Object[]> insertValuesProvider,
                                                   JdbcTreeDiscriminator treeDiscriminator) {
         this.jdbcTemplate = jdbcTemplate;
         this.tableName = tableName;
@@ -45,7 +45,7 @@ public class JdbcNestedNodeRepositoryConfiguration<ID extends Serializable, N ex
 
     public JdbcNestedNodeRepositoryConfiguration(JdbcTemplate jdbcTemplate, String tableName,
                                                  RowMapper<N> rowMapper, String insertQuery,
-                                                 Function<Object[], N> insertValuesProvider) {
+                                                 Function<N, Object[]> insertValuesProvider) {
         this(jdbcTemplate, tableName, rowMapper, insertQuery, insertValuesProvider, () -> "");
     }
 
@@ -65,7 +65,7 @@ public class JdbcNestedNodeRepositoryConfiguration<ID extends Serializable, N ex
         return insertQuery;
     }
 
-    public Function<Object[], N> getInsertValuesProvider() {
+    public Function<N, Object[]> getInsertValuesProvider() {
         return insertValuesProvider;
     }
 

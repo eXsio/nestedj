@@ -26,13 +26,13 @@ package pl.exsio.nestedj.jpa.repository;
 import org.junit.Test;
 import org.springframework.transaction.annotation.Transactional;
 import pl.exsio.nestedj.ex.InvalidNodesHierarchyException;
-import pl.exsio.nestedj.jpa.FunctionalNestedjTest;
+import pl.exsio.nestedj.jpa.FunctionalJpaNestedjTest;
 import pl.exsio.nestedj.model.TestNode;
 
 import static org.junit.Assert.*;
 
 @Transactional
-public class NestedNodeRepositoryRebuildingTest extends FunctionalNestedjTest {
+public class JpaNestedNodeRepositoryRebuildingTest extends FunctionalJpaNestedjTest {
 
     @Test
     public void testInitializeTree() {
@@ -49,7 +49,7 @@ public class NestedNodeRepositoryRebuildingTest extends FunctionalNestedjTest {
             assertEquals(0L, (long) x.getTreeLeft());
             assertEquals(0L, (long) x.getTreeRight());
 
-            this.nodeRepository.rebuildTree();
+            this.jpaRepository.rebuildTree();
             em.refresh(x);
             printNode("x", x);
             assertEquals(1, (long) x.getTreeLeft());
@@ -63,7 +63,7 @@ public class NestedNodeRepositoryRebuildingTest extends FunctionalNestedjTest {
 
     @Test
     public void testDestroyTree() {
-        nodeRepository.destroyTree();
+        jpaRepository.destroyTree();
         em.flush();
         em.clear();
 
@@ -120,7 +120,7 @@ public class NestedNodeRepositoryRebuildingTest extends FunctionalNestedjTest {
         try {
 
             this.breakTree();
-            this.nodeRepository.rebuildTree();
+            this.jpaRepository.rebuildTree();
 
             em.flush();
             em.clear();
@@ -163,14 +163,14 @@ public class NestedNodeRepositoryRebuildingTest extends FunctionalNestedjTest {
         TestNode j = this.createTestNode("j");
         TestNode k = this.createTestNode("k");
         TestNode a = this.findNode("a");
-        this.nodeRepository.insertAsNextSiblingOf(i, a);
-        this.nodeRepository.insertAsLastChildOf(j, i);
-        this.nodeRepository.insertAsLastChildOf(k, i);
+        this.jpaRepository.insertAsNextSiblingOf(i, a);
+        this.jpaRepository.insertAsLastChildOf(j, i);
+        this.jpaRepository.insertAsLastChildOf(k, i);
 
         this.em.createQuery("update TestNode set treeLeft = 0, treeRight = 0, treeLevel = 0 where discriminator = 'tree_1'").executeUpdate();
         em.flush();
         em.clear();
-        this.nodeRepository.rebuildTree();
+        this.jpaRepository.rebuildTree();
 
         a = this.findNode("a");
         TestNode b = this.findNode("b");

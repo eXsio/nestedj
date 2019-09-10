@@ -21,7 +21,7 @@ public abstract class JdbcNestedNodeQueryDelegate<ID extends Serializable, N ext
 
     protected final String insertQuery;
 
-    protected final Function<Object[], N> insertValuesProvider;
+    protected final Function<N, Object[]> insertValuesProvider;
 
     protected final JdbcTreeDiscriminator treeDiscriminator;
 

@@ -26,7 +26,7 @@ package pl.exsio.nestedj.jpa.repository;
 import org.junit.Test;
 import org.springframework.transaction.annotation.Transactional;
 import pl.exsio.nestedj.ex.InvalidNodesHierarchyException;
-import pl.exsio.nestedj.jpa.FunctionalNestedjTest;
+import pl.exsio.nestedj.jpa.FunctionalJpaNestedjTest;
 import pl.exsio.nestedj.model.TestNode;
 import pl.exsio.nestedj.model.Tree;
 
@@ -36,12 +36,12 @@ import java.util.Optional;
 import static org.junit.Assert.*;
 
 @Transactional
-public class NestedNodeRepositoryRetrievingTest extends FunctionalNestedjTest {
+public class JpaNestedNodeRepositoryRetrievingTest extends FunctionalJpaNestedjTest {
 
     @Test
     public void testGetParents() {
         TestNode h = this.findNode("h");
-        List<TestNode> parents = (List<TestNode>) this.nodeRepository.getParents(h);
+        List<TestNode> parents = (List<TestNode>) this.jpaRepository.getParents(h);
         assertEquals(3, parents.size());
         assertEquals("g", parents.get(0).getName());
         assertEquals("c", parents.get(1).getName());
@@ -52,7 +52,7 @@ public class NestedNodeRepositoryRetrievingTest extends FunctionalNestedjTest {
     @Test
     public void testGetPrevSibling() {
         TestNode c = this.findNode("c");
-        Optional<TestNode> prevSibling = this.nodeRepository.getPrevSibling(c);
+        Optional<TestNode> prevSibling = this.jpaRepository.getPrevSibling(c);
         assertTrue(prevSibling.isPresent());
         assertEquals("b", prevSibling.get().getName());
     }
@@ -60,7 +60,7 @@ public class NestedNodeRepositoryRetrievingTest extends FunctionalNestedjTest {
     @Test
     public void testGetNextSibling() {
         TestNode b = this.findNode("b");
-        Optional<TestNode> nextSibling = this.nodeRepository.getNextSibling(b);
+        Optional<TestNode> nextSibling = this.jpaRepository.getNextSibling(b);
         assertTrue(nextSibling.isPresent());
         assertEquals("c", nextSibling.get().getName());
     }
@@ -75,7 +75,7 @@ public class NestedNodeRepositoryRetrievingTest extends FunctionalNestedjTest {
             y.setTreeLevel(0L);
             this.em.persist(y);
             this.em.flush();
-            this.nodeRepository.rebuildTree();
+            this.jpaRepository.rebuildTree();
             em.refresh(y);
         } catch (InvalidNodesHierarchyException ex) {
             fail("something went wrong while creating a new root level node:" + ex.getMessage());
@@ -87,7 +87,7 @@ public class NestedNodeRepositoryRetrievingTest extends FunctionalNestedjTest {
         assertEquals(17, (long) y.getTreeLeft());
         assertEquals(18, (long) y.getTreeRight());
 
-        Optional<TestNode> prevSiblingRoot = this.nodeRepository.getPrevSibling(y);
+        Optional<TestNode> prevSiblingRoot = this.jpaRepository.getPrevSibling(y);
         assertTrue(prevSiblingRoot.isPresent());
         assertEquals("a", prevSiblingRoot.get().getName());
         assertSecondTreeIntact();
@@ -103,7 +103,7 @@ public class NestedNodeRepositoryRetrievingTest extends FunctionalNestedjTest {
             z.setTreeLevel(0L);
             this.em.persist(z);
             this.em.flush();
-            this.nodeRepository.rebuildTree();
+            this.jpaRepository.rebuildTree();
             em.refresh(z);
         } catch (InvalidNodesHierarchyException ex) {
             fail("something went wrong while creating a new root level node:" + ex.getMessage());
@@ -117,7 +117,7 @@ public class NestedNodeRepositoryRetrievingTest extends FunctionalNestedjTest {
 
         TestNode a = this.findNode("a");
 
-        Optional<TestNode> nextSiblingRoot = this.nodeRepository.getNextSibling(a);
+        Optional<TestNode> nextSiblingRoot = this.jpaRepository.getNextSibling(a);
         assertTrue(nextSiblingRoot.isPresent());
         assertEquals("z", nextSiblingRoot.get().getName());
         assertSecondTreeIntact();
@@ -125,7 +125,7 @@ public class NestedNodeRepositoryRetrievingTest extends FunctionalNestedjTest {
 
     @Test
     public void testGetTree() {
-        Tree<Long, TestNode> tree = this.nodeRepository.getTree(this.findNode("a"));
+        Tree<Long, TestNode> tree = this.jpaRepository.getTree(this.findNode("a"));
         assertEquals("a", tree.getNode().getName());
         assertEquals("b", tree.getChildren().get(0).getNode().getName());
         assertEquals(2, tree.getChildren().size());
@@ -139,7 +139,7 @@ public class NestedNodeRepositoryRetrievingTest extends FunctionalNestedjTest {
 
     @Test
     public void testGetTreeAsList() {
-        List<TestNode> list = (List<TestNode>) this.nodeRepository.getTreeAsList(this.findNode("a"));
+        List<TestNode> list = (List<TestNode>) this.jpaRepository.getTreeAsList(this.findNode("a"));
         assertEquals(8, list.size());
         assertSecondTreeIntact();
     }
@@ -147,7 +147,7 @@ public class NestedNodeRepositoryRetrievingTest extends FunctionalNestedjTest {
     @Test
     public void testGetParent() {
         TestNode b = this.findNode("b");
-        Optional<TestNode> parent = this.nodeRepository.getParent(b);
+        Optional<TestNode> parent = this.jpaRepository.getParent(b);
         assertTrue(parent.isPresent());
         assertEquals("a", parent.get().getName());
         assertSecondTreeIntact();
@@ -156,7 +156,7 @@ public class NestedNodeRepositoryRetrievingTest extends FunctionalNestedjTest {
     @Test
     public void testGetChildren() {
 
-        List result = (List) this.nodeRepository.getChildren(this.findNode("a"));
+        List result = (List) this.jpaRepository.getChildren(this.findNode("a"));
         assertEquals(2, result.size());
         assertSecondTreeIntact();
     }

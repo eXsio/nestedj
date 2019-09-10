@@ -26,19 +26,19 @@ package pl.exsio.nestedj.jpa.repository;
 import org.junit.Test;
 import org.springframework.transaction.annotation.Transactional;
 import pl.exsio.nestedj.ex.InvalidNodesHierarchyException;
-import pl.exsio.nestedj.jpa.FunctionalNestedjTest;
+import pl.exsio.nestedj.jpa.FunctionalJpaNestedjTest;
 import pl.exsio.nestedj.model.TestNode;
 
 import static org.junit.Assert.assertEquals;
 
 @Transactional
-public class NestedNodeRepositoryInsertingTest extends FunctionalNestedjTest {
+public class JpaNestedNodeRepositoryInsertingTest extends FunctionalJpaNestedjTest {
 
     @Test(expected = InvalidNodesHierarchyException.class)
     public void testInsertParentToChildAsSibling() {
         TestNode a = this.findNode("a");
         TestNode e = this.findNode("e");
-        this.nodeRepository.insertAsNextSiblingOf(a, e);
+        this.jpaRepository.insertAsNextSiblingOf(a, e);
         assertSecondTreeIntact();
     }
 
@@ -46,7 +46,7 @@ public class NestedNodeRepositoryInsertingTest extends FunctionalNestedjTest {
     public void testInsertParentToChildAsChild() {
         TestNode a = this.findNode("a");
         TestNode e = this.findNode("e");
-        this.nodeRepository.insertAsLastChildOf(a, e);
+        this.jpaRepository.insertAsLastChildOf(a, e);
         assertSecondTreeIntact();
     }
 
@@ -54,7 +54,7 @@ public class NestedNodeRepositoryInsertingTest extends FunctionalNestedjTest {
     public void testInsertAsNextSiblingSameNode() {
         TestNode a = this.findNode("a");
 
-        this.nodeRepository.insertAsNextSiblingOf(a, a);
+        this.jpaRepository.insertAsNextSiblingOf(a, a);
 
         assertSecondTreeIntact();
     }
@@ -63,7 +63,7 @@ public class NestedNodeRepositoryInsertingTest extends FunctionalNestedjTest {
     public void testInsertAsLastChildSameNode() {
         TestNode b = this.findNode("b");
 
-        this.nodeRepository.insertAsLastChildOf(b, b);
+        this.jpaRepository.insertAsLastChildOf(b, b);
         assertSecondTreeIntact();
     }
 
@@ -71,7 +71,7 @@ public class NestedNodeRepositoryInsertingTest extends FunctionalNestedjTest {
     public void testInsertAsPrevSiblingSameNode() {
         TestNode c = this.findNode("c");
 
-        this.nodeRepository.insertAsPrevSiblingOf(c, c);
+        this.jpaRepository.insertAsPrevSiblingOf(c, c);
         assertSecondTreeIntact();
     }
 
@@ -79,7 +79,7 @@ public class NestedNodeRepositoryInsertingTest extends FunctionalNestedjTest {
     public void testInsertAsFirstChildSameNode() {
         TestNode d = this.findNode("d");
 
-        this.nodeRepository.insertAsFirstChildOf(d, d);
+        this.jpaRepository.insertAsFirstChildOf(d, d);
 
         assertSecondTreeIntact();
     }
@@ -89,7 +89,7 @@ public class NestedNodeRepositoryInsertingTest extends FunctionalNestedjTest {
 
         TestNode i = this.createTestNode("i");
         TestNode e = this.findNode("e");
-        this.nodeRepository.insertAsFirstChildOf(i, e);
+        this.jpaRepository.insertAsFirstChildOf(i, e);
         TestNode a = this.findNode("a");
         TestNode b = this.findNode("b");
         TestNode h = this.findNode("h");
@@ -109,7 +109,7 @@ public class NestedNodeRepositoryInsertingTest extends FunctionalNestedjTest {
 
         TestNode i = this.createTestNode("i");
         TestNode b = this.findNode("b");
-        this.nodeRepository.insertAsFirstChildOf(i, b);
+        this.jpaRepository.insertAsFirstChildOf(i, b);
         TestNode a = this.findNode("a");
         em.flush();
         em.refresh(i);
@@ -140,7 +140,7 @@ public class NestedNodeRepositoryInsertingTest extends FunctionalNestedjTest {
 
         TestNode j = this.createTestNode("j");
         TestNode b = this.findNode("b");
-        this.nodeRepository.insertAsLastChildOf(j, b);
+        this.jpaRepository.insertAsLastChildOf(j, b);
         TestNode a = this.findNode("a");
         TestNode h = this.findNode("h");
         TestNode c = this.findNode("c");
@@ -160,7 +160,7 @@ public class NestedNodeRepositoryInsertingTest extends FunctionalNestedjTest {
 
         TestNode k = this.createTestNode("k");
         TestNode e = this.findNode("e");
-        this.nodeRepository.insertAsPrevSiblingOf(k, e);
+        this.jpaRepository.insertAsPrevSiblingOf(k, e);
         em.flush();
         em.clear();
         TestNode a = this.findNode("a");
@@ -183,7 +183,7 @@ public class NestedNodeRepositoryInsertingTest extends FunctionalNestedjTest {
 
         TestNode m = this.createTestNode("m");
         TestNode h = this.findNode("h");
-        this.nodeRepository.insertAsNextSiblingOf(m, h);
+        this.jpaRepository.insertAsNextSiblingOf(m, h);
         TestNode a = this.findNode("a");
         TestNode g = this.findNode("g");
         TestNode c = this.findNode("c");

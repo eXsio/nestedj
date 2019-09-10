@@ -3,16 +3,22 @@ package pl.exsio.nestedj;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
+import pl.exsio.nestedj.config.jdbc.JdbcNestedNodeRepositoryConfiguration;
 import pl.exsio.nestedj.config.jpa.JpaNestedNodeRepositoryConfiguration;
+import pl.exsio.nestedj.jdbc.repository.factory.JdbcNestedNodeRepositoryFactory;
 import pl.exsio.nestedj.jpa.discriminator.TestJpaTreeDiscriminator;
 import pl.exsio.nestedj.jpa.repository.factory.JpaNestedNodeRepositoryFactory;
 import pl.exsio.nestedj.model.TestNode;
+import pl.exsio.nestedj.qualifier.Jdbc;
+import pl.exsio.nestedj.qualifier.Jpa;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -20,6 +26,7 @@ import javax.persistence.PersistenceContext;
 import javax.sql.DataSource;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.function.Function;
 
 @Configuration
 public class TestConfiguration {
@@ -71,11 +78,24 @@ public class TestConfiguration {
     }
 
     @Bean
-    public NestedNodeRepository<Long, TestNode> repository() {
+    @Jpa
+    public NestedNodeRepository<Long, TestNode> jpaRepository() {
         JpaNestedNodeRepositoryConfiguration<Long, TestNode> configuration = new JpaNestedNodeRepositoryConfiguration<>(
                 entityManager, TestNode.class, Long.class, new TestJpaTreeDiscriminator()
         );
         return JpaNestedNodeRepositoryFactory.create(configuration);
+    }
+
+    @Bean
+    @Jdbc
+    public NestedNodeRepository<Long, TestNode> jdbcRepository(DataSource dataSource) {
+        RowMapper<TestNode> mapper = (resultSet, i) -> null;
+        String insertQuery = "";
+        Function<TestNode, Object[]> insertValuesProvider = testNode -> new Object[0];
+        JdbcNestedNodeRepositoryConfiguration<Long, TestNode> configuration = new JdbcNestedNodeRepositoryConfiguration<>(
+                new JdbcTemplate(dataSource), "nested_nodes", mapper, insertQuery, insertValuesProvider
+        );
+        return JdbcNestedNodeRepositoryFactory.create(configuration);
     }
 
 }

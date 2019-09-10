@@ -31,6 +31,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import pl.exsio.nestedj.DelegatingNestedNodeRepository;
 import pl.exsio.nestedj.TestConfiguration;
 import pl.exsio.nestedj.model.TestNode;
+import pl.exsio.nestedj.qualifier.Jpa;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -43,10 +44,11 @@ import static org.junit.Assert.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {TestConfiguration.class})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
-public abstract class FunctionalNestedjTest {
+public abstract class FunctionalJpaNestedjTest {
 
     @Autowired
-    protected DelegatingNestedNodeRepository<Long, TestNode> nodeRepository;
+    @Jpa
+    protected DelegatingNestedNodeRepository<Long, TestNode> jpaRepository;
 
     @PersistenceContext
     protected EntityManager em;
