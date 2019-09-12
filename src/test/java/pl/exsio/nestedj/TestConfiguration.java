@@ -13,6 +13,7 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import pl.exsio.nestedj.config.jdbc.JdbcNestedNodeRepositoryConfiguration;
 import pl.exsio.nestedj.config.jpa.JpaNestedNodeRepositoryConfiguration;
+import pl.exsio.nestedj.jdbc.discriminator.TestJdbcTreeDiscriminator;
 import pl.exsio.nestedj.jdbc.repository.factory.JdbcNestedNodeRepositoryFactory;
 import pl.exsio.nestedj.jpa.discriminator.TestJpaTreeDiscriminator;
 import pl.exsio.nestedj.jpa.repository.factory.JpaNestedNodeRepositoryFactory;
@@ -25,6 +26,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceContext;
 import javax.sql.DataSource;
 import java.util.Properties;
+import java.util.Random;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -90,17 +92,7 @@ public class TestConfiguration {
     @Jdbc
     public NestedNodeRepository<Long, TestNode> jdbcRepository(DataSource dataSource) {
         //ROW MAPPER FOR CREATING INSTANCES OF THE NODE OBJECT
-        RowMapper<TestNode> mapper = (resultSet, i) -> {
-            TestNode n = new TestNode();
-            n.setId(resultSet.getLong(0));
-            n.setTreeLeft(resultSet.getLong(1));
-            n.setTreeLevel(resultSet.getLong(2));
-            n.setTreeRight(resultSet.getLong(3));
-            n.setName(resultSet.getString(4));
-            n.setParentId(resultSet.getLong(5));
-            n.setDiscriminator(resultSet.getString(6));
-            return n;
-        };
+        RowMapper<TestNode> mapper = (resultSet, i) -> TestNode.fromResultSet(resultSet);
 
         //TABLE NAME
         String tableName = "nested_nodes";
@@ -109,10 +101,10 @@ public class TestConfiguration {
         String insertQuery = "insert into nested_nodes(id, tree_left, tree_level, tree_right, node_name, parent_id, discriminator) values(?,?,?,?,?,?,?)";
 
         // INSERT QUERY VALUES PROVIDER, CONVERTS NODE OBJECT INTO AN OBJECT ARRAY
-        Function<TestNode, Object[]> insertValuesProvider = n -> new Object[]{null, n.getTreeLeft(), n.getTreeLevel(), n.getTreeRight(), n.getName(), n.getParentId(), n.getDiscriminator()};
+        Function<TestNode, Object[]> insertValuesProvider = n -> new Object[]{new Random(100000).nextLong(), n.getTreeLeft(), n.getTreeLevel(), n.getTreeRight(), n.getName(), n.getParentId(), n.getDiscriminator()};
 
         JdbcNestedNodeRepositoryConfiguration<Long, TestNode> configuration = new JdbcNestedNodeRepositoryConfiguration<>(
-                new JdbcTemplate(dataSource), tableName, mapper, insertQuery, insertValuesProvider
+                new JdbcTemplate(dataSource), tableName, mapper, insertQuery, insertValuesProvider, new TestJdbcTreeDiscriminator()
         );
 
         configuration.setIdColumnName("id");

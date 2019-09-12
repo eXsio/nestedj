@@ -7,6 +7,7 @@ import pl.exsio.nestedj.jdbc.discriminator.JdbcTreeDiscriminator;
 import pl.exsio.nestedj.model.NestedNode;
 
 import java.io.Serializable;
+import java.util.Map;
 import java.util.function.Function;
 
 public abstract class JdbcNestedNodeQueryDelegate<ID extends Serializable, N extends NestedNode<ID>> {
@@ -35,6 +36,8 @@ public abstract class JdbcNestedNodeQueryDelegate<ID extends Serializable, N ext
 
     protected final String level;
 
+    protected final Map<String, String> treeColumnNames;
+
     public JdbcNestedNodeQueryDelegate(JdbcNestedNodeRepositoryConfiguration<ID, N> configuration) {
         this.jdbcTemplate = configuration.getJdbcTemplate();
         this.tableName = configuration.getTableName();
@@ -48,5 +51,11 @@ public abstract class JdbcNestedNodeQueryDelegate<ID extends Serializable, N ext
         this.left = configuration.getTreeColumnNames().get(NestedNode.LEFT);
         this.right = configuration.getTreeColumnNames().get(NestedNode.RIGHT);
         this.level = configuration.getTreeColumnNames().get(NestedNode.LEVEL);
+        this.treeColumnNames = configuration.getTreeColumnNames();
+    }
+
+    protected String getDiscriminatedQuery(String baseQuery) {
+        String disriminatedQuery = treeDiscriminator.getQueryPart();
+        return baseQuery.contains("where") ? String.format("%s and %s", baseQuery, disriminatedQuery) : String.format("%s where %s", baseQuery, disriminatedQuery);
     }
 }

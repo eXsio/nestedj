@@ -1,4 +1,4 @@
-/* 
+/*
  * The MIT License
  *
  * Copyright 2015 exsio.
@@ -26,6 +26,8 @@ package pl.exsio.nestedj.model;
 import com.google.common.base.MoreObjects;
 
 import javax.persistence.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Objects;
 
 @Entity
@@ -144,5 +146,20 @@ public class TestNode implements NestedNode<Long> {
     @Override
     public int hashCode() {
         return Objects.hash(getId());
+    }
+
+    public static TestNode fromResultSet(ResultSet resultSet) throws SQLException {
+        if (!resultSet.next()) {
+            return null;
+        }
+        TestNode n = new TestNode();
+        n.setId(resultSet.getLong("ID"));
+        n.setTreeLeft(resultSet.getLong("TREE_LEFT"));
+        n.setTreeLevel(resultSet.getLong("TREE_LEVEL"));
+        n.setTreeRight(resultSet.getLong("TREE_RIGHT"));
+        n.setName(resultSet.getString("NODE_NAME"));
+        n.setParentId(resultSet.getLong("PARENT_ID"));
+        n.setDiscriminator(resultSet.getString("DISCRIMINATOR"));
+        return n;
     }
 }

@@ -31,7 +31,8 @@ import pl.exsio.nestedj.DelegatingNestedNodeRepository;
 import pl.exsio.nestedj.TestConfiguration;
 import pl.exsio.nestedj.model.TestNode;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {TestConfiguration.class})
@@ -106,13 +107,13 @@ public abstract class FunctionalNestedjTest {
         assertEquals(13, (long) h2.getTreeRight());
 
         assertNull(this.getParent(a2));
-        assertSame(this.getParent(b2), a2);
-        assertSame(this.getParent(c2), a2);
-        assertSame(this.getParent(d2), b2);
-        assertSame(this.getParent(e2), b2);
-        assertSame(this.getParent(f2), c2);
-        assertSame(this.getParent(g2), c2);
-        assertSame(this.getParent(h2), g2);
+        assertEquals(this.getParent(b2), a2);
+        assertEquals(this.getParent(c2), a2);
+        assertEquals(this.getParent(d2), b2);
+        assertEquals(this.getParent(e2), b2);
+        assertEquals(this.getParent(f2), c2);
+        assertEquals(this.getParent(g2), c2);
+        assertEquals(this.getParent(h2), g2);
 
     }
 

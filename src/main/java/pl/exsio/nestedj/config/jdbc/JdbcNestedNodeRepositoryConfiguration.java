@@ -29,9 +29,9 @@ public class JdbcNestedNodeRepositoryConfiguration<ID extends Serializable, N ex
     private Map<String, String> treeColumnNames = Maps.newHashMap();
 
     public JdbcNestedNodeRepositoryConfiguration(JdbcTemplate jdbcTemplate, String tableName,
-                                                  RowMapper<N> rowMapper, String insertQuery,
-                                                  Function<N, Object[]> insertValuesProvider,
-                                                  JdbcTreeDiscriminator treeDiscriminator) {
+                                                 RowMapper<N> rowMapper, String insertQuery,
+                                                 Function<N, Object[]> insertValuesProvider,
+                                                 JdbcTreeDiscriminator treeDiscriminator) {
         this.jdbcTemplate = jdbcTemplate;
         this.tableName = tableName;
         this.rowMapper = rowMapper;

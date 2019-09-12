@@ -1,5 +1,6 @@
 package pl.exsio.nestedj.delegate.query.jdbc;
 
+import org.springframework.jdbc.core.ResultSetExtractor;
 import pl.exsio.nestedj.config.jdbc.JdbcNestedNodeRepositoryConfiguration;
 import pl.exsio.nestedj.delegate.query.NestedNodeRetrievingQueryDelegate;
 import pl.exsio.nestedj.model.NestedNode;
@@ -48,7 +49,18 @@ public class JdbcNestedNodeRetrievingQueryDelegate<ID extends Serializable, N ex
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Optional<NestedNodeInfo<ID>> getNodeInfo(ID nodeId) {
-        return Optional.empty();
+        NestedNodeInfo<ID> info = jdbcTemplate.query(
+                getDiscriminatedQuery(String.format("select %s, %s, %s, %s, %s from %s where %s = ?", id, parentId, left, right, level, tableName, id)),
+                preparedStatement -> preparedStatement.setObject(1, nodeId),
+                (ResultSetExtractor<NestedNodeInfo<ID>>) rs -> {
+                    if(!rs.next()) {
+                        return null;
+                    }
+                    return new NestedNodeInfo((ID) rs.getObject(id), (ID) rs.getObject(parentId), rs.getLong(left), rs.getLong(right), rs.getLong(level));
+                }
+        );
+        return Optional.ofNullable(info);
     }
 }

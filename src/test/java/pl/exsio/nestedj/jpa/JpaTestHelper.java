@@ -12,7 +12,7 @@ public class JpaTestHelper implements TestHelper {
 
     private final EntityManager em;
 
-    public JpaTestHelper(EntityManager em) {
+    JpaTestHelper(EntityManager em) {
         this.em = em;
     }
 
