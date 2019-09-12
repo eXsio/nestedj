@@ -21,24 +21,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package pl.exsio.nestedj.jpa.repository;
+package pl.exsio.nestedj.base;
 
 import org.junit.Test;
 import org.springframework.transaction.annotation.Transactional;
 import pl.exsio.nestedj.ex.InvalidNodesHierarchyException;
-import pl.exsio.nestedj.jpa.FunctionalJpaNestedjTest;
 import pl.exsio.nestedj.model.TestNode;
 
 import static org.junit.Assert.assertEquals;
 
 @Transactional
-public class JpaNestedNodeRepositoryInsertingTest extends FunctionalJpaNestedjTest {
+public abstract class NestedNodeRepositoryInsertingTest extends FunctionalNestedjTest {
 
     @Test(expected = InvalidNodesHierarchyException.class)
     public void testInsertParentToChildAsSibling() {
         TestNode a = this.findNode("a");
         TestNode e = this.findNode("e");
-        this.jpaRepository.insertAsNextSiblingOf(a, e);
+        this.repository.insertAsNextSiblingOf(a, e);
         assertSecondTreeIntact();
     }
 
@@ -46,7 +45,7 @@ public class JpaNestedNodeRepositoryInsertingTest extends FunctionalJpaNestedjTe
     public void testInsertParentToChildAsChild() {
         TestNode a = this.findNode("a");
         TestNode e = this.findNode("e");
-        this.jpaRepository.insertAsLastChildOf(a, e);
+        this.repository.insertAsLastChildOf(a, e);
         assertSecondTreeIntact();
     }
 
@@ -54,7 +53,7 @@ public class JpaNestedNodeRepositoryInsertingTest extends FunctionalJpaNestedjTe
     public void testInsertAsNextSiblingSameNode() {
         TestNode a = this.findNode("a");
 
-        this.jpaRepository.insertAsNextSiblingOf(a, a);
+        this.repository.insertAsNextSiblingOf(a, a);
 
         assertSecondTreeIntact();
     }
@@ -63,7 +62,7 @@ public class JpaNestedNodeRepositoryInsertingTest extends FunctionalJpaNestedjTe
     public void testInsertAsLastChildSameNode() {
         TestNode b = this.findNode("b");
 
-        this.jpaRepository.insertAsLastChildOf(b, b);
+        this.repository.insertAsLastChildOf(b, b);
         assertSecondTreeIntact();
     }
 
@@ -71,7 +70,7 @@ public class JpaNestedNodeRepositoryInsertingTest extends FunctionalJpaNestedjTe
     public void testInsertAsPrevSiblingSameNode() {
         TestNode c = this.findNode("c");
 
-        this.jpaRepository.insertAsPrevSiblingOf(c, c);
+        this.repository.insertAsPrevSiblingOf(c, c);
         assertSecondTreeIntact();
     }
 
@@ -79,7 +78,7 @@ public class JpaNestedNodeRepositoryInsertingTest extends FunctionalJpaNestedjTe
     public void testInsertAsFirstChildSameNode() {
         TestNode d = this.findNode("d");
 
-        this.jpaRepository.insertAsFirstChildOf(d, d);
+        this.repository.insertAsFirstChildOf(d, d);
 
         assertSecondTreeIntact();
     }
@@ -89,7 +88,7 @@ public class JpaNestedNodeRepositoryInsertingTest extends FunctionalJpaNestedjTe
 
         TestNode i = this.createTestNode("i");
         TestNode e = this.findNode("e");
-        this.jpaRepository.insertAsFirstChildOf(i, e);
+        this.repository.insertAsFirstChildOf(i, e);
         TestNode a = this.findNode("a");
         TestNode b = this.findNode("b");
         TestNode h = this.findNode("h");
@@ -109,11 +108,11 @@ public class JpaNestedNodeRepositoryInsertingTest extends FunctionalJpaNestedjTe
 
         TestNode i = this.createTestNode("i");
         TestNode b = this.findNode("b");
-        this.jpaRepository.insertAsFirstChildOf(i, b);
+        this.repository.insertAsFirstChildOf(i, b);
         TestNode a = this.findNode("a");
-        em.flush();
-        em.refresh(i);
-        em.refresh(b);
+        flush();
+        refresh(i);
+        refresh(b);
         printNode("i", i);
         b = findNode("b");
         TestNode h = this.findNode("h");
@@ -140,7 +139,7 @@ public class JpaNestedNodeRepositoryInsertingTest extends FunctionalJpaNestedjTe
 
         TestNode j = this.createTestNode("j");
         TestNode b = this.findNode("b");
-        this.jpaRepository.insertAsLastChildOf(j, b);
+        this.repository.insertAsLastChildOf(j, b);
         TestNode a = this.findNode("a");
         TestNode h = this.findNode("h");
         TestNode c = this.findNode("c");
@@ -160,9 +159,8 @@ public class JpaNestedNodeRepositoryInsertingTest extends FunctionalJpaNestedjTe
 
         TestNode k = this.createTestNode("k");
         TestNode e = this.findNode("e");
-        this.jpaRepository.insertAsPrevSiblingOf(k, e);
-        em.flush();
-        em.clear();
+        this.repository.insertAsPrevSiblingOf(k, e);
+        flushAndClear();
         TestNode a = this.findNode("a");
         TestNode h = this.findNode("h");
         TestNode c = this.findNode("c");
@@ -183,7 +181,7 @@ public class JpaNestedNodeRepositoryInsertingTest extends FunctionalJpaNestedjTe
 
         TestNode m = this.createTestNode("m");
         TestNode h = this.findNode("h");
-        this.jpaRepository.insertAsNextSiblingOf(m, h);
+        this.repository.insertAsNextSiblingOf(m, h);
         TestNode a = this.findNode("a");
         TestNode g = this.findNode("g");
         TestNode c = this.findNode("c");

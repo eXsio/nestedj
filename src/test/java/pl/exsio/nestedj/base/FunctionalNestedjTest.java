@@ -21,37 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package pl.exsio.nestedj.jpa;
+package pl.exsio.nestedj.base;
 
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import pl.exsio.nestedj.DelegatingNestedNodeRepository;
 import pl.exsio.nestedj.TestConfiguration;
 import pl.exsio.nestedj.model.TestNode;
-import pl.exsio.nestedj.qualifier.Jpa;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 
 import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {TestConfiguration.class})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
-public abstract class FunctionalJpaNestedjTest {
-
-    @Autowired
-    @Jpa
-    protected DelegatingNestedNodeRepository<Long, TestNode> jpaRepository;
-
-    @PersistenceContext
-    protected EntityManager em;
+public abstract class FunctionalNestedjTest {
 
     /**
      * STARTING NESTED TREE CONDITIONS
@@ -71,17 +56,10 @@ public abstract class FunctionalJpaNestedjTest {
      *                               \
      *                             12 H 13
      */
-    protected TestNode findNode(String symbol) {
 
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<TestNode> select = cb.createQuery(TestNode.class);
-        Root<TestNode> root = select.from(TestNode.class);
-        select.where(cb.equal(root.get("name"), symbol));
-        TestNode n = em.createQuery(select).getSingleResult();
-        printNode(symbol, n);
-        this.em.refresh(n);
-        return n;
-    }
+    protected DelegatingNestedNodeRepository<Long, TestNode> repository;
+
+    protected abstract TestNode findNode(String symbol);
 
     protected void printNode(String symbol, TestNode n) {
         if(n != null) {
@@ -97,16 +75,7 @@ public abstract class FunctionalJpaNestedjTest {
         return n;
     }
 
-    protected TestNode getParent(TestNode f) {
-        this.em.refresh(f);
-        TestNode parent = null;
-        Long parentId = f.getParentId();
-        if (parentId != null) {
-            parent = em.find(TestNode.class, parentId);
-        }
-        System.out.println(String.format("Parent of %s is %s", f.getName(), parent != null ? parent.getName() : "null"));
-        return parent;
-    }
+    protected abstract TestNode getParent(TestNode f);
 
 
     protected void assertSecondTreeIntact() {
@@ -147,15 +116,24 @@ public abstract class FunctionalJpaNestedjTest {
 
     }
 
-    protected void breakTree() {
+    protected abstract void breakTree();
 
-        this.em.createQuery("update TestNode set parentId = null where name='c' and discriminator = 'tree_1'").executeUpdate();
-        this.em.createQuery("update TestNode set treeLeft = 0, treeRight = 0, treeLevel = 0 where discriminator = 'tree_1'").executeUpdate();
+    protected abstract void resetParent(String symbol);
+
+    protected abstract void removeTree();
+
+    protected void flushAndClear() {
 
     }
 
-    protected void removeTree() {
-        this.em.createQuery("delete from TestNode where discriminator = 'tree_1'").executeUpdate();
+    protected void flush() {
+
     }
+
+    protected void refresh(TestNode node) {
+
+    }
+
+    protected abstract void save(TestNode node);
 
 }

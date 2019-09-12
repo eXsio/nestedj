@@ -21,29 +21,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package pl.exsio.nestedj.jpa.repository;
+package pl.exsio.nestedj.base;
 
 import org.junit.Test;
 import org.springframework.transaction.annotation.Transactional;
-import pl.exsio.nestedj.jpa.FunctionalJpaNestedjTest;
 import pl.exsio.nestedj.model.TestNode;
 
 import static org.junit.Assert.*;
 
 @Transactional
-public class JpaNestedNodeRepositoryMovingTest extends FunctionalJpaNestedjTest {
+public abstract class NestedNodeRepositoryMovingTest extends FunctionalNestedjTest {
 
     @Test
     public void testInsertAsLastChildOfDeepMove() {
         TestNode b = this.findNode("b");
         TestNode a = this.findNode("a");
-        this.jpaRepository.insertAsLastChildOf(b, a);
+        this.repository.insertAsLastChildOf(b, a);
         TestNode d = this.findNode("d");
         TestNode g = this.findNode("g");
         TestNode c = this.findNode("c");
 
-        em.refresh(b);
-        em.refresh(a);
+        refresh(b);
+        refresh(a);
         assertEquals(2, (long) c.getTreeLeft());
         assertEquals(9, (long) c.getTreeRight());
         assertEquals(10, (long) b.getTreeLeft());
@@ -62,13 +61,13 @@ public class JpaNestedNodeRepositoryMovingTest extends FunctionalJpaNestedjTest 
     public void testInsertAsFirstChildOfDeepMove() {
         TestNode c = this.findNode("c");
         TestNode a = this.findNode("a");
-        this.jpaRepository.insertAsFirstChildOf(c, a);
+        this.repository.insertAsFirstChildOf(c, a);
         TestNode d = this.findNode("d");
         TestNode g = this.findNode("g");
         TestNode b = this.findNode("b");
 
-        em.refresh(c);
-        em.refresh(a);
+        refresh(c);
+        refresh(a);
         assertEquals(2, (long) c.getTreeLeft());
         assertEquals(9, (long) c.getTreeRight());
         assertEquals(10, (long) b.getTreeLeft());
@@ -87,13 +86,13 @@ public class JpaNestedNodeRepositoryMovingTest extends FunctionalJpaNestedjTest 
     public void testInsertAsNextSiblingOfDeepMove() {
         TestNode b = this.findNode("b");
         TestNode a = this.findNode("a");
-        this.jpaRepository.insertAsNextSiblingOf(b, a);
+        this.repository.insertAsNextSiblingOf(b, a);
         TestNode d = this.findNode("d");
         TestNode g = this.findNode("g");
         TestNode e = this.findNode("e");
 
-        em.refresh(b);
-        em.refresh(a);
+        refresh(b);
+        refresh(a);
         assertEquals(11, (long) b.getTreeLeft());
         assertEquals(16, (long) b.getTreeRight());
         assertEquals(1, (long) a.getTreeLeft());
@@ -113,14 +112,14 @@ public class JpaNestedNodeRepositoryMovingTest extends FunctionalJpaNestedjTest 
     public void testInsertAsPrevSiblingOfDeepMove() {
         TestNode c = this.findNode("c");
         TestNode a = this.findNode("a");
-        this.jpaRepository.insertAsPrevSiblingOf(c, a);
+        this.repository.insertAsPrevSiblingOf(c, a);
         TestNode d = this.findNode("d");
         TestNode g = this.findNode("g");
         TestNode f = this.findNode("f");
         TestNode h = this.findNode("h");
 
-        em.refresh(c);
-        em.refresh(a);
+        refresh(c);
+        refresh(a);
         assertEquals(1, (long) c.getTreeLeft());
         assertEquals(8, (long) c.getTreeRight());
         assertEquals(9, (long) a.getTreeLeft());
@@ -141,7 +140,7 @@ public class JpaNestedNodeRepositoryMovingTest extends FunctionalJpaNestedjTest 
     public void testInsertAsPrevSiblingOfMoveRight() {
         TestNode d = this.findNode("d");
         TestNode g = this.findNode("g");
-        this.jpaRepository.insertAsPrevSiblingOf(d, g);
+        this.repository.insertAsPrevSiblingOf(d, g);
         TestNode f = this.findNode("f");
         TestNode c = this.findNode("c");
         TestNode a = this.findNode("a");
@@ -149,8 +148,8 @@ public class JpaNestedNodeRepositoryMovingTest extends FunctionalJpaNestedjTest 
         TestNode e = this.findNode("e");
         TestNode h = this.findNode("h");
 
-        em.refresh(d);
-        em.refresh(g);
+        refresh(d);
+        refresh(g);
         assertEquals(3, (long) e.getTreeLeft());
         assertEquals(4, (long) e.getTreeRight());
         assertEquals(5, (long) b.getTreeRight());
@@ -174,14 +173,14 @@ public class JpaNestedNodeRepositoryMovingTest extends FunctionalJpaNestedjTest 
     public void testInsertAsPrevSiblingOfMoveLeft() {
         TestNode g = this.findNode("g");
         TestNode e = this.findNode("e");
-        this.jpaRepository.insertAsPrevSiblingOf(g, e);
+        this.repository.insertAsPrevSiblingOf(g, e);
         TestNode c = this.findNode("c");
         TestNode a = this.findNode("a");
         TestNode b = this.findNode("b");
         TestNode h = this.findNode("h");
 
-        em.refresh(g);
-        em.refresh(e);
+        refresh(g);
+        refresh(e);
         assertEquals(5, (long) g.getTreeLeft());
         assertEquals(8, (long) g.getTreeRight());
         assertEquals(6, (long) h.getTreeLeft());
@@ -202,7 +201,7 @@ public class JpaNestedNodeRepositoryMovingTest extends FunctionalJpaNestedjTest 
     public void testInsertAsNextSiblingOfMoveRight() {
         TestNode d = this.findNode("d");
         TestNode f = this.findNode("f");
-        this.jpaRepository.insertAsNextSiblingOf(d, f);
+        this.repository.insertAsNextSiblingOf(d, f);
         TestNode g = this.findNode("g");
         TestNode c = this.findNode("c");
         TestNode a = this.findNode("a");
@@ -210,8 +209,8 @@ public class JpaNestedNodeRepositoryMovingTest extends FunctionalJpaNestedjTest 
         TestNode e = this.findNode("e");
         TestNode h = this.findNode("h");
 
-        em.refresh(d);
-        em.refresh(f);
+        refresh(d);
+        refresh(f);
         assertEquals(3, (long) e.getTreeLeft());
         assertEquals(4, (long) e.getTreeRight());
         assertEquals(5, (long) b.getTreeRight());
@@ -234,15 +233,15 @@ public class JpaNestedNodeRepositoryMovingTest extends FunctionalJpaNestedjTest 
     public void testInsertAsNextSiblingOfMoveLeft() {
         TestNode g = this.findNode("g");
         TestNode d = this.findNode("d");
-        this.jpaRepository.insertAsNextSiblingOf(g, d);
+        this.repository.insertAsNextSiblingOf(g, d);
         TestNode c = this.findNode("c");
         TestNode a = this.findNode("a");
         TestNode b = this.findNode("b");
         TestNode e = this.findNode("e");
         TestNode h = this.findNode("h");
 
-        em.refresh(d);
-        em.refresh(g);
+        refresh(d);
+        refresh(g);
         assertEquals(5, (long) g.getTreeLeft());
         assertEquals(8, (long) g.getTreeRight());
         assertEquals(6, (long) h.getTreeLeft());
@@ -263,15 +262,15 @@ public class JpaNestedNodeRepositoryMovingTest extends FunctionalJpaNestedjTest 
     public void testInsertAsLastChildOfMoveLeft() {
         TestNode g = this.findNode("g");
         TestNode b = this.findNode("b");
-        this.jpaRepository.insertAsLastChildOf(g, b);
+        this.repository.insertAsLastChildOf(g, b);
         TestNode f = this.findNode("f");
         TestNode c = this.findNode("c");
         TestNode a = this.findNode("a");
         TestNode d = this.findNode("d");
         TestNode h = this.findNode("h");
 
-        em.refresh(g);
-        em.refresh(b);
+        refresh(g);
+        refresh(b);
         assertEquals(7, (long) g.getTreeLeft());
         assertEquals(10, (long) g.getTreeRight());
         assertEquals(8, (long) h.getTreeLeft());
@@ -292,7 +291,7 @@ public class JpaNestedNodeRepositoryMovingTest extends FunctionalJpaNestedjTest 
     public void testInsertAsLastChildOfMoveRight() {
         TestNode d = this.findNode("d");
         TestNode g = this.findNode("g");
-        this.jpaRepository.insertAsLastChildOf(d, g);
+        this.repository.insertAsLastChildOf(d, g);
         TestNode f = this.findNode("f");
         TestNode c = this.findNode("c");
         TestNode a = this.findNode("a");
@@ -300,8 +299,8 @@ public class JpaNestedNodeRepositoryMovingTest extends FunctionalJpaNestedjTest 
         TestNode e = this.findNode("e");
         TestNode h = this.findNode("h");
 
-        em.refresh(d);
-        em.refresh(g);
+        refresh(d);
+        refresh(g);
         assertEquals(3, (long) e.getTreeLeft());
         assertEquals(4, (long) e.getTreeRight());
         assertEquals(5, (long) b.getTreeRight());
@@ -322,10 +321,10 @@ public class JpaNestedNodeRepositoryMovingTest extends FunctionalJpaNestedjTest 
     public void testInsertAsFirstChildOfMoveRight() {
         TestNode d = findNode("d");
         TestNode g = findNode("g");
-        this.jpaRepository.insertAsFirstChildOf(d, g);
+        this.repository.insertAsFirstChildOf(d, g);
 
-        em.refresh(d);
-        em.refresh(g);
+        refresh(d);
+        refresh(g);
         TestNode f = findNode("f");
         TestNode c = findNode("c");
         TestNode a = findNode("a");
@@ -353,14 +352,14 @@ public class JpaNestedNodeRepositoryMovingTest extends FunctionalJpaNestedjTest 
     public void testInsertAsFirstChildOfMoveLeft() {
         TestNode g = this.findNode("g");
         TestNode b = this.findNode("b");
-        this.jpaRepository.insertAsFirstChildOf(g, b);
+        this.repository.insertAsFirstChildOf(g, b);
         TestNode f = this.findNode("f");
         TestNode c = this.findNode("c");
         TestNode a = this.findNode("a");
         TestNode h = this.findNode("h");
 
-        em.refresh(g);
-        em.refresh(b);
+        refresh(g);
+        refresh(b);
         assertEquals(3, (long) g.getTreeLeft());
         assertEquals(6, (long) g.getTreeRight());
         assertEquals(13, (long) f.getTreeLeft());
@@ -378,7 +377,7 @@ public class JpaNestedNodeRepositoryMovingTest extends FunctionalJpaNestedjTest 
     public void testInsertAsNextSiblingOfMoveEdge() {
         TestNode h = this.findNode("h");
         TestNode c = this.findNode("c");
-        this.jpaRepository.insertAsLastChildOf(h, c);
+        this.repository.insertAsLastChildOf(h, c);
 
         TestNode a = this.findNode("a");
         TestNode b = this.findNode("b");
@@ -414,7 +413,7 @@ public class JpaNestedNodeRepositoryMovingTest extends FunctionalJpaNestedjTest 
 
         TestNode c = this.findNode("c");
         TestNode a = this.findNode("a");
-        this.jpaRepository.insertAsNextSiblingOf(c, a);
+        this.repository.insertAsNextSiblingOf(c, a);
 
         a = this.findNode("a");
         TestNode b = this.findNode("b");

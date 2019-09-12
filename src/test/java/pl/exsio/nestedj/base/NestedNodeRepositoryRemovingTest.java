@@ -21,23 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package pl.exsio.nestedj.jpa.repository;
+package pl.exsio.nestedj.base;
 
 import org.junit.Test;
 import org.springframework.transaction.annotation.Transactional;
-import pl.exsio.nestedj.jpa.FunctionalJpaNestedjTest;
 import pl.exsio.nestedj.model.TestNode;
 
 import static org.junit.Assert.assertEquals;
 
 @Transactional
-public class JpaNestedNodeRepositoryRemovingTest extends FunctionalJpaNestedjTest {
+public abstract class NestedNodeRepositoryRemovingTest extends FunctionalNestedjTest {
 
     @Test
     public void testRemoveSubtreeWithoutChildren() {
 
         TestNode d = this.findNode("d");
-        this.jpaRepository.removeSubtree(d);
+        this.repository.removeSubtree(d);
         TestNode a = this.findNode("a");
         TestNode e = this.findNode("e");
         TestNode b = this.findNode("b");
@@ -64,7 +63,7 @@ public class JpaNestedNodeRepositoryRemovingTest extends FunctionalJpaNestedjTes
     public void testRemoveSubtree() {
 
         TestNode b = this.findNode("b");
-        this.jpaRepository.removeSubtree(b);
+        this.repository.removeSubtree(b);
         TestNode a = this.findNode("a");
         TestNode g = this.findNode("g");
         TestNode c = this.findNode("c");
@@ -86,7 +85,7 @@ public class JpaNestedNodeRepositoryRemovingTest extends FunctionalJpaNestedjTes
     public void testRemoveSingleNodeThatHasChildren() {
 
         TestNode b = this.findNode("b");
-        this.jpaRepository.removeSingle(b);
+        this.repository.removeSingle(b);
         TestNode a = this.findNode("a");
         TestNode e = this.findNode("e");
         TestNode d = this.findNode("d");
@@ -114,7 +113,7 @@ public class JpaNestedNodeRepositoryRemovingTest extends FunctionalJpaNestedjTes
     public void testRemoveSingleNode() {
 
         TestNode d = this.findNode("d");
-        this.jpaRepository.removeSingle(d);
+        this.repository.removeSingle(d);
         TestNode a = this.findNode("a");
         TestNode g = this.findNode("g");
         TestNode c = this.findNode("c");

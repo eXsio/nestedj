@@ -21,18 +21,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package pl.exsio.nestedj.jpa.repository;
+package pl.exsio.nestedj.base;
 
 import org.junit.Test;
 import org.springframework.transaction.annotation.Transactional;
 import pl.exsio.nestedj.ex.InvalidNodesHierarchyException;
-import pl.exsio.nestedj.jpa.FunctionalJpaNestedjTest;
 import pl.exsio.nestedj.model.TestNode;
 
 import static org.junit.Assert.*;
 
 @Transactional
-public class JpaNestedNodeRepositoryRebuildingTest extends FunctionalJpaNestedjTest {
+public abstract class NestedNodeRepositoryRebuildingTest extends FunctionalNestedjTest {
 
     @Test
     public void testInitializeTree() {
@@ -43,14 +42,14 @@ public class JpaNestedNodeRepositoryRebuildingTest extends FunctionalJpaNestedjT
             x.setTreeLeft(0L);
             x.setTreeRight(0L);
             x.setTreeLevel(0L);
-            this.em.persist(x);
-            this.em.flush();
+            save(x);
+            flush();
 
             assertEquals(0L, (long) x.getTreeLeft());
             assertEquals(0L, (long) x.getTreeRight());
 
-            this.jpaRepository.rebuildTree();
-            em.refresh(x);
+            this.repository.rebuildTree();
+            refresh(x);
             printNode("x", x);
             assertEquals(1, (long) x.getTreeLeft());
             assertEquals(2, (long) x.getTreeRight());
@@ -63,9 +62,8 @@ public class JpaNestedNodeRepositoryRebuildingTest extends FunctionalJpaNestedjT
 
     @Test
     public void testDestroyTree() {
-        jpaRepository.destroyTree();
-        em.flush();
-        em.clear();
+        repository.destroyTree();
+        flushAndClear();
 
         TestNode a = this.findNode("a");
         TestNode e = this.findNode("e");
@@ -120,10 +118,10 @@ public class JpaNestedNodeRepositoryRebuildingTest extends FunctionalJpaNestedjT
         try {
 
             this.breakTree();
-            this.jpaRepository.rebuildTree();
+            this.resetParent("c");
+            this.repository.rebuildTree();
 
-            em.flush();
-            em.clear();
+            flushAndClear();
 
             TestNode a = this.findNode("a");
             TestNode e = this.findNode("e");
@@ -163,14 +161,13 @@ public class JpaNestedNodeRepositoryRebuildingTest extends FunctionalJpaNestedjT
         TestNode j = this.createTestNode("j");
         TestNode k = this.createTestNode("k");
         TestNode a = this.findNode("a");
-        this.jpaRepository.insertAsNextSiblingOf(i, a);
-        this.jpaRepository.insertAsLastChildOf(j, i);
-        this.jpaRepository.insertAsLastChildOf(k, i);
+        this.repository.insertAsNextSiblingOf(i, a);
+        this.repository.insertAsLastChildOf(j, i);
+        this.repository.insertAsLastChildOf(k, i);
 
-        this.em.createQuery("update TestNode set treeLeft = 0, treeRight = 0, treeLevel = 0 where discriminator = 'tree_1'").executeUpdate();
-        em.flush();
-        em.clear();
-        this.jpaRepository.rebuildTree();
+        breakTree();
+        flushAndClear();
+        this.repository.rebuildTree();
 
         a = this.findNode("a");
         TestNode b = this.findNode("b");
@@ -181,9 +178,9 @@ public class JpaNestedNodeRepositoryRebuildingTest extends FunctionalJpaNestedjT
         TestNode f = this.findNode("f");
         TestNode h = this.findNode("h");
 
-        i = em.find(TestNode.class, i.getId());
-        j = em.find(TestNode.class, j.getId());
-        k = em.find(TestNode.class, k.getId());
+        i = findNode("i");
+        j = findNode("j");
+        k = findNode("k");
 
         printNode("i", i);
         printNode("j", j);
