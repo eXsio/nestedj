@@ -69,16 +69,8 @@ public class JpaNestedNodeIRemovingQueryDelegate<ID extends Serializable, N exte
 
     @Override
     public void decrementSideFieldsBeforeSingleNodeRemoval(Long from, String field) {
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
-        Root<N> root = update.from(nodeClass);
-
-        update.set(root.<Long>get(field), cb.diff(root.get(field), DECREMENT_BY))
-                .where(getPredicates(cb, root, cb.greaterThan(root.get(field), from)));
-
-        entityManager.createQuery(update).executeUpdate();
+        decrementSideFields(from, DECREMENT_BY, field);
     }
-
 
     @Override
     public void pushUpDeletedNodesChildren(NestedNodeInfo<ID> node) {
@@ -99,14 +91,7 @@ public class JpaNestedNodeIRemovingQueryDelegate<ID extends Serializable, N exte
 
     @Override
     public void decrementSideFieldsAfterSubtreeRemoval(Long from, Long delta, String field) {
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
-        Root<N> root = update.from(nodeClass);
-
-        update.set(root.<Long>get(field), cb.diff(root.get(field), delta))
-                .where(getPredicates(cb, root, cb.greaterThan(root.get(field), from)));
-
-        entityManager.createQuery(update).executeUpdate();
+        decrementSideFields(from, delta, field);
     }
 
     @Override
@@ -120,5 +105,16 @@ public class JpaNestedNodeIRemovingQueryDelegate<ID extends Serializable, N exte
         ));
 
         entityManager.createQuery(delete).executeUpdate();
+    }
+
+    private void decrementSideFields(Long from, Long delta, String field) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
+        Root<N> root = update.from(nodeClass);
+
+        update.set(root.<Long>get(field), cb.diff(root.get(field), delta))
+                .where(getPredicates(cb, root, cb.greaterThan(root.get(field), from)));
+
+        entityManager.createQuery(update).executeUpdate();
     }
 }

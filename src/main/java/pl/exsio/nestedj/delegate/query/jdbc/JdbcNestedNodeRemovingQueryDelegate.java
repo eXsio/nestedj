@@ -80,19 +80,7 @@ public class JdbcNestedNodeRemovingQueryDelegate<ID extends Serializable, N exte
 
     @Override
     public void decrementSideFieldsBeforeSingleNodeRemoval(Long from, String field) {
-        String columnName = treeColumnNames.get(field);
-        jdbcTemplate.update(
-                getDiscriminatedQuery(
-                        new Query("update :tableName set :columnName = (:columnName - ?) where :columnName > ?")
-                                .set("columnName", columnName)
-                                .build()
-                ),
-                preparedStatement -> {
-                    preparedStatement.setLong(1, DECREMENT_BY);
-                    preparedStatement.setLong(2, from);
-                    setDiscriminatorParams(preparedStatement, 3);
-                }
-        );
+        decrementSideFields(from, DECREMENT_BY, field);
     }
 
     @Override
@@ -111,19 +99,7 @@ public class JdbcNestedNodeRemovingQueryDelegate<ID extends Serializable, N exte
 
     @Override
     public void decrementSideFieldsAfterSubtreeRemoval(Long from, Long delta, String field) {
-        String columnName = treeColumnNames.get(field);
-        jdbcTemplate.update(
-                getDiscriminatedQuery(
-                        new Query("update :tableName set :columnName = (:columnName - ?) where :columnName > ?")
-                                .set("columnName", columnName)
-                                .build()
-                ),
-                preparedStatement -> {
-                    preparedStatement.setLong(1, delta);
-                    preparedStatement.setLong(2, from);
-                    setDiscriminatorParams(preparedStatement, 3);
-                }
-        );
+        decrementSideFields(from, delta, field);
     }
 
     @Override
@@ -135,6 +111,22 @@ public class JdbcNestedNodeRemovingQueryDelegate<ID extends Serializable, N exte
                 preparedStatement -> {
                     preparedStatement.setObject(1, node.getLeft());
                     preparedStatement.setObject(2, node.getRight());
+                    setDiscriminatorParams(preparedStatement, 3);
+                }
+        );
+    }
+
+    private void decrementSideFields(Long from, Long delta, String field) {
+        String columnName = treeColumnNames.get(field);
+        jdbcTemplate.update(
+                getDiscriminatedQuery(
+                        new Query("update :tableName set :columnName = (:columnName - ?) where :columnName > ?")
+                                .set("columnName", columnName)
+                                .build()
+                ),
+                preparedStatement -> {
+                    preparedStatement.setLong(1, delta);
+                    preparedStatement.setLong(2, from);
                     setDiscriminatorParams(preparedStatement, 3);
                 }
         );
