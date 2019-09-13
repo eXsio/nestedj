@@ -20,7 +20,7 @@ public class JdbcNestedNodeInsertingQueryDelegate<ID extends Serializable, N ext
     @Override
 
     public void insert(N node) {
-        if(node.getId() == null) {
+        if (node.getId() == null) {
             doInsert(node);
         } else {
             update(node);
@@ -37,7 +37,7 @@ public class JdbcNestedNodeInsertingQueryDelegate<ID extends Serializable, N ext
                     preparedStatement.setObject(1, node.getTreeLeft());
                     preparedStatement.setObject(2, node.getTreeRight());
                     preparedStatement.setObject(3, node.getTreeLevel());
-                    if(node.getParentId() == null) {
+                    if (node.getParentId() == null) {
                         preparedStatement.setNull(4, Types.OTHER);
                     } else {
                         preparedStatement.setObject(4, node.getParentId());

@@ -72,6 +72,7 @@ public abstract class NestedNodeRepositoryRetrievingTest extends FunctionalNeste
             y.setTreeLeft(0L);
             y.setTreeRight(0L);
             y.setTreeLevel(0L);
+            y.setParentId(null);
             save(y);
             flush();
             this.repository.rebuildTree();
@@ -80,6 +81,7 @@ public abstract class NestedNodeRepositoryRetrievingTest extends FunctionalNeste
             fail("something went wrong while creating a new root level node:" + ex.getMessage());
         }
 
+        System.out.println(y);
         // ensure node y was built as a root level node
         assertEquals(0, (long) y.getTreeLevel());
         assertNull(y.getParentId());

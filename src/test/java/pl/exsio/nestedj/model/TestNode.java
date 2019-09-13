@@ -158,6 +158,9 @@ public class TestNode implements NestedNode<Long> {
         n.setTreeRight(resultSet.getLong("TREE_RIGHT"));
         n.setName(resultSet.getString("NODE_NAME"));
         n.setParentId(resultSet.getLong("PARENT_ID"));
+        if(resultSet.wasNull()) {
+            n.setParentId(null);
+        }
         n.setDiscriminator(resultSet.getString("DISCRIMINATOR"));
         return n;
     }

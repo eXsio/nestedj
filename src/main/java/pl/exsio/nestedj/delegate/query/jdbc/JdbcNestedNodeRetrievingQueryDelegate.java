@@ -1,5 +1,6 @@
 package pl.exsio.nestedj.delegate.query.jdbc;
 
+import com.google.common.collect.Lists;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import pl.exsio.nestedj.config.jdbc.JdbcNestedNodeRepositoryConfiguration;
 import pl.exsio.nestedj.delegate.query.NestedNodeRetrievingQueryDelegate;
@@ -20,32 +21,102 @@ public class JdbcNestedNodeRetrievingQueryDelegate<ID extends Serializable, N ex
 
     @Override
     public Iterable<N> getTreeAsList(N node) {
-        return null;
+        return jdbcTemplate.query(
+                getDiscriminatedQuery(
+                        new Query("select * from :tableName where :left >= ? and :right <= ? order by :left asc").build()
+                ),
+                preparedStatement -> {
+                    preparedStatement.setObject(1, node.getTreeLeft());
+                    preparedStatement.setObject(2, node.getTreeRight());
+                    setDiscriminatorParams(preparedStatement, 3);
+                },
+                rowMapper
+        );
     }
 
     @Override
     public Iterable<N> getChildren(N node) {
-        return null;
+        return jdbcTemplate.query(
+                getDiscriminatedQuery(
+                        new Query("select * from :tableName where :left >= ? and :right <= ? and :level = ? order by :left asc").build()
+                ),
+                preparedStatement -> {
+                    preparedStatement.setObject(1, node.getTreeLeft());
+                    preparedStatement.setObject(2, node.getTreeRight());
+                    preparedStatement.setObject(3, node.getTreeLevel() + 1);
+                    setDiscriminatorParams(preparedStatement, 4);
+                },
+                rowMapper
+        );
     }
 
     @Override
     public Optional<N> getParent(N node) {
-        return Optional.empty();
+        if (node.getTreeLevel() > 0) {
+            return jdbcTemplate.query(
+                    getDiscriminatedQuery(
+                            new Query("select * from :tableName where :left < ? and :right > ? and :level = ? order by :left asc").build()
+                    ),
+                    preparedStatement -> {
+                        preparedStatement.setObject(1, node.getTreeLeft());
+                        preparedStatement.setObject(2, node.getTreeRight());
+                        preparedStatement.setObject(3, node.getTreeLevel() - 1);
+                        setDiscriminatorParams(preparedStatement, 4);
+                    },
+                    rowMapper
+            ).stream().findFirst();
+        } else {
+            return Optional.empty();
+        }
     }
 
     @Override
     public Iterable<N> getParents(N node) {
-        return null;
+        if (node.getTreeLevel() > 0) {
+            return jdbcTemplate.query(
+                    getDiscriminatedQuery(
+                            new Query("select * from :tableName where :left < ? and :right > ? order by :left desc").build()
+                    ),
+                    preparedStatement -> {
+                        preparedStatement.setObject(1, node.getTreeLeft());
+                        preparedStatement.setObject(2, node.getTreeRight());
+                        setDiscriminatorParams(preparedStatement, 3);
+                    },
+                    rowMapper
+            );
+        } else {
+            return Lists.newLinkedList();
+        }
     }
 
     @Override
     public Optional<N> getPrevSibling(N node) {
-        return Optional.empty();
+        return jdbcTemplate.query(
+                getDiscriminatedQuery(
+                        new Query("select * from :tableName where :right = ? and :level = ? order by :left asc").build()
+                ),
+                preparedStatement -> {
+                    preparedStatement.setObject(1, node.getTreeLeft() - 1);
+                    preparedStatement.setObject(2, node.getTreeLevel());
+                    setDiscriminatorParams(preparedStatement, 3);
+                },
+                rowMapper
+        ).stream().findFirst();
     }
 
     @Override
     public Optional<N> getNextSibling(N node) {
-        return Optional.empty();
+        return jdbcTemplate.query(
+                getDiscriminatedQuery(
+                        new Query("select * from :tableName where :left = ? and :level = ? order by :left asc").build()
+                ),
+                preparedStatement -> {
+                    preparedStatement.setObject(1, node.getTreeRight() + 1);
+                    preparedStatement.setObject(2, node.getTreeLevel());
+                    setDiscriminatorParams(preparedStatement, 3);
+                },
+                rowMapper
+        ).stream().findFirst();
     }
 
     @Override

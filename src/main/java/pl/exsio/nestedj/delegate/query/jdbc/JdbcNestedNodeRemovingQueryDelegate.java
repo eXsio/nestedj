@@ -27,7 +27,7 @@ public class JdbcNestedNodeRemovingQueryDelegate<ID extends Serializable, N exte
                 ),
                 preparedStatement -> {
                     Optional<ID> newParentId = findNodeParentId(node);
-                    if(!newParentId.isPresent()) {
+                    if (!newParentId.isPresent()) {
                         preparedStatement.setNull(1, Types.OTHER);
                     } else {
                         preparedStatement.setObject(1, newParentId.get());
@@ -55,7 +55,7 @@ public class JdbcNestedNodeRemovingQueryDelegate<ID extends Serializable, N exte
                         setDiscriminatorParams(preparedStatement, 4);
                     },
                     rs -> {
-                        if(!rs.next()) {
+                        if (!rs.next()) {
                             throw new InvalidNodeException(String.format("Couldn't find node's parent, although its level is greater than 0. It seems the tree is malformed: %s", node));
                         }
                         return (ID) rs.getObject(this.id);

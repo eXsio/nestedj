@@ -62,7 +62,8 @@ public abstract class JdbcNestedNodeQueryDelegate<ID extends Serializable, N ext
         String[] queryParts = baseQuery.split("order by");
 
         String modifiedQuery = queryParts[0].contains("where") ? String.format("%s and %s", queryParts[0], disriminatedQuery) : String.format("%s where %s", queryParts[0], disriminatedQuery);
-        return queryParts.length == 1 ? modifiedQuery : String.format("%s order by %s", modifiedQuery, queryParts[1]);
+        String s = queryParts.length == 1 ? modifiedQuery : String.format("%s order by %s", modifiedQuery, queryParts[1]);
+        return s;
     }
 
     protected void setDiscriminatorParams(PreparedStatement ps, int offset) throws SQLException {
