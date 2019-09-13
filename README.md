@@ -57,7 +57,7 @@ Using the traditional ```parant_id``` relationship would mean firing multiple qu
 ## Advantages of NestedJ
 
    - **No Reflection!** - no custom annotations, no additional boostrap logic
-   - **Best achievable performance** - all tree actions are performed using a minimal number of Criteria Queries, without loading any parts of the tree structure to the memory
+   - **Best achievable performance** - all tree actions are performed using a minimal number of Bulk SQL Queries, without loading any parts of the tree structure to the memory and without node-by-node processing
    - **No JPA mappings enforced** - no ManyToOne/OneToMany mappings needed for the lib to work (if you're using JPA implementation)
    - **No ID/PK class enforced** - no hardwired requirements for any particular ID/Primary Key class
    - **Fully customizable** - you can repimplement the parts you need and leave the rest intact
