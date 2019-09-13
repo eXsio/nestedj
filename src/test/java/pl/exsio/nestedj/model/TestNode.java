@@ -32,10 +32,11 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "nested_nodes")
+@SequenceGenerator(name="seq", initialValue=1, allocationSize=1)
 public class TestNode implements NestedNode<Long> {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq")
     private Long id;
 
     @Column(name = "node_name", nullable = false)

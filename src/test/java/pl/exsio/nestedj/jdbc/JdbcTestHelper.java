@@ -73,8 +73,8 @@ public class JdbcTestHelper implements TestHelper {
 
     public void save(TestNode node) {
         jdbcTemplate.execute(
-                String.format("insert into nested_nodes(id, tree_left, tree_level, tree_right, node_name, parent_id, discriminator) values(%s,%s,%s,%s,'%s',%s,'%s')",
-                            null, node.getTreeLeft(), node.getTreeLevel(), node.getTreeRight(), node.getName(), node.getParentId(), node.getDiscriminator()
+                String.format("insert into nested_nodes(id, tree_left, tree_level, tree_right, node_name, parent_id, discriminator) values(next value for SEQ,%s,%s,%s,'%s',%s,'%s')",
+                             node.getTreeLeft(), node.getTreeLevel(), node.getTreeRight(), node.getName(), node.getParentId(), node.getDiscriminator()
                         )
         );
     }
