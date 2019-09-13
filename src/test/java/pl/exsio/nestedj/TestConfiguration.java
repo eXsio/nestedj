@@ -91,9 +91,7 @@ public class TestConfiguration {
     @Jdbc
     public NestedNodeRepository<Long, TestNode> jdbcRepository(DataSource dataSource) {
         //ROW MAPPER FOR CREATING INSTANCES OF THE NODE OBJECT
-        RowMapper<TestNode> mapper = (resultSet, i) -> {
-            return TestNode.fromResultSet(resultSet);
-        };
+        RowMapper<TestNode> mapper = (resultSet, i) -> TestNode.fromResultSet(resultSet);
 
         //TABLE NAME
         String tableName = "nested_nodes";

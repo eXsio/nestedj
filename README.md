@@ -3,14 +3,14 @@
 [![Coverity Status](https://scan.coverity.com/projects/8499/badge.svg?flat=1)](https://scan.coverity.com/projects/exsio-nestedj)
 [![codecov](https://codecov.io/gh/eXsio/nestedj/branch/master/graph/badge.svg)](https://codecov.io/gh/eXsio/nestedj)
 
-NestedJ is a Java library that implements the Nested Set pattern with the help of JPA.
+NestedJ is a Java library that implements the Nested Set pattern for Java.
 
-### Overview
+## Overview
 NestedJ can automate the insertion/moving/removing of tree nodes. It can also retrieve persisted Nodes as a flat or recursive Java structures / collections.
 
 ### What is Nested Set?
 
-Nested Set is a RDBMS Tree implementation. It allows to query for whole tree branches and finding ancestors and descendants using one simple query. As usual, there is no freee lunch, so the price to pay in this case is a slightly more complex logic for modifying the tree (inserting / moving / removing nodes and branches). Fortunately NestedJ makes it as easy as using a standard JPA EntityManager.
+Nested Set is a RDBMS Tree implementation. It allows to query for whole tree branches and finding ancestors and descendants using one simple query. As usual, there is no freee lunch, so the price to pay in this case is a slightly more complex logic for modifying the tree (inserting / moving / removing nodes and branches). Fortunately NestedJ makes it very easy.
 
 ### Example
 
@@ -54,7 +54,7 @@ Using the traditional ```parant_id``` relationship would mean firing multiple qu
 
 ##### Important: Nested Set is NOT a binary tree - the number of nodes on any treeLevel is unlimited. 
 
-### Advantages of NestedJ
+## Advantages of NestedJ
 
    - **No Reflection!** - no custom annotations, no additional boostrap logic
    - **Best achievable performance** - all tree actions are performed using a minimal number of Criteria Queries, without loading any parts of the tree structure to the memory
@@ -64,7 +64,7 @@ Using the traditional ```parant_id``` relationship would mean firing multiple qu
    - **Fully tested** - integration tests created for all possible tree operations
    - **Minimal number of Project dependencies** - only Guava and SLF4J
 
-### Installation
+## Installation
 
 ```
 
@@ -78,41 +78,22 @@ Using the traditional ```parant_id``` relationship would mean firing multiple qu
 <dependency>
     <groupId>com.github.eXsio</groupId>
     <artifactId>nestedj</artifactId>
-    <version>3.0.0</version>
+    <version>4.0.0</version>
 </dependency>
 
 ```
 
-### First Steps
 
-In order to use NestedJ, You have to configure it. In 9 our of 10 cases you will want to use the preconfigured builder methods available in the ```NestedNodeRepository``` interface:
- 
- 
- Here's the full code:
+##JPA Usage
 
+In order to use NestedJ, You have to configure it. In 9 our of 10 cases you will want to use the preconfigured builder methods available in the ```JpaNestedNodeRepositoryFactory``` interface:
+ 
     //ID and Node classes
-    Class<Long> idClass = Long.class;
-    Class<YourNode> nodeClass = YourNode.class;
-    
-    NestedNodeRepository.createDefault(idClass, nodeClass, entityManager)
-    NestedNodeRepository.createDiscriminated(idClass, nodeClass, entityManager, new CustomTreeDiscriminator());
- 
+    JpaNestedNodeRepositoryConfiguration<Long, TestNode> configuration = new JpaNestedNodeRepositoryConfiguration<>(
+                    entityManager, YourNode.class, Long.class, new YourJpaTreeDiscriminator() //Discriminator is optional, allows to create multiple trees in one table
+            );
+    return JpaNestedNodeRepositoryFactory.create(configuration); 
 
-```DelegatingNestedNodeRepository``` is a default, provided implementation of ```NestedNodeRepository```. If You need or want, You can implement your own inserter/mover/retriever/remover/rebuilder that fit your needs and configure the whole thing by hand:
-
-```
-    CustomNestedNodeInserter<ID, N> inserter = new CustomNestedNodeInserter<>(entityManager, discriminator);
-    CustomNestedNodeRetriever<ID, N> retriever = new CustomNestedNodeRetriever<>(entityManager, discriminator);
-    return new DelegatingNestedNodeRepository<>(idClass, nodeClass, inserter,
-            new CustomNestedNodeMover<>(entityManager, discriminator),
-            new CustomNestedNodeRemover<>(entityManager, discriminator),
-            retriever,
-            new CustomNestedNodeRebuilder<>(entityManager, discriminator, inserter, retriever)
-    );
-
-```
-
-### Entiy mapping
 
 Here is the example entity that implements the ```NestedNode``` interface:
 
@@ -185,28 +166,45 @@ public class TestNode implements NestedNode<Long> {
 }
 ```
 
-As You see, there are 4 specific columns:
-- Left
-- Right
-- Level
-- Parent ID
+##JDBC Usage
 
-Strictly speaking NestedSet doesn't need the parent id column, but at the same time it's structure is so fragile, that this additional feature helps rebuild the tree if it becomes corrupted for some reason.
+In order to use NestedJ, You have to configure it. In 9 our of 10 cases you will want to use the preconfigured builder methods available in the ```JdbcNestedNodeRepositoryFactory``` interface:
+ 
+    //ROW MAPPER FOR CREATING INSTANCES OF THE NODE OBJECT FROM RESULT SET
+    RowMapper<TestNode> mapper = (resultSet, i) -> YourNode.fromResultSet(resultSet);
 
-It is recommended that ```Left```, ```Right``` and ```Level``` be non nullable. This will ensure better stability of the Nested Set structure.
+    //TABLE NAME
+    String tableName = "nested_nodes";
 
-The ID of the entity interface is a parametrized type, which allows for using Long as well as UUID or any other ```Serializable``` class.
+    // QUERY USED FOR INSERTING NEW NODES
+    String insertQuery = "insert into nested_nodes(id, tree_left, tree_level, tree_right, node_name, parent_id, discriminator) values(next value for SEQ,?,?,?,?,?,?)";
 
-##### The ```NestedNode``` interface expects the implementing class to adhere to the JavaBean standard (field names should match getters and setters)
+    // INSERT QUERY VALUES PROVIDER, CONVERTS NODE OBJECT INTO AN OBJECT ARRAY
+    Function<TestNode, Object[]> insertValuesProvider = n -> new Object[]{n.getTreeLeft(), n.getTreeLevel(), n.getTreeRight(), n.getName(), n.getParentId(), n.getDiscriminator()};
 
+    //CONFIGURATION CLASS
+    JdbcNestedNodeRepositoryConfiguration<Long, TestNode> configuration = new JdbcNestedNodeRepositoryConfiguration<>(
+            new JdbcTemplate(dataSource), tableName, mapper, insertQuery, insertValuesProvider, new TestJdbcTreeDiscriminator()
+    );
 
-### Usage
+    //CUSTOM COLUMN NAMES
+    configuration.setIdColumnName("id");
+    configuration.setParentIdColumnName("parent_id");
+    configuration.setLeftColumnName("tree_left");
+    configuration.setRighColumnName("tree_right");
+    configuration.setLevelColumnName("tree_level");
+
+    return JdbcNestedNodeRepositoryFactory.create(configuration);
+
+The Node Class has to implement the ```NestedNode``` interface so that the logic can operage on Nested Node specific columns.
+
+## General Usage
 
 After creating schema You can use the special ```NestedNodeRepository``` to perform a tree-specific opeeration, such as:
 
 ```
     void insertAsFirstChildOf(N node, N parent);
-
+    
     void insertAsLastChildOf(N node, N parent);
 
     void insertAsNextSiblingOf(N node, N parent);
@@ -221,28 +219,55 @@ After creating schema You can use the special ```NestedNodeRepository``` to perf
 
     Optional<N> getParent(N node);
 
+    Optional<N> getPrevSibling(N node);
+
+    Optional<N> getNextSibling(N node);
+
     Iterable<N> getParents(N node);
 
     Iterable<N> getTreeAsList(N node);
 
     Tree<ID, N> getTree(N node);
 
-    void rebuildTree(Class<N> nodeClass);
-    
-    void destroyTree(Class<N> nodeClass);
+    void rebuildTree();
+
+    void destroyTree();
 ```
 
-The Entity inheritance is permitted. NestedJ will begin searching for it's annotation at the top class and move down the inheritance tree.
+As You see, the ```NestedNode``` interface contains 5 specific columns:
+- ID
+- Left
+- Right
+- Level
+- Parent ID
 
-### Multiple Trees in one Table/Entity
+Strictly speaking NestedSet doesn't need the parent id column, but at the same time it's structure is so fragile, that this additional feature helps rebuild the tree if it becomes corrupted for some reason.
 
-You can have multiple independant trees in single Table/Entity. Just implement your own version of ```TreeDiscriminator``` that will apply additional selectors on all JPA Queries.
+It is recommended that ```Left```, ```Right``` and ```Level``` be non nullable. This will ensure better stability of the Nested Set structure.
 
-### Fixing / Initializing / Rebuilding the Tree
+The ID of the interface is a parametrized type, which allows for using Long as well as UUID or any other ```Serializable``` class.
 
-Nested Set is a pretty fragile structure. One bad manual modification of the table can destroy it. Also inserting big number of records manually would be very hard if you'd have to insert them with the correct treeLeft/treeRight/treeLevel values. Fortunately NestedJ can rebuild the Tree from scratch. Just use ```rebuild(Class<N> nodeClass)``` method on the ```NestedNodeRepository<ID, N>```.
+##### The ```NestedNode``` interface expects the implementing class to adhere to the JavaBean standard (field names should match getters and setters)
 
+## Multiple Trees in one Table/Entity
 
-### BUGS
+You can have multiple independant trees in single Table/Entity. Just implement your own version of ```JpaTreeDiscriminator``` or ```JdbcTreeDiscriminator``` that will apply additional selectors on all Queries.
+
+## Fixing / Initializing / Rebuilding the Tree
+
+Nested Set is a pretty fragile structure. One bad manual modification of the table can destroy it. Also inserting big number of records manually would be very hard if you'd have to insert them with the correct treeLeft/treeRight/treeLevel values. Fortunately NestedJ can rebuild the Tree from scratch. Just use ```rebuild()``` method on the ```NestedNodeRepository<ID, N>```.
+
+## Extending NestedJ
+
+NestedJ comes with 2 implementations:
+- JPA
+- JDBC
+
+If however you would need a custom one, or you want to enhance/customize one of the implementations, you can easily do this by implementing / overriding one or more ```*QueryDelegate``` classes that are responsible for communicating with the actual database. NestedJ is structured as a decoupled set of classes and you are free to experiment and adjust anything you want.
+
+## Concurrency
+NestedJ is not designed to handle concurrent tree modification. One single tree operation (insert/move/delete) can trigger an update on many tree nodes (which is the whole point of Nested Set), so it would be best if you ensure there are no concurrent updates going on. Having that said NestedJ has no Concurrency control mechanism built in. It is up to the user to decide whether any such logic is needed and how it should work. The simples one would be to lock entire table during a tree operation either via setting a proper transaction isolation or using any kind of Distributed Lock (for example from Spring Integration)
+
+## BUGS
 
 If You find any bugs, feel free to submit PR or create an issue on GitHub: https://github.com/eXsio/nestedj

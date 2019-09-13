@@ -1,5 +1,11 @@
 NestedJ Changelog:
 
+- 4.0.0
+    - Decoupled DB Query Delegates from the actual Tree logic
+    - Created JDBC implementation of the NestedNodeRepository
+    - Refactored test suite - divided tests into categories and ensured that all implementations (JPA, JDBC) use the same tests and assertions
+    - Bumped up dependencies
+
 - 3.0.0
 
     - Removed custom annotations (@LeftColumn/@RightColumn/etc)
