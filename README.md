@@ -84,7 +84,7 @@ Using the traditional ```parant_id``` relationship would mean firing multiple qu
 ```
 
 
-##JPA Usage
+## JPA Usage
 
 In order to use NestedJ, You have to configure it. In 9 our of 10 cases you will want to use the preconfigured builder methods available in the ```JpaNestedNodeRepositoryFactory``` interface:
  
@@ -166,7 +166,7 @@ public class TestNode implements NestedNode<Long> {
 }
 ```
 
-##JDBC Usage
+## JDBC Usage
 
 In order to use NestedJ, You have to configure it. In 9 our of 10 cases you will want to use the preconfigured builder methods available in the ```JdbcNestedNodeRepositoryFactory``` interface:
  
