@@ -66,7 +66,7 @@ Using the traditional ```parant_id``` relationship would mean firing multiple qu
 
 ## Installation
 
-```
+```xml
 
 <repositories>
     <repository>
@@ -88,16 +88,17 @@ Using the traditional ```parant_id``` relationship would mean firing multiple qu
 
 In order to use NestedJ, You have to configure it. In 9 our of 10 cases you will want to use the preconfigured builder methods available in the ```JpaNestedNodeRepositoryFactory``` interface:
  
+ ```java
     //ID and Node classes
     JpaNestedNodeRepositoryConfiguration<Long, TestNode> configuration = new JpaNestedNodeRepositoryConfiguration<>(
                     entityManager, YourNode.class, Long.class, new YourJpaTreeDiscriminator() //Discriminator is optional, allows to create multiple trees in one table
             );
     return JpaNestedNodeRepositoryFactory.create(configuration); 
 
-
+```
 Here is the example entity that implements the ```NestedNode``` interface:
 
-```
+```java
 
 @Entity
 @Table(name = "nested_nodes")
@@ -169,7 +170,9 @@ public class TestNode implements NestedNode<Long> {
 ## JDBC Usage
 
 In order to use NestedJ, You have to configure it. In 9 our of 10 cases you will want to use the preconfigured builder methods available in the ```JdbcNestedNodeRepositoryFactory``` interface:
- 
+
+```java
+
     //ROW MAPPER FOR CREATING INSTANCES OF THE NODE OBJECT FROM RESULT SET
     RowMapper<TestNode> mapper = (resultSet, i) -> YourNode.fromResultSet(resultSet);
 
@@ -195,6 +198,8 @@ In order to use NestedJ, You have to configure it. In 9 our of 10 cases you will
     configuration.setLevelColumnName("tree_level");
 
     return JdbcNestedNodeRepositoryFactory.create(configuration);
+    
+```
 
 The Node Class has to implement the ```NestedNode``` interface so that the logic can operage on Nested Node specific columns.
 
@@ -202,7 +207,8 @@ The Node Class has to implement the ```NestedNode``` interface so that the logic
 
 After creating schema You can use the special ```NestedNodeRepository``` to perform a tree-specific opeeration, such as:
 
-```
+```java
+
     void insertAsFirstChildOf(N node, N parent);
     
     void insertAsLastChildOf(N node, N parent);
