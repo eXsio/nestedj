@@ -37,6 +37,7 @@ public class JdbcNestedNodeInsertingQueryDelegate<ID extends Serializable, N ext
                 preparedStatement -> {
                     preparedStatement.setLong(1, INCREMENT_BY);
                     preparedStatement.setLong(2, from);
+                    setDiscriminatorParams(preparedStatement, 3);
                 }
         );
     }
