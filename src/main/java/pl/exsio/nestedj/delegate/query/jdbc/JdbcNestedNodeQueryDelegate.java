@@ -1,5 +1,6 @@
 package pl.exsio.nestedj.delegate.query.jdbc;
 
+import com.google.common.collect.Maps;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import pl.exsio.nestedj.config.jdbc.JdbcNestedNodeRepositoryConfiguration;
@@ -65,6 +66,32 @@ public abstract class JdbcNestedNodeQueryDelegate<ID extends Serializable, N ext
     protected void setDiscriminatorParams(PreparedStatement ps, int offset) throws SQLException {
         for (int i = 0; i < treeDiscriminator.getParameters().size(); i++) {
             ps.setObject(i + offset, treeDiscriminator.getParameters().get(i));
+        }
+    }
+
+    protected class Query {
+
+        private final String query;
+
+        private final Map<String, String> parts = Maps.newHashMap();
+
+        public Query(String query) {
+            this.query = query;
+        }
+
+        public Query set(String label, String part) {
+            parts.put(label, part);
+            return this;
+        }
+
+        public String build() {
+            String q = query;
+            for (Map.Entry<String, String> entry : parts.entrySet()) {
+                String label = ":" + entry.getKey();
+                String part = entry.getValue();
+                q = q.replaceAll(label, part);
+            }
+            return q;
         }
     }
 }

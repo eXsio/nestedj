@@ -33,7 +33,13 @@ public class JdbcNestedNodeInsertingQueryDelegate<ID extends Serializable, N ext
         String columnName = treeColumnNames.get(fieldName);
         String sign = gte ? ">=" : ">";
         jdbcTemplate.update(
-                getDiscriminatedQuery(String.format("update %s set %s = (%s + ?) where %s %s ?", tableName, columnName, columnName, columnName, sign)),
+                getDiscriminatedQuery(
+                        new Query("update :tableName set :columnName = (:columnName + ?) where :columnName :sign ?")
+                                .set("tableName", tableName)
+                                .set("columnName", columnName)
+                                .set("sign", sign)
+                                .build()
+                ),
                 preparedStatement -> {
                     preparedStatement.setLong(1, INCREMENT_BY);
                     preparedStatement.setLong(2, from);

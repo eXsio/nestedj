@@ -27,7 +27,8 @@ import org.junit.Test;
 import org.springframework.transaction.annotation.Transactional;
 import pl.exsio.nestedj.model.TestNode;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 @Transactional
 public abstract class NestedNodeRepositoryMovingTest extends FunctionalNestedjTest {
@@ -53,7 +54,7 @@ public abstract class NestedNodeRepositoryMovingTest extends FunctionalNestedjTe
         assertEquals(12, (long) d.getTreeRight());
         assertEquals(1, (long) b.getTreeLevel());
         assertEquals(2, (long) d.getTreeLevel());
-        assertSame(this.getParent(b), a);
+        assertEquals(this.getParent(b), a);
         assertSecondTreeIntact();
     }
 
@@ -78,7 +79,7 @@ public abstract class NestedNodeRepositoryMovingTest extends FunctionalNestedjTe
         assertEquals(12, (long) d.getTreeRight());
         assertEquals(2, (long) g.getTreeLevel());
         assertEquals(1, (long) c.getTreeLevel());
-        assertSame(this.getParent(c), a);
+        assertEquals(this.getParent(c), a);
         assertSecondTreeIntact();
     }
 
@@ -165,7 +166,7 @@ public abstract class NestedNodeRepositoryMovingTest extends FunctionalNestedjTe
         assertEquals(16, (long) a.getTreeRight());
         assertEquals(2, (long) d.getTreeLevel());
 
-        assertSame(this.getParent(d), c);
+        assertEquals(this.getParent(d), c);
         assertSecondTreeIntact();
     }
 
@@ -193,7 +194,7 @@ public abstract class NestedNodeRepositoryMovingTest extends FunctionalNestedjTe
         assertEquals(16, (long) a.getTreeRight());
         assertEquals(2, (long) g.getTreeLevel());
         assertEquals(3, (long) h.getTreeLevel());
-        assertSame(this.getParent(g), b);
+        assertEquals(this.getParent(g), b);
         assertSecondTreeIntact();
     }
 
@@ -225,7 +226,7 @@ public abstract class NestedNodeRepositoryMovingTest extends FunctionalNestedjTe
         assertEquals(15, (long) c.getTreeRight());
         assertEquals(16, (long) a.getTreeRight());
         assertEquals(2, (long) d.getTreeLevel());
-        assertSame(this.getParent(d), c);
+        assertEquals(this.getParent(d), c);
         assertSecondTreeIntact();
     }
 
@@ -254,7 +255,7 @@ public abstract class NestedNodeRepositoryMovingTest extends FunctionalNestedjTe
         assertEquals(16, (long) a.getTreeRight());
         assertEquals(2, (long) g.getTreeLevel());
         assertEquals(3, (long) h.getTreeLevel());
-        assertSame(this.getParent(g), b);
+        assertEquals(this.getParent(g), b);
         assertSecondTreeIntact();
     }
 
@@ -283,7 +284,7 @@ public abstract class NestedNodeRepositoryMovingTest extends FunctionalNestedjTe
         assertEquals(16, (long) a.getTreeRight());
         assertEquals(2, (long) g.getTreeLevel());
         assertEquals(3, (long) h.getTreeLevel());
-        assertSame(this.getParent(g), b);
+        assertEquals(this.getParent(g), b);
         assertSecondTreeIntact();
     }
 
@@ -313,7 +314,7 @@ public abstract class NestedNodeRepositoryMovingTest extends FunctionalNestedjTe
         assertEquals(15, (long) c.getTreeRight());
         assertEquals(16, (long) a.getTreeRight());
         assertEquals(3, (long) d.getTreeLevel());
-        assertSame(this.getParent(d), g);
+        assertEquals(this.getParent(d), g);
         assertSecondTreeIntact();
     }
 
@@ -344,7 +345,7 @@ public abstract class NestedNodeRepositoryMovingTest extends FunctionalNestedjTe
         assertEquals(15, (long) c.getTreeRight());
         assertEquals(16, (long) a.getTreeRight());
         assertEquals(3, (long) d.getTreeLevel());
-        assertSame(this.getParent(d), g);
+        assertEquals(this.getParent(d), g);
         assertSecondTreeIntact();
     }
 
@@ -369,7 +370,7 @@ public abstract class NestedNodeRepositoryMovingTest extends FunctionalNestedjTe
         assertEquals(16, (long) a.getTreeRight());
         assertEquals(2, (long) g.getTreeLevel());
         assertEquals(3, (long) h.getTreeLevel());
-        assertSame(this.getParent(g), b);
+        assertEquals(this.getParent(g), b);
         assertSecondTreeIntact();
     }
 
@@ -404,7 +405,7 @@ public abstract class NestedNodeRepositoryMovingTest extends FunctionalNestedjTe
         assertEquals(12, (long) g.getTreeRight());
         assertEquals(13, (long) h.getTreeLeft());
         assertEquals(14, (long) h.getTreeRight());
-        assertSame(this.getParent(h), c);
+        assertEquals(this.getParent(h), c);
         assertSecondTreeIntact();
     }
 

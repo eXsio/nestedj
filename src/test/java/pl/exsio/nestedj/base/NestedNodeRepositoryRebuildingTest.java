@@ -92,13 +92,13 @@ public abstract class NestedNodeRepositoryRebuildingTest extends FunctionalNeste
         assertEquals(0, (long) h.getTreeRight());
 
         assertNull(this.getParent(a));
-        assertSame(this.getParent(b), a);
-        assertSame(this.getParent(c), a);
-        assertSame(this.getParent(d), b);
-        assertSame(this.getParent(e), b);
-        assertSame(this.getParent(f), c);
-        assertSame(this.getParent(g), c);
-        assertSame(this.getParent(h), g);
+        assertEquals(this.getParent(b), a);
+        assertEquals(this.getParent(c), a);
+        assertEquals(this.getParent(d), b);
+        assertEquals(this.getParent(e), b);
+        assertEquals(this.getParent(f), c);
+        assertEquals(this.getParent(g), c);
+        assertEquals(this.getParent(h), g);
 
         assertEquals(0, (long) e.getTreeLevel());
         assertEquals(0, (long) f.getTreeLevel());
@@ -133,13 +133,13 @@ public abstract class NestedNodeRepositoryRebuildingTest extends FunctionalNeste
             TestNode f = this.findNode("f");
 
             assertNull(this.getParent(a));
-            assertSame(this.getParent(b), a);
+            assertEquals(this.getParent(b), a);
             assertNull(this.getParent(c));
-            assertSame(this.getParent(d), b);
-            assertSame(this.getParent(e), b);
-            assertSame(this.getParent(f), c);
-            assertSame(this.getParent(g), c);
-            assertSame(this.getParent(h), g);
+            assertEquals(this.getParent(d), b);
+            assertEquals(this.getParent(e), b);
+            assertEquals(this.getParent(f), c);
+            assertEquals(this.getParent(g), c);
+            assertEquals(this.getParent(h), g);
 
             assertEquals(2, (long) e.getTreeLevel());
             assertEquals(1, (long) f.getTreeLevel());
@@ -187,16 +187,16 @@ public abstract class NestedNodeRepositoryRebuildingTest extends FunctionalNeste
         printNode("k", k);
 
         assertNull(this.getParent(a));
-        assertSame(this.getParent(b), a);
-        assertSame(this.getParent(c), a);
-        assertSame(this.getParent(d), b);
-        assertSame(this.getParent(e), b);
-        assertSame(this.getParent(f), c);
-        assertSame(this.getParent(g), c);
-        assertSame(this.getParent(h), g);
+        assertEquals(this.getParent(b), a);
+        assertEquals(this.getParent(c), a);
+        assertEquals(this.getParent(d), b);
+        assertEquals(this.getParent(e), b);
+        assertEquals(this.getParent(f), c);
+        assertEquals(this.getParent(g), c);
+        assertEquals(this.getParent(h), g);
         assertNull(this.getParent(i));
-        assertSame(this.getParent(j), i);
-        assertSame(this.getParent(k), i);
+        assertEquals(this.getParent(j), i);
+        assertEquals(this.getParent(k), i);
 
         assertSecondTreeIntact();
     }

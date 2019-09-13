@@ -27,7 +27,8 @@ import org.junit.Test;
 import org.springframework.transaction.annotation.Transactional;
 import pl.exsio.nestedj.model.TestNode;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 @Transactional
 public abstract class NestedNodeRepositoryTest extends FunctionalNestedjTest {
@@ -109,8 +110,8 @@ public abstract class NestedNodeRepositoryTest extends FunctionalNestedjTest {
         assertEquals(21, (long) m.getTreeRight());
 
         assertNull(this.getParent(i));
-        assertSame(this.getParent(j), i);
-        assertSame(this.getParent(k), i);
+        assertEquals(this.getParent(j), i);
+        assertEquals(this.getParent(k), i);
         assertSecondTreeIntact();
 
        breakTree();
