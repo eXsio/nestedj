@@ -58,11 +58,11 @@ Using the traditional ```parant_id``` relationship would mean firing multiple qu
 
    - **No Reflection!** - no custom annotations, no additional boostrap logic
    - **Best achievable performance** - all tree actions are performed using a minimal number of Criteria Queries, without loading any parts of the tree structure to the memory
-   - **No JPA mappings enforced** - no ManyToOne/OneToMany mappings needed for the lib to work
+   - **No JPA mappings enforced** - no ManyToOne/OneToMany mappings needed for the lib to work (if you're using JPA implementation)
    - **No ID/PK class enforced** - no hardwired requirements for any particular ID/Primary Key class
    - **Fully customizable** - you can repimplement the parts you need and leave the rest intact
    - **Fully tested** - integration tests created for all possible tree operations
-   - **Minimal number of Project dependencies** - only Guava and SLF4J
+   - **Minimal number of Project dependencies** - only Guava and (JPA API or Spring JDBC) - depending on which implementation you want to use 
 
 ## Installation
 
