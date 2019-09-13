@@ -1,5 +1,6 @@
 package pl.exsio.nestedj.config.jdbc;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -7,6 +8,7 @@ import pl.exsio.nestedj.jdbc.discriminator.JdbcTreeDiscriminator;
 import pl.exsio.nestedj.model.NestedNode;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -49,7 +51,17 @@ public class JdbcNestedNodeRepositoryConfiguration<ID extends Serializable, N ex
     public JdbcNestedNodeRepositoryConfiguration(JdbcTemplate jdbcTemplate, String tableName,
                                                  RowMapper<N> rowMapper, String insertQuery,
                                                  Function<N, Object[]> insertValuesProvider) {
-        this(jdbcTemplate, tableName, rowMapper, insertQuery, insertValuesProvider, () -> "");
+        this(jdbcTemplate, tableName, rowMapper, insertQuery, insertValuesProvider, new JdbcTreeDiscriminator() {
+            @Override
+            public String getQueryPart() {
+                return "";
+            }
+
+            @Override
+            public List<Object> getParameters() {
+                return Lists.newLinkedList();
+            }
+        });
     }
 
     public JdbcTemplate getJdbcTemplate() {
