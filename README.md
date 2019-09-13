@@ -184,7 +184,7 @@ In order to use NestedJ, You have to configure it. In 9 our of 10 cases you will
 
     //CONFIGURATION CLASS
     JdbcNestedNodeRepositoryConfiguration<Long, TestNode> configuration = new JdbcNestedNodeRepositoryConfiguration<>(
-            new JdbcTemplate(dataSource), tableName, mapper, insertQuery, insertValuesProvider, new TestJdbcTreeDiscriminator()
+            new JdbcTemplate(dataSource), tableName, mapper, insertQuery, insertValuesProvider, new YourJdbcTreeDiscriminator() //Discriminator is optional, allows to create multiple trees in one table
     );
 
     //CUSTOM COLUMN NAMES
