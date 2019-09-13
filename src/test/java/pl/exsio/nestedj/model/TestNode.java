@@ -39,7 +39,7 @@ public class TestNode implements NestedNode<Long> {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq")
     private Long id;
 
-    @Column(name = "node_name", nullable = false)
+    @Column(name = "node_name", nullable = false, unique = true)
     private String name;
 
     @Column(name = "tree_left", nullable = false)
@@ -57,6 +57,7 @@ public class TestNode implements NestedNode<Long> {
     @Column(name = "discriminator", nullable = false)
     private String discriminator;
 
+    @Override
     public void setId(Long id) {
         this.id = id;
     }
@@ -150,9 +151,6 @@ public class TestNode implements NestedNode<Long> {
     }
 
     public static TestNode fromResultSet(ResultSet resultSet) throws SQLException {
-        if (!resultSet.next()) {
-            return null;
-        }
         TestNode n = new TestNode();
         n.setId(resultSet.getLong("ID"));
         n.setTreeLeft(resultSet.getLong("TREE_LEFT"));

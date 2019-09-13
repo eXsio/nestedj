@@ -27,11 +27,7 @@ public class JdbcNestedNodeMovingQueryDelegate<ID extends Serializable, N extend
     public Integer markNodeIds(NestedNodeInfo<ID> node) {
         return jdbcTemplate.update(
                 getDiscriminatedQuery(
-                        new Query("update :tableName set :right = (-:right - ?) where :left >= ? and :right <= ?")
-                            .set("tableName", tableName)
-                            .set("right", right)
-                            .set("left", left)
-                            .build()
+                        new Query("update :tableName set :right = (-:right - ?) where :left >= ? and :right <= ?").build()
                 ),
                 preparedStatement -> {
                     preparedStatement.setLong(1, MARKING_MODIFIER);
@@ -79,7 +75,6 @@ public class JdbcNestedNodeMovingQueryDelegate<ID extends Serializable, N extend
         jdbcTemplate.update(
                 getDiscriminatedQuery(
                         new Query("update :tableName set :columnName = :columnName :sign ? where :columnName > ? and :columnName < ?")
-                                .set("tableName", tableName)
                                 .set("columnName", columnName)
                                 .set("sign", sign)
                         .build()
@@ -98,10 +93,6 @@ public class JdbcNestedNodeMovingQueryDelegate<ID extends Serializable, N extend
         jdbcTemplate.update(
                 getDiscriminatedQuery(
                         new Query("update :tableName set :level = (:level + ?), :right = (-(:right + ?) :sign ?), :left = :left :sign ? where :right < 0")
-                                .set("tableName", tableName)
-                                .set("level", level)
-                                .set("left", left)
-                                .set("right", right)
                                 .set("sign", sign)
                                 .build()
                 ),
@@ -118,11 +109,7 @@ public class JdbcNestedNodeMovingQueryDelegate<ID extends Serializable, N extend
     private void doUpdateParentField(ID newParentId, NestedNodeInfo<ID> node) {
         jdbcTemplate.update(
                 getDiscriminatedQuery(
-                        new Query("update :tableName set :parentId = ? where :id = ?")
-                                .set("tableName", tableName)
-                                .set("parentId", parentId)
-                                .set("id", id)
-                                .build()
+                        new Query("update :tableName set :parentId = ? where :id = ?").build()
                 ),
                 preparedStatement -> {
                     if(newParentId == null) {

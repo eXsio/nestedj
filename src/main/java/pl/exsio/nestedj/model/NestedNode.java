@@ -43,6 +43,8 @@ public interface NestedNode<ID extends Serializable> {
 
     ID getParentId();
 
+    void setId(ID id);
+
     void setTreeLeft(Long treeLeft);
 
     void setTreeRight(Long treeRight);

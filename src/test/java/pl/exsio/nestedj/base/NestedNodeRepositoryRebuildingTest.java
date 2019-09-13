@@ -25,38 +25,32 @@ package pl.exsio.nestedj.base;
 
 import org.junit.Test;
 import org.springframework.transaction.annotation.Transactional;
-import pl.exsio.nestedj.ex.InvalidNodesHierarchyException;
 import pl.exsio.nestedj.model.TestNode;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 @Transactional
 public abstract class NestedNodeRepositoryRebuildingTest extends FunctionalNestedjTest {
 
     @Test
     public void testInitializeTree() {
-        try {
+        this.removeTree();
+        TestNode x = this.createTestNode("x");
+        x.setTreeLeft(0L);
+        x.setTreeRight(0L);
+        x.setTreeLevel(0L);
+        save(x);
+        flush();
 
-            this.removeTree();
-            TestNode x = this.createTestNode("x");
-            x.setTreeLeft(0L);
-            x.setTreeRight(0L);
-            x.setTreeLevel(0L);
-            save(x);
-            flush();
+        assertEquals(0L, (long) x.getTreeLeft());
+        assertEquals(0L, (long) x.getTreeRight());
 
-            assertEquals(0L, (long) x.getTreeLeft());
-            assertEquals(0L, (long) x.getTreeRight());
-
-            this.repository.rebuildTree();
-            refresh(x);
-            printNode("x", x);
-            assertEquals(1, (long) x.getTreeLeft());
-            assertEquals(2, (long) x.getTreeRight());
-
-        } catch (InvalidNodesHierarchyException ex) {
-            fail("something went wrong:" + ex.getMessage());
-        }
+        this.repository.rebuildTree();
+        refresh(x);
+        printNode("x", x);
+        assertEquals(1, (long) x.getTreeLeft());
+        assertEquals(2, (long) x.getTreeRight());
         assertSecondTreeIntact();
     }
 
@@ -115,42 +109,40 @@ public abstract class NestedNodeRepositoryRebuildingTest extends FunctionalNeste
 
     @Test
     public void testRebuildTree() {
-        try {
 
-            this.breakTree();
-            this.resetParent("c");
-            this.repository.rebuildTree();
 
-            flushAndClear();
+        this.breakTree();
+        this.resetParent("c");
+        this.repository.rebuildTree();
 
-            TestNode a = this.findNode("a");
-            TestNode e = this.findNode("e");
-            TestNode b = this.findNode("b");
-            TestNode d = this.findNode("d");
-            TestNode g = this.findNode("g");
-            TestNode c = this.findNode("c");
-            TestNode h = this.findNode("h");
-            TestNode f = this.findNode("f");
+        flushAndClear();
 
-            assertNull(this.getParent(a));
-            assertEquals(this.getParent(b), a);
-            assertNull(this.getParent(c));
-            assertEquals(this.getParent(d), b);
-            assertEquals(this.getParent(e), b);
-            assertEquals(this.getParent(f), c);
-            assertEquals(this.getParent(g), c);
-            assertEquals(this.getParent(h), g);
+        TestNode a = this.findNode("a");
+        TestNode e = this.findNode("e");
+        TestNode b = this.findNode("b");
+        TestNode d = this.findNode("d");
+        TestNode g = this.findNode("g");
+        TestNode c = this.findNode("c");
+        TestNode h = this.findNode("h");
+        TestNode f = this.findNode("f");
 
-            assertEquals(2, (long) e.getTreeLevel());
-            assertEquals(1, (long) f.getTreeLevel());
-            assertEquals(1, (long) g.getTreeLevel());
-            assertEquals(1, (long) b.getTreeLevel());
-            assertEquals(0, (long) c.getTreeLevel());
-            assertEquals(2, (long) h.getTreeLevel());
+        assertNull(this.getParent(a));
+        assertEquals(this.getParent(b), a);
+        assertNull(this.getParent(c));
+        assertEquals(this.getParent(d), b);
+        assertEquals(this.getParent(e), b);
+        assertEquals(this.getParent(f), c);
+        assertEquals(this.getParent(g), c);
+        assertEquals(this.getParent(h), g);
 
-        } catch (InvalidNodesHierarchyException ex) {
-            fail("something went wrong:" + ex.getMessage());
-        }
+        assertEquals(2, (long) e.getTreeLevel());
+        assertEquals(1, (long) f.getTreeLevel());
+        assertEquals(1, (long) g.getTreeLevel());
+        assertEquals(1, (long) b.getTreeLevel());
+        assertEquals(0, (long) c.getTreeLevel());
+        assertEquals(2, (long) h.getTreeLevel());
+
+
         assertSecondTreeIntact();
     }
 

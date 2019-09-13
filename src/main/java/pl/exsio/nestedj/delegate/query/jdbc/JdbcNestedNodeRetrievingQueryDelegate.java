@@ -52,7 +52,9 @@ public class JdbcNestedNodeRetrievingQueryDelegate<ID extends Serializable, N ex
     @SuppressWarnings("unchecked")
     public Optional<NestedNodeInfo<ID>> getNodeInfo(ID nodeId) {
         NestedNodeInfo<ID> info = jdbcTemplate.query(
-                getDiscriminatedQuery(String.format("select %s, %s, %s, %s, %s from %s where %s = ?", id, parentId, left, right, level, tableName, id)),
+                getDiscriminatedQuery(
+                        new Query("select :id, :parentId, :left, :right, :level from :tableName where :id = ?").build()
+                ),
                 preparedStatement -> {
                     preparedStatement.setObject(1, nodeId);
                     setDiscriminatorParams(preparedStatement, 2);

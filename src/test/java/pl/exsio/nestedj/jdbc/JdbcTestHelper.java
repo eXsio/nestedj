@@ -1,7 +1,9 @@
 package pl.exsio.nestedj.jdbc;
 
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.KeyHolder;
 import pl.exsio.nestedj.base.TestHelper;
+import pl.exsio.nestedj.delegate.query.jdbc.JdbcKeyHolder;
 import pl.exsio.nestedj.model.TestNode;
 
 import javax.sql.DataSource;
@@ -17,7 +19,7 @@ public class JdbcTestHelper implements TestHelper {
     @Override
     public TestNode findNode(String symbol) {
         return jdbcTemplate.query("select id, node_name, tree_left, tree_right, tree_level, parent_id, discriminator from nested_nodes where node_name = '" + symbol + "'",
-                TestNode::fromResultSet);
+                (resultSet, i) -> TestNode.fromResultSet(resultSet)).stream().findFirst().orElse(null);
     }
 
     @Override
@@ -34,7 +36,7 @@ public class JdbcTestHelper implements TestHelper {
 
     public TestNode findNode(Long id) {
         return jdbcTemplate.query("select id, node_name, tree_left, tree_right, tree_level, parent_id, discriminator from nested_nodes where id = '" + id + "'",
-                TestNode::fromResultSet);
+                (resultSet, i) -> TestNode.fromResultSet(resultSet)).stream().findFirst().orElse(null);
     }
 
     @Override
@@ -72,10 +74,13 @@ public class JdbcTestHelper implements TestHelper {
     }
 
     public void save(TestNode node) {
-        jdbcTemplate.execute(
-                String.format("insert into nested_nodes(id, tree_left, tree_level, tree_right, node_name, parent_id, discriminator) values(next value for SEQ,%s,%s,%s,'%s',%s,'%s')",
-                             node.getTreeLeft(), node.getTreeLevel(), node.getTreeRight(), node.getName(), node.getParentId(), node.getDiscriminator()
-                        )
-        );
+        KeyHolder keyHolder = new JdbcKeyHolder();
+        jdbcTemplate.update(con -> {
+            String insertQuery = String.format("insert into nested_nodes(id, tree_left, tree_level, tree_right, node_name, parent_id, discriminator) values(next value for SEQ,%s,%s,%s,'%s',%s,'%s')",
+                    node.getTreeLeft(), node.getTreeLevel(), node.getTreeRight(), node.getName(), node.getParentId(), node.getDiscriminator()
+            );
+            return con.prepareStatement(insertQuery, new String[]{"id"});
+        }, keyHolder);
+        node.setId((Long) keyHolder.getKey());
     }
 }

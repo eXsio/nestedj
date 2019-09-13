@@ -52,7 +52,10 @@ public class JpaNestedNodeRebuildingQueryDelegate<ID extends Serializable, N ext
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaUpdate<N> update = cb.createCriteriaUpdate(nodeClass);
         Root<N> root = update.from(nodeClass);
-        update.set(root.<Long>get(LEFT), 1L).set(root.<Long>get(RIGHT), 2L)
+        update
+                .set(root.<Long>get(LEVEL), 0L)
+                .set(root.<Long>get(LEFT), 1L)
+                .set(root.<Long>get(RIGHT), 2L)
                 .where(getPredicates(cb, root, cb.equal(update.getRoot().get(ID), first.getId())));
         entityManager.createQuery(update).executeUpdate();
     }

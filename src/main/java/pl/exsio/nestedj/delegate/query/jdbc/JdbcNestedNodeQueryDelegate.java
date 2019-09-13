@@ -59,8 +59,10 @@ public abstract class JdbcNestedNodeQueryDelegate<ID extends Serializable, N ext
 
     protected String getDiscriminatedQuery(String baseQuery) {
         String disriminatedQuery = treeDiscriminator.getQueryPart();
+        String[] queryParts = baseQuery.split("order by");
 
-        return baseQuery.contains("where") ? String.format("%s and %s", baseQuery, disriminatedQuery) : String.format("%s where %s", baseQuery, disriminatedQuery);
+        String modifiedQuery = queryParts[0].contains("where") ? String.format("%s and %s", queryParts[0], disriminatedQuery) : String.format("%s where %s", queryParts[0], disriminatedQuery);
+        return queryParts.length == 1 ? modifiedQuery : String.format("%s order by %s", modifiedQuery, queryParts[1]);
     }
 
     protected void setDiscriminatorParams(PreparedStatement ps, int offset) throws SQLException {
@@ -75,7 +77,7 @@ public abstract class JdbcNestedNodeQueryDelegate<ID extends Serializable, N ext
 
         private final Map<String, String> parts = Maps.newHashMap();
 
-        public Query(String query) {
+        protected Query(String query) {
             this.query = query;
         }
 
@@ -84,8 +86,14 @@ public abstract class JdbcNestedNodeQueryDelegate<ID extends Serializable, N ext
             return this;
         }
 
-        public String build() {
+        protected String build() {
             String q = query;
+            q = q.replaceAll(":tableName", tableName);
+            q = q.replaceAll(":parentId", parentId);
+            q = q.replaceAll(":id", id);
+            q = q.replaceAll(":left", left);
+            q = q.replaceAll(":right", right);
+            q = q.replaceAll(":level", level);
             for (Map.Entry<String, String> entry : parts.entrySet()) {
                 String label = ":" + entry.getKey();
                 String part = entry.getValue();
