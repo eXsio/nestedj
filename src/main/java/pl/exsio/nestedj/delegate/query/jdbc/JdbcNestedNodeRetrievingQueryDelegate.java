@@ -139,4 +139,26 @@ public class JdbcNestedNodeRetrievingQueryDelegate<ID extends Serializable, N ex
         );
         return Optional.ofNullable(info);
     }
+
+    @Override
+    public Optional<N> findFirstRoot() {
+        return jdbcTemplate.query(
+                getDiscriminatedQuery(
+                        new Query("select * from :tableName where :level = 0 order by :left asc").build()
+                ),
+                preparedStatement -> setDiscriminatorParams(preparedStatement, 1),
+                rowMapper
+        ).stream().findFirst();
+    }
+
+    @Override
+    public Optional<N> findLastRoot() {
+        return jdbcTemplate.query(
+                getDiscriminatedQuery(
+                        new Query("select * from :tableName where :level = 0 order by :left desc").build()
+                ),
+                preparedStatement -> setDiscriminatorParams(preparedStatement, 1),
+                rowMapper
+        ).stream().findFirst();
+    }
 }

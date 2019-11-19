@@ -86,4 +86,14 @@ public class QueryBasedNestedNodeRetriever<ID extends Serializable, N extends Ne
         return queryDelegate.getNodeInfo(nodeId);
     }
 
+    @Override
+    public Optional<N> findFirstRoot() {
+        return queryDelegate.findFirstRoot();
+    }
+
+    @Override
+    public Optional<N> findLastRoot() {
+        return queryDelegate.findLastRoot();
+    }
+
 }

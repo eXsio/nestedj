@@ -47,4 +47,8 @@ public interface NestedNodeRetriever<ID extends Serializable, N extends NestedNo
     Iterable<N> getParents(N node);
 
     Optional<NestedNodeInfo<ID>> getNodeInfo(ID nodeIds);
+
+    Optional<N> findFirstRoot();
+
+    Optional<N> findLastRoot();
 }

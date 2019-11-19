@@ -1,5 +1,8 @@
 NestedJ Changelog:
 
+- 4.1.0
+    -added new Repository methods: insertAsFirstRoot, insertAsLastRoot
+
 - 4.0.0
     - Decoupled DB Query Delegates from the actual Tree logic
     - Created JDBC implementation of the NestedNodeRepository

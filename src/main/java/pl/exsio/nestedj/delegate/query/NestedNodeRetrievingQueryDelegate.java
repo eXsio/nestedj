@@ -21,4 +21,8 @@ public interface NestedNodeRetrievingQueryDelegate<ID extends Serializable, N ex
     Optional<N> getNextSibling(N node);
 
     Optional<NestedNodeInfo<ID>> getNodeInfo(ID nodeId);
+
+    Optional<N> findFirstRoot();
+
+    Optional<N> findLastRoot();
 }

@@ -49,6 +49,15 @@ public class QueryBasedNestedNodeInserter<ID extends Serializable, N extends Nes
         insertNodeIntoTree(parentInfo, node, mode);
     }
 
+    @Override
+    public void insertAsFirstNode(N node) {
+        node.setTreeLeft(1L);
+        node.setTreeRight(2L);
+        node.setTreeLevel(0L);
+        node.setParentId(null);
+        queryDelegate.insert(node);
+    }
+
     private void insertNodeIntoTree(NestedNodeInfo<ID> parent, N node, Mode mode) {
         Long left = this.getNodeLeft(parent, mode);
         Long right = left + 1;

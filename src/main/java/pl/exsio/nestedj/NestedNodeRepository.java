@@ -61,5 +61,9 @@ public interface NestedNodeRepository<ID extends Serializable, N extends NestedN
 
     void destroyTree();
 
+    void insertAsFirstRoot(N node);
+
+    void insertAsLastRoot(N node);
+
 
 }

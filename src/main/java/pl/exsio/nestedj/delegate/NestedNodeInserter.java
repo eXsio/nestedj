@@ -32,4 +32,5 @@ public interface NestedNodeInserter<ID extends Serializable, N extends NestedNod
 
     void insert(N node, NestedNodeInfo<ID> parentInfo, Mode mode);
 
+    void insertAsFirstNode(N node);
 }

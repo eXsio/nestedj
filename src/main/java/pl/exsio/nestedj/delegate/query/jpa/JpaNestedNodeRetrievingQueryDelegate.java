@@ -138,4 +138,34 @@ public class JpaNestedNodeRetrievingQueryDelegate<ID extends Serializable, N ext
             return Optional.empty();
         }
     }
+
+    @Override
+    public Optional<N> findFirstRoot() {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<N> select = cb.createQuery(nodeClass);
+        Root<N> root = select.from(nodeClass);
+        select.where(getPredicates(cb, root,
+                cb.equal(root.<Long>get(LEVEL), 0L)
+        )).orderBy(cb.asc(root.<Long>get(LEFT)));
+        try {
+            return Optional.of(entityManager.createQuery(select).setMaxResults(1).getSingleResult());
+        } catch (NoResultException ex) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Optional<N> findLastRoot() {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<N> select = cb.createQuery(nodeClass);
+        Root<N> root = select.from(nodeClass);
+        select.where(getPredicates(cb, root,
+                cb.equal(root.<Long>get(LEVEL), 0L)
+        )).orderBy(cb.desc(root.<Long>get(LEFT)));
+        try {
+            return Optional.of(entityManager.createQuery(select).setMaxResults(1).getSingleResult());
+        } catch (NoResultException ex) {
+            return Optional.empty();
+        }
+    }
 }

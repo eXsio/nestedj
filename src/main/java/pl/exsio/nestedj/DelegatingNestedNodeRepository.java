@@ -178,6 +178,30 @@ public class DelegatingNestedNodeRepository<ID extends Serializable, N extends N
         rebuilder.destroyTree();
     }
 
+    @Override
+    public void insertAsFirstRoot(N node) {
+        Optional<N> firstRoot = retriever.findFirstRoot();
+        if(firstRoot.isPresent()) {
+            insertAsPrevSiblingOf(node, firstRoot.get());
+        } else {
+            insertAsFirstNode(node);
+        }
+    }
+
+    @Override
+    public void insertAsLastRoot(N node) {
+        Optional<N> lastRoot = retriever.findLastRoot();
+        if(lastRoot.isPresent()) {
+            insertAsNextSiblingOf(node, lastRoot.get());
+        } else {
+            insertAsFirstNode(node);
+        }
+    }
+
+    private void insertAsFirstNode(N node) {
+        inserter.insertAsFirstNode(node);
+    }
+
     public boolean isAllowNullableTreeFields() {
         return allowNullableTreeFields;
     }
