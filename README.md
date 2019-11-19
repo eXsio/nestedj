@@ -10,7 +10,7 @@ NestedJ can automate the insertion/moving/removing of tree nodes. It can also re
 
 ### What is Nested Set?
 
-Nested Set is a RDBMS Tree implementation. It allows to query for whole tree branches and finding ancestors and descendants using one simple query. As usual, there is no freee lunch, so the price to pay in this case is a slightly more complex logic for modifying the tree (inserting / moving / removing nodes and branches). Fortunately NestedJ makes it very easy.
+Nested Set is a RDBMS Tree implementation. It allows to fetch whole tree branches and find ancestors and descendants using single SQL statement. As usual, there is no freee lunch, so the price to pay in this case is a slightly more complex logic for modifying the tree (inserting / moving / removing nodes and branches). Fortunately NestedJ makes it very easy.
 
 ### Example
 
