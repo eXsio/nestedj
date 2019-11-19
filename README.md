@@ -238,6 +238,10 @@ After creating schema You can use the special ```NestedNodeRepository``` to perf
     void rebuildTree();
 
     void destroyTree();
+
+    void insertAsFirstRoot(N node);
+
+    void insertAsLastRoot(N node);
 ```
 
 As You see, the ```NestedNode``` interface contains 5 specific columns:
