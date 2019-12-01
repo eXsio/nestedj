@@ -177,4 +177,8 @@ public class TestNode implements NestedNode<Long> {
         n.setDiscriminator(resultSet.getString("DISCRIMINATOR"));
         return n;
     }
+
+    public TestNode copy() {
+        return new TestNode(id, treeLeft, treeLevel, treeRight, name, parentId, discriminator);
+    }
 }

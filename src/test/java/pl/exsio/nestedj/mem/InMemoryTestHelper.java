@@ -5,13 +5,16 @@ import pl.exsio.nestedj.base.TestHelper;
 import pl.exsio.nestedj.config.mem.InMemoryNestedNodeRepositoryConfiguration;
 import pl.exsio.nestedj.model.TestNode;
 
+import java.util.stream.Collectors;
+
 public class InMemoryTestHelper implements TestHelper {
 
     private final InMemoryNestedNodeRepositoryConfiguration<Long, TestNode> config = TestConfiguration.IN_MEM_CONFIG;
 
     @Override
     public TestNode findNode(String symbol) {
-        return config.getNodes().stream().filter(n -> n.getName().equals(symbol)).findFirst().get();
+        System.out.println(config.getNodes());
+        return config.getNodes().stream().filter(n -> n.getName().equals(symbol)).findFirst().orElse(null);
     }
 
     @Override
@@ -19,12 +22,16 @@ public class InMemoryTestHelper implements TestHelper {
         if (f.getParentId() == null) {
             return null;
         }
-        return config.getNodes().stream().filter(n -> n.getId().equals(f.getId())).findFirst().get();
+        TestNode parent = config.getNodes().stream().filter(n -> n.getId().equals(f.getParentId())).findFirst().orElse(null);
+        System.out.println(String.format("Parent of %s is %s", f.getName(), parent != null ? parent.getName() : "null"));
+        return parent;
     }
 
     @Override
     public void breakTree() {
-        config.getNodes().forEach(n -> {
+        config.getNodes().stream()
+                .filter(n -> n.getDiscriminator()
+                        .equals("tree_1")).forEach(n -> {
             n.setTreeLevel(0L);
             n.setTreeLeft(0L);
             n.setTreeRight(0L);
@@ -38,7 +45,8 @@ public class InMemoryTestHelper implements TestHelper {
 
     @Override
     public void removeTree() {
-        config.getNodes().clear();
+        config.getNodes().stream().filter(n -> n.getDiscriminator().equals("tree_1"))
+                .forEach(n -> config.getNodes().remove(n));
     }
 
     @Override
@@ -49,6 +57,6 @@ public class InMemoryTestHelper implements TestHelper {
 
     public void rollback() {
         config.getNodes().clear();
-        config.getNodes().addAll(TestConfiguration.IN_MEM_NODES);
+        config.getNodes().addAll(TestConfiguration.IN_MEM_NODES.stream().map(TestNode::copy).collect(Collectors.toList()));
     }
 }
