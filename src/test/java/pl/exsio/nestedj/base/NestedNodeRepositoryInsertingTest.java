@@ -50,7 +50,7 @@ public abstract class NestedNodeRepositoryInsertingTest extends FunctionalNested
         assertSecondTreeIntact();
     }
 
-    @Test(expected = InvalidNodesHierarchyException.class)
+    @Test
     public void testInsertAsNextSiblingSameNode() {
         TestNode a = this.findNode("a");
 
@@ -67,7 +67,7 @@ public abstract class NestedNodeRepositoryInsertingTest extends FunctionalNested
         assertSecondTreeIntact();
     }
 
-    @Test(expected = InvalidNodesHierarchyException.class)
+    @Test
     public void testInsertAsPrevSiblingSameNode() {
         TestNode c = this.findNode("c");
 
