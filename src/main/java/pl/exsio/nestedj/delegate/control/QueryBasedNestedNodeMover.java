@@ -51,9 +51,14 @@ public class QueryBasedNestedNodeMover<ID extends Serializable, N extends Nested
 
     @Override
     public void move(NestedNodeInfo<ID> nodeInfo, NestedNodeInfo<ID> parentInfo, Mode mode) {
+        if ((mode.equals(Mode.PREV_SIBLING) || mode.equals(Mode.NEXT_SIBLING)) && nodeInfo.equals(parentInfo)) {
+            return;
+        }
+
         if ((mode.equals(Mode.FIRST_CHILD) || mode.equals(Mode.LAST_CHILD)) && !canMoveNodeToSelectedParent(nodeInfo, parentInfo)) {
             throw new InvalidNodesHierarchyException("You cannot move a parent node to it's child or move a node to itself");
         }
+
         Integer nodeCount = queryDelegate.markNodeIds(nodeInfo);
 
         Sign sign = getSign(nodeInfo, parentInfo, mode);
