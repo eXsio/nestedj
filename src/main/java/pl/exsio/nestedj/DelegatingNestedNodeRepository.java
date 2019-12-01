@@ -182,7 +182,9 @@ public class DelegatingNestedNodeRepository<ID extends Serializable, N extends N
     public void insertAsFirstRoot(N node) {
         Optional<N> firstRoot = retriever.findFirstRoot();
         if(firstRoot.isPresent()) {
-            insertAsPrevSiblingOf(node, firstRoot.get());
+            if(differentNodes(node, firstRoot.get())) {
+                insertAsPrevSiblingOf(node, firstRoot.get());
+            }
         } else {
             insertAsFirstNode(node);
         }
@@ -192,10 +194,16 @@ public class DelegatingNestedNodeRepository<ID extends Serializable, N extends N
     public void insertAsLastRoot(N node) {
         Optional<N> lastRoot = retriever.findLastRoot();
         if(lastRoot.isPresent()) {
-            insertAsNextSiblingOf(node, lastRoot.get());
+            if(differentNodes(node, lastRoot.get())) {
+                insertAsNextSiblingOf(node, lastRoot.get());
+            }
         } else {
             insertAsFirstNode(node);
         }
+    }
+
+    private boolean differentNodes(N node, N firstRoot) {
+        return !firstRoot.getId().equals(node.getId());
     }
 
     private void insertAsFirstNode(N node) {

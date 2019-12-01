@@ -1,7 +1,10 @@
 NestedJ Changelog:
 
+- 4.1.1
+    - don't throw exception when inserting last root as last root or first root as first root
+
 - 4.1.0
-    -added new Repository methods: insertAsFirstRoot, insertAsLastRoot
+    - added new Repository methods: insertAsFirstRoot, insertAsLastRoot
 
 - 4.0.0
     - Decoupled DB Query Delegates from the actual Tree logic
