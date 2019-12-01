@@ -1,7 +1,7 @@
 package pl.exsio.nestedj.delegate.query.jpa;
 
 import pl.exsio.nestedj.config.jpa.JpaNestedNodeRepositoryConfiguration;
-import pl.exsio.nestedj.jpa.discriminator.JpaTreeDiscriminator;
+import pl.exsio.nestedj.config.jpa.discriminator.JpaTreeDiscriminator;
 import pl.exsio.nestedj.model.NestedNode;
 
 import javax.persistence.EntityManager;

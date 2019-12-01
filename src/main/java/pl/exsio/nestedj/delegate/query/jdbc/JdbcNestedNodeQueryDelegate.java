@@ -4,7 +4,7 @@ import com.google.common.collect.Maps;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import pl.exsio.nestedj.config.jdbc.JdbcNestedNodeRepositoryConfiguration;
-import pl.exsio.nestedj.jdbc.discriminator.JdbcTreeDiscriminator;
+import pl.exsio.nestedj.config.jdbc.discriminator.JdbcTreeDiscriminator;
 import pl.exsio.nestedj.model.NestedNode;
 
 import java.io.Serializable;

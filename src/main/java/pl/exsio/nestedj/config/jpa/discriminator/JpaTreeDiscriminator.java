@@ -1,4 +1,4 @@
-package pl.exsio.nestedj.jpa.discriminator;
+package pl.exsio.nestedj.config.jpa.discriminator;
 
 import pl.exsio.nestedj.model.NestedNode;
 

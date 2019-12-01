@@ -1,4 +1,4 @@
-package pl.exsio.nestedj.jpa.repository.factory;
+package pl.exsio.nestedj.config.jpa.factory;
 
 import pl.exsio.nestedj.DelegatingNestedNodeRepository;
 import pl.exsio.nestedj.NestedNodeRepository;

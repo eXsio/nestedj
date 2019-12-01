@@ -1,4 +1,4 @@
-package pl.exsio.nestedj.jdbc.discriminator;
+package pl.exsio.nestedj.config.jdbc.discriminator;
 
 import com.google.common.collect.Lists;
 
