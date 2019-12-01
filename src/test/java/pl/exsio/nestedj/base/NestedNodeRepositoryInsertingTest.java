@@ -248,8 +248,48 @@ public abstract class NestedNodeRepositoryInsertingTest extends FunctionalNested
     }
 
     @Test
+    public void testInsertAsFirstRootWhenAlreadyIsFirstRoot() {
+        TestNode x = this.createTestNode("x");
+        this.repository.insertAsFirstRoot(x);
+        this.repository.insertAsFirstRoot(x);
+        flushAndClear();
+        x = findNode("x");
+        TestNode a = findNode("a");
+        assertEquals(1, (long) x.getTreeLeft());
+        assertEquals(2, (long) x.getTreeRight());
+        assertEquals(0, (long) x.getTreeLevel());
+        assertNull(x.getParentId());
+
+        assertEquals(3, (long) a.getTreeLeft());
+        assertEquals(18, (long) a.getTreeRight());
+        assertEquals(0, (long) a.getTreeLevel());
+        assertNull(x.getParentId());
+        assertSecondTreeIntact();
+    }
+
+    @Test
     public void testInsertAsLastRoot() {
         TestNode x = this.createTestNode("x");
+        this.repository.insertAsLastRoot(x);
+        flushAndClear();
+        x = findNode("x");
+        TestNode a = findNode("a");
+        assertEquals(17, (long) x.getTreeLeft());
+        assertEquals(18, (long) x.getTreeRight());
+        assertEquals(0, (long) x.getTreeLevel());
+        assertNull(x.getParentId());
+
+        assertEquals(1, (long) a.getTreeLeft());
+        assertEquals(16, (long) a.getTreeRight());
+        assertEquals(0, (long) a.getTreeLevel());
+        assertNull(x.getParentId());
+        assertSecondTreeIntact();
+    }
+
+    @Test
+    public void testInsertAsLastRootWhenAlreadyIsLastRoot() {
+        TestNode x = this.createTestNode("x");
+        this.repository.insertAsLastRoot(x);
         this.repository.insertAsLastRoot(x);
         flushAndClear();
         x = findNode("x");
