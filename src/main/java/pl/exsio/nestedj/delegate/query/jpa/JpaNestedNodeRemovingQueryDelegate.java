@@ -13,13 +13,13 @@ import java.util.Optional;
 
 import static pl.exsio.nestedj.model.NestedNode.*;
 
-public class JpaNestedNodeIRemovingQueryDelegate<ID extends Serializable, N extends NestedNode<ID>>
+public class JpaNestedNodeRemovingQueryDelegate<ID extends Serializable, N extends NestedNode<ID>>
         extends JpaNestedNodeQueryDelegate<ID, N>
         implements NestedNodeRemovingQueryDelegate<ID, N> {
 
     private final static Long UPDATE_INCREMENT_BY = 2L;
 
-    public JpaNestedNodeIRemovingQueryDelegate(JpaNestedNodeRepositoryConfiguration<ID, N> configuration) {
+    public JpaNestedNodeRemovingQueryDelegate(JpaNestedNodeRepositoryConfiguration<ID, N> configuration) {
         super(configuration);
     }
 

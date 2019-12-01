@@ -58,8 +58,7 @@ public class InMemoryNestedNodeRetrievingQueryDelegate<ID extends Serializable, 
         return nodesStream()
                 .filter(n -> getLong(LEFT, n) < node.getTreeLeft())
                 .filter(n -> getLong(RIGHT, n) > node.getTreeRight())
-                .filter(n -> getLong(LEVEL, n).equals(node.getTreeLevel() - 1))
-                .sorted(Comparator.comparing(NestedNode::getTreeLeft))
+                .sorted(Comparator.<N, Long>comparing(NestedNode::getTreeLeft).reversed())
                 .collect(Collectors.toList());
     }
 
