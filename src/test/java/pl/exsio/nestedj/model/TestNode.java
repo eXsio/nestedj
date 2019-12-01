@@ -57,6 +57,19 @@ public class TestNode implements NestedNode<Long> {
     @Column(name = "discriminator", nullable = false)
     private String discriminator;
 
+    public TestNode() {
+    }
+
+    public TestNode(Long id, Long treeLeft, Long treeLevel, Long treeRight, String name, Long parentId, String discriminator) {
+        this.id = id;
+        this.name = name;
+        this.treeLeft = treeLeft;
+        this.treeRight = treeRight;
+        this.treeLevel = treeLevel;
+        this.parentId = parentId;
+        this.discriminator = discriminator;
+    }
+
     @Override
     public void setId(Long id) {
         this.id = id;
