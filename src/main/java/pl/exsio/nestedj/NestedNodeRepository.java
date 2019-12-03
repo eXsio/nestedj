@@ -198,6 +198,9 @@ public interface NestedNodeRepository<ID extends Serializable, N extends NestedN
     void insertAsLastRoot(N node);
 
     /**
+     * Lock interface that serves as a Tree/Repository locking source.
+     * Contains a default implementation of NoLock class used when no locking is required.
+     *
      *
      * @param <ID> - Nested Node Identier Class
      * @param <N> - Nested Node Class

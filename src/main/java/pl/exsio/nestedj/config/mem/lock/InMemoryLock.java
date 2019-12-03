@@ -38,6 +38,9 @@ public class InMemoryLock<ID extends Serializable, N extends NestedNode<ID>> imp
         this.lockHandleProvider = lockHandleProvider;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized boolean lockNode(N node) {
         if (repositoryLocked.get()) {
@@ -55,6 +58,9 @@ public class InMemoryLock<ID extends Serializable, N extends NestedNode<ID>> imp
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized void unlockNode(N node) {
         if(lockHandleProvider == null) {
@@ -64,6 +70,9 @@ public class InMemoryLock<ID extends Serializable, N extends NestedNode<ID>> imp
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized boolean lockRepository() {
         if (repositoryLocked.get()) {
@@ -73,6 +82,9 @@ public class InMemoryLock<ID extends Serializable, N extends NestedNode<ID>> imp
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public synchronized void unlockRepository() {
         repositoryLocked.set(false);

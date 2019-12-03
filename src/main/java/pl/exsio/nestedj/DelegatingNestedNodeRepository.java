@@ -35,6 +35,9 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * {@inheritDoc}
+ */
 public class DelegatingNestedNodeRepository<ID extends Serializable, N extends NestedNode<ID>> implements NestedNodeRepository<ID, N> {
 
     private final NestedNodeInserter<ID, N> inserter;
@@ -65,21 +68,33 @@ public class DelegatingNestedNodeRepository<ID extends Serializable, N extends N
         this.lock = lock;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void insertAsFirstChildOf(N node, N parent) {
         lockNode(node, () -> insertOrMove(node, parent, NestedNodeHierarchyManipulator.Mode.FIRST_CHILD));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void insertAsLastChildOf(N node, N parent) {
         lockNode(node, () -> insertOrMove(node, parent, NestedNodeHierarchyManipulator.Mode.LAST_CHILD));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void insertAsNextSiblingOf(N node, N parent) {
         lockNode(node, () -> insertOrMove(node, parent, NestedNodeHierarchyManipulator.Mode.NEXT_SIBLING));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void insertAsPrevSiblingOf(N node, N parent) {
         lockNode(node, () -> insertOrMove(node, parent, NestedNodeHierarchyManipulator.Mode.PREV_SIBLING));
@@ -116,6 +131,9 @@ public class DelegatingNestedNodeRepository<ID extends Serializable, N extends N
         return (nodeInfo.getLeft() != null && nodeInfo.getRight() != null);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void removeSingle(N node) {
         lockNode(node, () -> {
@@ -128,6 +146,9 @@ public class DelegatingNestedNodeRepository<ID extends Serializable, N extends N
         });
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void removeSubtree(N node) {
         lockNode(node, () -> {
@@ -140,51 +161,81 @@ public class DelegatingNestedNodeRepository<ID extends Serializable, N extends N
         });
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<N> getTreeAsList(N node) {
         return this.retriever.getTreeAsList(node);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<N> getChildren(N node) {
         return this.retriever.getChildren(node);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Optional<N> getParent(N node) {
         return this.retriever.getParent(node);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Optional<N> getPrevSibling(N node) {
         return this.retriever.getPrevSibling(node);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Optional<N> getNextSibling(N node) {
         return this.retriever.getNextSibling(node);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Tree<ID, N> getTree(N node) {
         return this.retriever.getTree(node);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<N> getParents(N node) {
         return this.retriever.getParents(node);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void rebuildTree() {
         lockRepository(rebuilder::rebuildTree);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void destroyTree() {
         lockRepository(rebuilder::destroyTree);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void insertAsFirstRoot(N node) {
         lockNode(node, () -> {
@@ -199,6 +250,9 @@ public class DelegatingNestedNodeRepository<ID extends Serializable, N extends N
         });
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void insertAsLastRoot(N node) {
         lockNode(node, () -> {
