@@ -65,5 +65,16 @@ public interface NestedNodeRepository<ID extends Serializable, N extends NestedN
 
     void insertAsLastRoot(N node);
 
+    interface Lock<ID extends Serializable, N extends NestedNode<ID>> {
+
+        boolean lockNode(N node);
+
+        void unlockNode(N node);
+
+        boolean lockRepository();
+
+        boolean unlockRepository();
+    }
+
 
 }

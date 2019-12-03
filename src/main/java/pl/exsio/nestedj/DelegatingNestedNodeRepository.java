@@ -26,6 +26,7 @@ package pl.exsio.nestedj;
 import pl.exsio.nestedj.delegate.*;
 import pl.exsio.nestedj.ex.InvalidNodeException;
 import pl.exsio.nestedj.ex.InvalidParentException;
+import pl.exsio.nestedj.ex.RepositoryLockedException;
 import pl.exsio.nestedj.model.NestedNode;
 import pl.exsio.nestedj.model.NestedNodeInfo;
 import pl.exsio.nestedj.model.Tree;
@@ -45,40 +46,45 @@ public class DelegatingNestedNodeRepository<ID extends Serializable, N extends N
 
     private final NestedNodeRebuilder<ID, N> rebuilder;
 
+    private final Lock<ID, N> lock;
+
     private boolean allowNullableTreeFields = false;
+
 
 
     public DelegatingNestedNodeRepository(NestedNodeMover<ID, N> mover,
                                           NestedNodeRemover<ID, N> remover,
                                           NestedNodeRetriever<ID, N> retriever,
                                           NestedNodeRebuilder<ID, N> rebuilder,
-                                          NestedNodeInserter<ID, N> inserter) {
+                                          NestedNodeInserter<ID, N> inserter,
+                                          Lock<ID, N> lock) {
         this.inserter = inserter;
         this.mover = mover;
         this.remover = remover;
         this.retriever = retriever;
         this.rebuilder = rebuilder;
+        this.lock = lock;
     }
 
 
     @Override
     public void insertAsFirstChildOf(N node, N parent) {
-        this.insertOrMove(node, parent, NestedNodeHierarchyManipulator.Mode.FIRST_CHILD);
+        lockNode(node, () -> insertOrMove(node, parent, NestedNodeHierarchyManipulator.Mode.FIRST_CHILD));
     }
 
     @Override
     public void insertAsLastChildOf(N node, N parent) {
-        this.insertOrMove(node, parent, NestedNodeHierarchyManipulator.Mode.LAST_CHILD);
+        lockNode(node, () -> insertOrMove(node, parent, NestedNodeHierarchyManipulator.Mode.LAST_CHILD));
     }
 
     @Override
     public void insertAsNextSiblingOf(N node, N parent) {
-        this.insertOrMove(node, parent, NestedNodeHierarchyManipulator.Mode.NEXT_SIBLING);
+        lockNode(node, () -> insertOrMove(node, parent, NestedNodeHierarchyManipulator.Mode.NEXT_SIBLING));
     }
 
     @Override
     public void insertAsPrevSiblingOf(N node, N parent) {
-        this.insertOrMove(node, parent, NestedNodeHierarchyManipulator.Mode.PREV_SIBLING);
+        lockNode(node, () -> insertOrMove(node, parent, NestedNodeHierarchyManipulator.Mode.PREV_SIBLING));
     }
 
     private void insertOrMove(N node, N parent, NestedNodeHierarchyManipulator.Mode mode) {
@@ -114,23 +120,26 @@ public class DelegatingNestedNodeRepository<ID extends Serializable, N extends N
 
     @Override
     public void removeSingle(N node) {
-        Optional<NestedNodeInfo<ID>> nodeInfo = retriever.getNodeInfo(node.getId());
-        if (nodeInfo.isPresent()) {
-            this.remover.removeSingle(nodeInfo.get());
-        } else {
-            throw new InvalidNodeException(String.format("Couldn't remove node, was it already removed?: %s", node));
-        }
-
+        lockNode(node, () -> {
+            Optional<NestedNodeInfo<ID>> nodeInfo = retriever.getNodeInfo(node.getId());
+            if (nodeInfo.isPresent()) {
+                this.remover.removeSingle(nodeInfo.get());
+            } else {
+                throw new InvalidNodeException(String.format("Couldn't remove node, was it already removed?: %s", node));
+            }
+        });
     }
 
     @Override
     public void removeSubtree(N node) {
-        Optional<NestedNodeInfo<ID>> nodeInfo = retriever.getNodeInfo(node.getId());
-        if (nodeInfo.isPresent()) {
-            this.remover.removeSubtree(nodeInfo.get());
-        } else {
-            throw new InvalidNodeException(String.format("Couldn't remove node subtree, was it already removed?: %s", node));
-        }
+        lockNode(node, () -> {
+            Optional<NestedNodeInfo<ID>> nodeInfo = retriever.getNodeInfo(node.getId());
+            if (nodeInfo.isPresent()) {
+                this.remover.removeSubtree(nodeInfo.get());
+            } else {
+                throw new InvalidNodeException(String.format("Couldn't remove node subtree, was it already removed?: %s", node));
+            }
+        });
     }
 
     @Override
@@ -170,36 +179,40 @@ public class DelegatingNestedNodeRepository<ID extends Serializable, N extends N
 
     @Override
     public void rebuildTree() {
-        this.rebuilder.rebuildTree();
+        lockRepository(rebuilder::rebuildTree);
     }
 
     @Override
     public void destroyTree() {
-        rebuilder.destroyTree();
+        lockRepository(rebuilder::destroyTree);
     }
 
     @Override
     public void insertAsFirstRoot(N node) {
-        Optional<N> firstRoot = retriever.findFirstRoot();
-        if(firstRoot.isPresent()) {
-            if(differentNodes(node, firstRoot.get())) {
-                insertAsPrevSiblingOf(node, firstRoot.get());
+        lockNode(node, () -> {
+            Optional<N> firstRoot = retriever.findFirstRoot();
+            if (firstRoot.isPresent()) {
+                if (differentNodes(node, firstRoot.get())) {
+                    insertOrMove(node, firstRoot.get(), NestedNodeHierarchyManipulator.Mode.PREV_SIBLING);
+                }
+            } else {
+                insertAsFirstNode(node);
             }
-        } else {
-            insertAsFirstNode(node);
-        }
+        });
     }
 
     @Override
     public void insertAsLastRoot(N node) {
-        Optional<N> lastRoot = retriever.findLastRoot();
-        if(lastRoot.isPresent()) {
-            if(differentNodes(node, lastRoot.get())) {
-                insertAsNextSiblingOf(node, lastRoot.get());
+        lockNode(node, () -> {
+            Optional<N> lastRoot = retriever.findLastRoot();
+            if (lastRoot.isPresent()) {
+                if (differentNodes(node, lastRoot.get())) {
+                    insertOrMove(node, lastRoot.get(), NestedNodeHierarchyManipulator.Mode.NEXT_SIBLING);
+                }
+            } else {
+                insertAsFirstNode(node);
             }
-        } else {
-            insertAsFirstNode(node);
-        }
+        });
     }
 
     private boolean differentNodes(N node, N firstRoot) {
@@ -216,5 +229,33 @@ public class DelegatingNestedNodeRepository<ID extends Serializable, N extends N
 
     public void setAllowNullableTreeFields(boolean allowNullableTreeFields) {
         this.allowNullableTreeFields = allowNullableTreeFields;
+    }
+
+
+    private void lockNode(N node, TreeModifier modifier) {
+        if (!lock.lockNode(node)) {
+            throw new RepositoryLockedException(String.format("Nested Node Repository is locked for Node %s. Try again later.", node));
+        }
+        try {
+            modifier.modifyTree();
+        } finally {
+            lock.unlockNode(node);
+        }
+    }
+
+    private void lockRepository(TreeModifier modifier) {
+        if (!lock.lockRepository()) {
+            throw new RepositoryLockedException("Nested Node Repository is locked. Try again later.");
+        }
+        try {
+            modifier.modifyTree();
+        } finally {
+            lock.unlockRepository();
+        }
+    }
+
+    private interface TreeModifier {
+
+        void modifyTree();
     }
 }
