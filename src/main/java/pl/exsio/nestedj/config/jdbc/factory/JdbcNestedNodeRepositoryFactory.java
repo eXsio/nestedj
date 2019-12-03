@@ -22,7 +22,7 @@ public final class JdbcNestedNodeRepositoryFactory {
      * Creates a new instance of NestedNodeRepository backed by JDBC storage without any Repository locking.
      *
      * @param configuration - JDBC Repository configuration
-     * @param <ID> - Nested Node Identier Class
+     * @param <ID> - Nested Node Identifier Class
      * @param <N> - Nested Node Class
      * @return - a new instance of NestedNodeRepository backed by JDBC storage
      */
@@ -35,7 +35,7 @@ public final class JdbcNestedNodeRepositoryFactory {
      *
      * @param configuration - JDBC Repository configuration
      * @param lock - custom Repository Lock implementation
-     * @param <ID> - Nested Node Identier Class
+     * @param <ID> - Nested Node Identifier Class
      * @param <N> - Nested Node Class
      * @return - a new instance of NestedNodeRepository backed by JDBC storage
      */

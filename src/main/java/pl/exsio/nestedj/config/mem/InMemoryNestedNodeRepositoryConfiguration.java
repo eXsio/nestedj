@@ -13,7 +13,7 @@ import java.util.Set;
 /**
  * Configuration class that serves as a base of creating new instances of InMemory Repository.
  *
- * @param <ID> - Nested Node Identier Class
+ * @param <ID> - Nested Node Identifier Class
  * @param <N> - Nested Node Class
  */
 public class InMemoryNestedNodeRepositoryConfiguration<ID extends Serializable, N extends NestedNode<ID>> {

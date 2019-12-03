@@ -4,6 +4,11 @@ import com.google.common.base.MoreObjects;
 
 import java.io.Serializable;
 
+/**
+ * Internal representation of Nested Node, not intended for use outside of NestedJ implementation.
+ *
+ * @param <ID> - Nested Node Identifier Class
+ */
 public class NestedNodeInfo<ID extends Serializable> {
 
     private final ID id;

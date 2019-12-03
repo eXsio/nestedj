@@ -8,7 +8,7 @@ import java.io.Serializable;
  * Tree Discriminator for use with InMemory Repository implementation.
  * Allows to store multiple intependant Trees in one Repository/Collection.
  *
- * @param <ID> - Nested Node Identier Class
+ * @param <ID> - Nested Node Identifier Class
  * @param <N> - Nested Node Class
  */
 public interface InMemoryTreeDiscriminator<ID extends Serializable, N extends NestedNode<ID>> {

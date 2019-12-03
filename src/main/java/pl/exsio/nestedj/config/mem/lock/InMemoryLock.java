@@ -18,7 +18,7 @@ import java.util.function.Function;
  * Additionally the Lock check whether the whole Repository is locked or not. Locked repository takes precedence before
  * locking single Node.
  *
- * @param <ID> - Nested Node Identier Class
+ * @param <ID> - Nested Node Identifier Class
  * @param <N> - Nested Node Class
  */
 public class InMemoryLock<ID extends Serializable, N extends NestedNode<ID>> implements NestedNodeRepository.Lock<ID, N> {

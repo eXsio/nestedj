@@ -22,7 +22,7 @@ public final class InMemoryNestedNodeRepositoryFactory {
      * Creates a new instance of NestedNodeRepository backed by InMemory storage without any Repository locking.
      *
      * @param configuration - InMemory Repository configuration
-     * @param <ID> - Nested Node Identier Class
+     * @param <ID> - Nested Node Identifier Class
      * @param <N> - Nested Node Class
      * @return - a new instance of NestedNodeRepository backed by InMemory storage
      */
@@ -35,7 +35,7 @@ public final class InMemoryNestedNodeRepositoryFactory {
      *
      * @param configuration - InMemory Repository configuration
      * @param lock - custom Repository Lock implementation
-     * @param <ID> - Nested Node Identier Class
+     * @param <ID> - Nested Node Identifier Class
      * @param <N> - Nested Node Class
      * @return - a new instance of NestedNodeRepository backed by InMemory storage
      */

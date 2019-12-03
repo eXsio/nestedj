@@ -15,7 +15,7 @@ import java.util.function.Supplier;
 /**
  * Default implementation of JPA Tree Discriminator based on Map of <String, Supplier<Object>>
  *
- * @param <ID> - Nested Node Identier Class
+ * @param <ID> - Nested Node Identifier Class
  * @param <N> - Nested Node Class
  */
 public class MapJpaTreeDiscriminator<ID extends Serializable, N extends NestedNode<ID>> implements JpaTreeDiscriminator<ID, N> {

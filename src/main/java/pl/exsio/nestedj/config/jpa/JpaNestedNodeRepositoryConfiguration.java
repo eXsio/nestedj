@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * Configuration class that serves as a base of creating new instances of JPA Repository.
  *
- * @param <ID> - Nested Node Identier Class
+ * @param <ID> - Nested Node Identifier Class
  * @param <N> - Nested Node Class
  */
 public class JpaNestedNodeRepositoryConfiguration<ID extends Serializable, N extends NestedNode<ID>> {
@@ -27,7 +27,7 @@ public class JpaNestedNodeRepositoryConfiguration<ID extends Serializable, N ext
      * Creates new JPA Repository with custom Tree Discriminator.
      *
      * @param entityManager - JPA Entity Manager to be used by the Repository
-     * @param nodeClass - Nested Node Identier Class
+     * @param nodeClass - Nested Node Identifier Class
      * @param idClass - Nested Node Class
      * @param treeDiscriminator - custom Tree Discriminator
      */
@@ -43,7 +43,7 @@ public class JpaNestedNodeRepositoryConfiguration<ID extends Serializable, N ext
      * Creates new JPA Repository with no Tree Discriminator.
      *
      * @param entityManager - JPA Entity Manager to be used by the Repository
-     * @param nodeClass - Nested Node Identier Class
+     * @param nodeClass - Nested Node Identifier Class
      * @param idClass - Nested Node Class
      */
     public JpaNestedNodeRepositoryConfiguration(EntityManager entityManager, Class<N> nodeClass, Class<ID> idClass) {

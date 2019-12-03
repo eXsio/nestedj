@@ -12,7 +12,7 @@ import java.util.List;
  * Tree Discriminator for use with JPA Repository implementation.
  * Allows to store multiple intependant Trees in one Repository/Collection.
  *
- * @param <ID> - Nested Node Identier Class
+ * @param <ID> - Nested Node Identifier Class
  * @param <N> - Nested Node Class
  */
 public interface JpaTreeDiscriminator<ID extends Serializable, N extends NestedNode<ID>> {

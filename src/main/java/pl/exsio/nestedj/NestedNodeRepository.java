@@ -39,7 +39,7 @@ import java.util.Optional;
  *  As for Tree manipulation, the Repository covers all scenarios and should be the only entry point. I you're missing a feature
  *  in that area, please consider raising a request here: https://github.com/eXsio/nestedj
  *
- * @param <ID> - Nested Node Identier Class
+ * @param <ID> - Nested Node Identifier Class
  * @param <N> - Nested Node Class
  */
 public interface NestedNodeRepository<ID extends Serializable, N extends NestedNode<ID>> {
@@ -202,7 +202,7 @@ public interface NestedNodeRepository<ID extends Serializable, N extends NestedN
      * Contains a default implementation of NoLock class used when no locking is required.
      *
      *
-     * @param <ID> - Nested Node Identier Class
+     * @param <ID> - Nested Node Identifier Class
      * @param <N> - Nested Node Class
      */
     interface Lock<ID extends Serializable, N extends NestedNode<ID>> {

@@ -15,7 +15,7 @@ import java.util.function.Function;
 /**
  * Configuration class that serves as a base of creating new instances of JDBC Repository.
  *
- * @param <ID> - Nested Node Identier Class
+ * @param <ID> - Nested Node Identifier Class
  * @param <N> - Nested Node Class
  */
 public class JdbcNestedNodeRepositoryConfiguration<ID extends Serializable, N extends NestedNode<ID>> {
