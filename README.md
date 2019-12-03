@@ -29,26 +29,31 @@ How can we do it? We could:
 -- repeat for each (sub)category in tree
 select cat_id from categories where cat_parent_id = :parent_id
 
+-- this solution causes N+1 select problem
 select * from products where cat_id in (:gathered_cat_ids)
 
 ```
 
-- use proprietary SQL features like Oracle's recursive queries (increased complexity due to recursive logic hidden in database, but still present):
+- use proprietary SQL features like Oracle's recursive queries:
 
 ```sql
 
+-- increased complexity due to recursive logic hidden in database, but still present
 select p.* 
-from product p inner join categories c on p.cat_id = c.cat_id
+from product p 
+inner join categories c on p.cat_id = c.cat_id
 connect by prior c.cat_id = c.cat_parent_id
 where c.cat_parent_id = :parent_id
 ```
 
-- use NestedJ (O(n) access):
+- use NestedJ:
 
 ```sql
 
+-- O(n) access
 select p.* 
-from product p inner join categories c on p.cat_id = c.cat_id
+from product p 
+inner join categories c on p.cat_id = c.cat_id
 where c.tree_left >= :parent_left and c.tree_right <= :parent_right
 
 ```
@@ -95,6 +100,16 @@ Using the traditional ```parant_id``` relationship would require recursive execu
 
 ##### Important: Nested Set is NOT a binary tree - the number of nodes on any treeLevel is unlimited. 
 
+## Tradeoffs?
+
+Of course there is no free lunch :) Nested Set Model offers unbeatable tree traversal performance at the cost of elevated (but reasonable - no recursion) complexity
+of all tree modification operations. Any update of the Tree structure triggers cascade update of left/right/level values in multiple nodes.
+NestedJ should only be considered when the reads count highly outnumbers the modifications count. 
+
+Going back to our e-commerce example: Product Catalog of a medium size store could be updated up to 100 - 500 times a day. 
+At the same time the number of visitors could be 100k - 500k a day. Even with increased Tree modification complexity we are still 
+gaining a lot of performance. There is no recursiveness during the Tree update. 
+
 ## Advantages of NestedJ
 
    - **No Reflection!** - no custom annotations, no additional boostrap logic
@@ -111,6 +126,9 @@ Using the traditional ```parant_id``` relationship would require recursive execu
  - [JPA](README-JPA.md) - uses Hibernate and Criteria Queries
  - [JDBC](README-JDBC.md) - uses Spring's JdbcTemplate
  - [In Memory](README-MEM.md) - uses java.util.Set and JDK8+ Streams  
+ 
+ All of the implementations are interoperable - they use the same base abstractions. You can use the in-memory implementation to locally build, modify, traverse the Tree 
+ and once it's saved to the Database, you can pick up where you left off with JPA or JDBC implementation. 
 
 ## Multiple Trees in one Table/Entity/Collection
 
