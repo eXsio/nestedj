@@ -19,7 +19,7 @@ The [Nested Set Model](https://en.wikipedia.org/wiki/Nested_set_model) is a tech
 ### Practical Example
 
 Let's say you have a e-commerce solution with a multi-level Product Catalog. One of the most basic requirements would be that 
-if a Customer browses one of the Categories, he should be presented with Products from that Category and from its Subcategories (regardless of their depth).
+if a Customer browses one of the Categories, he should be presented with Products from that Category and from its Subcategories (regardless of their depth in the hierarchy).
 
 How can we do it? We could:
 - Recursively traverse the Category and it's Subcategories, executing 1 SQL per Category and gatering all the Category IDs:
@@ -110,6 +110,26 @@ Going back to our e-commerce example: Product Catalog of a medium size store cou
 At the same time the number of visitors could be 100k - 500k a day. Even with increased Tree modification complexity we are still 
 gaining a lot of performance. There is no recursiveness during the Tree update. 
 
+## Installation
+
+```xml
+
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
+
+<dependency>
+    <groupId>com.github.eXsio</groupId>
+    <artifactId>nestedj</artifactId>
+    <version>5.0.0</version>
+</dependency>
+
+```
+
+
 ## Advantages of NestedJ
 
    - **No Reflection!** - no custom annotations, no additional boostrap logic
@@ -121,7 +141,7 @@ gaining a lot of performance. There is no recursiveness during the Tree update.
    - **Minimal number of Project dependencies** - only Guava and (JPA API or Spring JDBC) - depending on which implementation you want to use 
    - **Multiple Implementations** - choose between JPA, JDBC or in-memory storage
 
-## Implementations
+## Storage implementations
 
  - [JPA](README-JPA.md) - uses Hibernate and Criteria Queries
  - [JDBC](README-JDBC.md) - uses Spring's JdbcTemplate
