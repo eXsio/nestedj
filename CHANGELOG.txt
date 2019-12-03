@@ -1,5 +1,14 @@
 NestedJ Changelog:
 
+- 5.0.0
+    - new backing storage implementation - In Memory. Operates on Java Set using Streams
+    - ability to add pessimistic locking to all Tree operations via new Lock interface
+    - change methods that were returning Iterable to return List
+    - add Javadocs to public APIs
+    - move Factory classes to config packages for better clarity
+    - update project dependencies
+    - rework README for better clarity
+
 - 4.1.1
     - don't throw exception when inserting last root as last root or first root as first root
 

@@ -28,13 +28,14 @@ import pl.exsio.nestedj.model.NestedNodeInfo;
 import pl.exsio.nestedj.model.Tree;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Optional;
 
 public interface NestedNodeRetriever<ID extends Serializable, N extends NestedNode<ID>> {
 
-    Iterable<N> getTreeAsList(N node);
+    List<N> getTreeAsList(N node);
 
-    Iterable<N> getChildren(N node);
+    List<N> getChildren(N node);
 
     Optional<N> getParent(N nodes);
 
@@ -44,7 +45,7 @@ public interface NestedNodeRetriever<ID extends Serializable, N extends NestedNo
 
     Tree<ID, N> getTree(N node);
 
-    Iterable<N> getParents(N node);
+    List<N> getParents(N node);
 
     Optional<NestedNodeInfo<ID>> getNodeInfo(ID nodeIds);
 

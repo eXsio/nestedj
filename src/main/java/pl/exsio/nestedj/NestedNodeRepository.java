@@ -27,6 +27,7 @@ import pl.exsio.nestedj.model.NestedNode;
 import pl.exsio.nestedj.model.Tree;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Optional;
 
 public interface NestedNodeRepository<ID extends Serializable, N extends NestedNode<ID>> {
@@ -43,7 +44,7 @@ public interface NestedNodeRepository<ID extends Serializable, N extends NestedN
 
     void removeSubtree(N node);
 
-    Iterable<N> getChildren(N node);
+    List<N> getChildren(N node);
 
     Optional<N> getParent(N node);
 
@@ -51,9 +52,9 @@ public interface NestedNodeRepository<ID extends Serializable, N extends NestedN
 
     Optional<N> getNextSibling(N node);
 
-    Iterable<N> getParents(N node);
+    List<N> getParents(N node);
 
-    Iterable<N> getTreeAsList(N node);
+    List<N> getTreeAsList(N node);
 
     Tree<ID, N> getTree(N node);
 
@@ -73,7 +74,7 @@ public interface NestedNodeRepository<ID extends Serializable, N extends NestedN
 
         boolean lockRepository();
 
-        boolean unlockRepository();
+        void unlockRepository();
     }
 
 

@@ -74,8 +74,7 @@ public class InMemoryLock<ID extends Serializable, N extends NestedNode<ID>> imp
     }
 
     @Override
-    public synchronized boolean unlockRepository() {
+    public synchronized void unlockRepository() {
         repositoryLocked.set(false);
-        return false;
     }
 }

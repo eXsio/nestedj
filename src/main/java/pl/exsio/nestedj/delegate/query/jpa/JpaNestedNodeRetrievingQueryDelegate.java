@@ -11,6 +11,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static pl.exsio.nestedj.model.NestedNode.*;
@@ -26,7 +27,7 @@ public class JpaNestedNodeRetrievingQueryDelegate<ID extends Serializable, N ext
     }
 
     @Override
-    public Iterable<N> getTreeAsList(N node) {
+    public List<N> getTreeAsList(N node) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<N> select = cb.createQuery(nodeClass);
         Root<N> root = select.from(nodeClass);
@@ -39,7 +40,7 @@ public class JpaNestedNodeRetrievingQueryDelegate<ID extends Serializable, N ext
     }
 
     @Override
-    public Iterable<N> getChildren(N node) {
+    public List<N> getChildren(N node) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<N> select = cb.createQuery(nodeClass);
         Root<N> root = select.from(nodeClass);
@@ -69,7 +70,7 @@ public class JpaNestedNodeRetrievingQueryDelegate<ID extends Serializable, N ext
     }
 
     @Override
-    public Iterable<N> getParents(N node) {
+    public List<N> getParents(N node) {
         if (node.getTreeLevel() > 0) {
             CriteriaBuilder cb = entityManager.getCriteriaBuilder();
             CriteriaQuery<N> select = cb.createQuery(nodeClass);

@@ -32,6 +32,7 @@ import pl.exsio.nestedj.model.NestedNodeInfo;
 import pl.exsio.nestedj.model.Tree;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Optional;
 
 public class DelegatingNestedNodeRepository<ID extends Serializable, N extends NestedNode<ID>> implements NestedNodeRepository<ID, N> {
@@ -50,8 +51,6 @@ public class DelegatingNestedNodeRepository<ID extends Serializable, N extends N
 
     private boolean allowNullableTreeFields = false;
 
-
-
     public DelegatingNestedNodeRepository(NestedNodeMover<ID, N> mover,
                                           NestedNodeRemover<ID, N> remover,
                                           NestedNodeRetriever<ID, N> retriever,
@@ -65,7 +64,6 @@ public class DelegatingNestedNodeRepository<ID extends Serializable, N extends N
         this.rebuilder = rebuilder;
         this.lock = lock;
     }
-
 
     @Override
     public void insertAsFirstChildOf(N node, N parent) {
@@ -143,12 +141,12 @@ public class DelegatingNestedNodeRepository<ID extends Serializable, N extends N
     }
 
     @Override
-    public Iterable<N> getTreeAsList(N node) {
+    public List<N> getTreeAsList(N node) {
         return this.retriever.getTreeAsList(node);
     }
 
     @Override
-    public Iterable<N> getChildren(N node) {
+    public List<N> getChildren(N node) {
         return this.retriever.getChildren(node);
     }
 
@@ -173,7 +171,7 @@ public class DelegatingNestedNodeRepository<ID extends Serializable, N extends N
     }
 
     @Override
-    public Iterable<N> getParents(N node) {
+    public List<N> getParents(N node) {
         return this.retriever.getParents(node);
     }
 
@@ -255,7 +253,6 @@ public class DelegatingNestedNodeRepository<ID extends Serializable, N extends N
     }
 
     private interface TreeModifier {
-
         void modifyTree();
     }
 }

@@ -8,6 +8,7 @@ import pl.exsio.nestedj.model.NestedNode;
 import pl.exsio.nestedj.model.NestedNodeInfo;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Optional;
 
 public class JdbcNestedNodeRetrievingQueryDelegate<ID extends Serializable, N extends NestedNode<ID>>
@@ -20,7 +21,7 @@ public class JdbcNestedNodeRetrievingQueryDelegate<ID extends Serializable, N ex
 
 
     @Override
-    public Iterable<N> getTreeAsList(N node) {
+    public List<N> getTreeAsList(N node) {
         return jdbcTemplate.query(
                 getDiscriminatedQuery(
                         new Query("select * from :tableName where :left >= ? and :right <= ? order by :left asc").build()
@@ -35,7 +36,7 @@ public class JdbcNestedNodeRetrievingQueryDelegate<ID extends Serializable, N ex
     }
 
     @Override
-    public Iterable<N> getChildren(N node) {
+    public List<N> getChildren(N node) {
         return jdbcTemplate.query(
                 getDiscriminatedQuery(
                         new Query("select * from :tableName where :left >= ? and :right <= ? and :level = ? order by :left asc").build()
@@ -71,7 +72,7 @@ public class JdbcNestedNodeRetrievingQueryDelegate<ID extends Serializable, N ex
     }
 
     @Override
-    public Iterable<N> getParents(N node) {
+    public List<N> getParents(N node) {
         if (node.getTreeLevel() > 0) {
             return jdbcTemplate.query(
                     getDiscriminatedQuery(

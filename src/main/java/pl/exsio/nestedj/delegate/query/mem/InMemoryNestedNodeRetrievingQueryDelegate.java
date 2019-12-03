@@ -7,6 +7,7 @@ import pl.exsio.nestedj.model.NestedNodeInfo;
 
 import java.io.Serializable;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -22,7 +23,7 @@ public class InMemoryNestedNodeRetrievingQueryDelegate<ID extends Serializable, 
 
 
     @Override
-    public Iterable<N> getTreeAsList(N node) {
+    public List<N> getTreeAsList(N node) {
         return nodesStream()
                 .filter(n -> getLong(LEFT, n) >= node.getTreeLeft())
                 .filter(n -> getLong(RIGHT, n) <= node.getTreeRight())
@@ -31,7 +32,7 @@ public class InMemoryNestedNodeRetrievingQueryDelegate<ID extends Serializable, 
     }
 
     @Override
-    public Iterable<N> getChildren(N node) {
+    public List<N> getChildren(N node) {
         return nodesStream()
                 .filter(n -> getLong(LEFT, n) >= node.getTreeLeft())
                 .filter(n -> getLong(RIGHT, n) <= node.getTreeRight())
@@ -54,7 +55,7 @@ public class InMemoryNestedNodeRetrievingQueryDelegate<ID extends Serializable, 
     }
 
     @Override
-    public Iterable<N> getParents(N node) {
+    public List<N> getParents(N node) {
         return nodesStream()
                 .filter(n -> getLong(LEFT, n) < node.getTreeLeft())
                 .filter(n -> getLong(RIGHT, n) > node.getTreeRight())

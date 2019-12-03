@@ -4,17 +4,18 @@ import pl.exsio.nestedj.model.NestedNode;
 import pl.exsio.nestedj.model.NestedNodeInfo;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Optional;
 
 public interface NestedNodeRetrievingQueryDelegate<ID extends Serializable, N extends NestedNode<ID>> {
 
-    Iterable<N> getTreeAsList(N node);
+    List<N> getTreeAsList(N node);
 
-    Iterable<N> getChildren(N node);
+    List<N> getChildren(N node);
 
     Optional<N> getParent(N node);
 
-    Iterable<N> getParents(N node);
+    List<N> getParents(N node);
 
     Optional<N> getPrevSibling(N node);
 

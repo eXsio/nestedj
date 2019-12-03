@@ -13,7 +13,6 @@ public class NoLock<ID extends Serializable, N extends NestedNode<ID>> implement
 
     @Override
     public void unlockNode(N node) {
-
     }
 
     @Override
@@ -22,7 +21,6 @@ public class NoLock<ID extends Serializable, N extends NestedNode<ID>> implement
     }
 
     @Override
-    public boolean unlockRepository() {
-        return false;
+    public void unlockRepository() {
     }
 }

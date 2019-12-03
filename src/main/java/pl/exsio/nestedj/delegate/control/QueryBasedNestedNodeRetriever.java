@@ -31,6 +31,7 @@ import pl.exsio.nestedj.model.NestedNodeInfo;
 import pl.exsio.nestedj.model.Tree;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Optional;
 
 public class QueryBasedNestedNodeRetriever<ID extends Serializable, N extends NestedNode<ID>> implements NestedNodeRetriever<ID, N> {
@@ -52,12 +53,12 @@ public class QueryBasedNestedNodeRetriever<ID extends Serializable, N extends Ne
     }
 
     @Override
-    public Iterable<N> getTreeAsList(N node) {
+    public List<N> getTreeAsList(N node) {
         return queryDelegate.getTreeAsList(node);
     }
 
     @Override
-    public Iterable<N> getChildren(N node) {
+    public List<N> getChildren(N node) {
         return queryDelegate.getChildren(node);
     }
 
@@ -67,7 +68,7 @@ public class QueryBasedNestedNodeRetriever<ID extends Serializable, N extends Ne
     }
 
     @Override
-    public Iterable<N> getParents(N node) {
+    public List<N> getParents(N node) {
         return queryDelegate.getParents(node);
     }
 
