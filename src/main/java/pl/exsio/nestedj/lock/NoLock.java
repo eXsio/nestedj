@@ -5,6 +5,12 @@ import pl.exsio.nestedj.model.NestedNode;
 
 import java.io.Serializable;
 
+/**
+ *  Default no-op Lock implementation
+ *
+ * @param <ID> - Nested Node Identier Class
+ * @param <N> - Nested Node Class
+ */
 public class NoLock<ID extends Serializable, N extends NestedNode<ID>> implements NestedNodeRepository.Lock<ID, N> {
     @Override
     public boolean lockNode(N node) {
