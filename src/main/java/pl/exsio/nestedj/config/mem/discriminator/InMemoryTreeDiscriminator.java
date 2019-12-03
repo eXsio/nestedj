@@ -14,7 +14,7 @@ import java.io.Serializable;
 public interface InMemoryTreeDiscriminator<ID extends Serializable, N extends NestedNode<ID>> {
 
     /**
-     * Methods that decides whether a target Node belongs to the Tree or not.
+     * Method that decides whether a target Node belongs to the Tree or not.
      *
      * @param node - target Node
      * @return true if Node belongs to the Tree, false if Node does not belong to the Tree

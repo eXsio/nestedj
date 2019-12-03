@@ -11,7 +11,7 @@ import pl.exsio.nestedj.model.NestedNode;
 import java.io.Serializable;
 
 /**
- * Factory class to construc new instances of InMemory Tree Repositories.
+ * Factory class to construct new instances of InMemory Tree Repositories.
  */
 public final class InMemoryNestedNodeRepositoryFactory {
 

@@ -59,7 +59,6 @@ public class InMemoryNestedNodeRepositoryConfiguration<ID extends Serializable, 
     }
 
     /**
-     *
      * @return Tree Discriminator used by this Configuration
      */
     public InMemoryTreeDiscriminator<ID, N> getTreeDiscriminator() {
@@ -67,7 +66,6 @@ public class InMemoryNestedNodeRepositoryConfiguration<ID extends Serializable, 
     }
 
     /**
-     *
      * @return Identiy Generator used by this Configuration
      */
     public InMemoryNestedNodeIdentityGenerator<ID> getIdentityGenerator() {

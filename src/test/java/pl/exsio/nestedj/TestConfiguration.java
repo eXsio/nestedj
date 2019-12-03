@@ -140,7 +140,7 @@ public class TestConfiguration {
         configuration.setIdColumnName("id");
         configuration.setParentIdColumnName("parent_id");
         configuration.setLeftColumnName("tree_left");
-        configuration.setRighColumnName("tree_right");
+        configuration.setRightColumnName("tree_right");
         configuration.setLevelColumnName("tree_level");
 
         return JdbcNestedNodeRepositoryFactory.create(configuration);

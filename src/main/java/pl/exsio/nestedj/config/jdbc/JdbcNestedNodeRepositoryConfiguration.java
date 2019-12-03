@@ -12,6 +12,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+/**
+ * Configuration class that serves as a base of creating new instances of JDBC Repository.
+ *
+ * @param <ID> - Nested Node Identier Class
+ * @param <N> - Nested Node Class
+ */
 public class JdbcNestedNodeRepositoryConfiguration<ID extends Serializable, N extends NestedNode<ID>> {
 
     private final JdbcTemplate jdbcTemplate;
@@ -30,6 +36,16 @@ public class JdbcNestedNodeRepositoryConfiguration<ID extends Serializable, N ex
 
     private Map<String, String> treeColumnNames = Maps.newHashMap();
 
+    /**
+     * Creates new JDBC Repository with custm Tree Discriminator.
+     *
+     * @param jdbcTemplate - Spring JDBC Template to be used by the Repository
+     * @param tableName - name of the Database Table with Nested Nodes
+     * @param rowMapper - Spring RowMapper that can create instances of N from SQL ResultSet
+     * @param insertQuery - SQL Query used to insert the Nodes to the Table
+     * @param insertValuesProvider - provider of Insert SQL values
+     * @param treeDiscriminator - custom Tree Discriminator
+     */
     public JdbcNestedNodeRepositoryConfiguration(JdbcTemplate jdbcTemplate, String tableName,
                                                  RowMapper<N> rowMapper, String insertQuery,
                                                  Function<N, Object[]> insertValuesProvider,
@@ -48,6 +64,15 @@ public class JdbcNestedNodeRepositoryConfiguration<ID extends Serializable, N ex
         this.selectQuery = String.format("select * from %s", tableName);
     }
 
+    /**
+     * Creates new JDBC Repository with no Tree Discriminator.
+     *
+     * @param jdbcTemplate - Spring JDBC Template to be used by the Repository
+     * @param tableName - name of the Database Table with Nested Nodes
+     * @param rowMapper - Spring RowMapper that can create instances of N from SQL ResultSet
+     * @param insertQuery - SQL Query used to insert the Nodes to the Table
+     * @param insertValuesProvider - provider of Insert SQL values
+     */
     public JdbcNestedNodeRepositoryConfiguration(JdbcTemplate jdbcTemplate, String tableName,
                                                  RowMapper<N> rowMapper, String insertQuery,
                                                  Function<N, Object[]> insertValuesProvider) {
@@ -64,63 +89,105 @@ public class JdbcNestedNodeRepositoryConfiguration<ID extends Serializable, N ex
         });
     }
 
+    /**
+     * @return Spring JdbcTemplate used by this Configuration
+     */
     public JdbcTemplate getJdbcTemplate() {
         return jdbcTemplate;
     }
 
+    /**
+     * @return Database Table name used by this Configuration
+     */
     public String getTableName() {
         return tableName;
     }
 
+    /**
+     * @return Spring RowMapper used by this Configuration
+     */
     public RowMapper<N> getRowMapper() {
         return rowMapper;
     }
 
+    /**
+     * @return Insert SQL Query used by this Configuration
+     */
     public String getInsertQuery() {
         return insertQuery;
     }
 
+    /**
+     * @return Insert statement values provider used by this Configuration
+     */
     public Function<N, Object[]> getInsertValuesProvider() {
         return insertValuesProvider;
     }
 
+    /**
+     * @return Tree Discriminator used by this Configuration
+     */
     public JdbcTreeDiscriminator getTreeDiscriminator() {
         return treeDiscriminator;
     }
 
+    /**
+     * @return Maping of SQL column names to standarized field names used by this Configuration
+     */
     public Map<String, String> getTreeColumnNames() {
         return treeColumnNames;
     }
 
+    /**
+     * Sets custom ID column name
+     */
     public JdbcNestedNodeRepositoryConfiguration<ID, N> setIdColumnName(String field) {
         treeColumnNames.put(NestedNode.ID, field);
         return this;
     }
 
+    /**
+     * Sets custom PARENT_ID column name
+     */
     public JdbcNestedNodeRepositoryConfiguration<ID, N> setParentIdColumnName(String field) {
         treeColumnNames.put(NestedNode.PARENT_ID, field);
         return this;
     }
 
+    /**
+     * Sets custom LEFT column name
+     */
     public JdbcNestedNodeRepositoryConfiguration<ID, N> setLeftColumnName(String field) {
         treeColumnNames.put(NestedNode.LEFT, field);
         return this;
     }
 
-    public JdbcNestedNodeRepositoryConfiguration<ID, N> setRighColumnName(String field) {
+    /**
+     * Sets custom RIGHT name
+     */
+    public JdbcNestedNodeRepositoryConfiguration<ID, N> setRightColumnName(String field) {
         treeColumnNames.put(NestedNode.RIGHT, field);
         return this;
     }
 
+    /**
+     * Sets custom LEVEL column name
+     */
     public JdbcNestedNodeRepositoryConfiguration<ID, N> setLevelColumnName(String field) {
         treeColumnNames.put(NestedNode.LEVEL, field);
         return this;
     }
 
+    /**
+     * @return SQL Select Query used by this Configuration
+     */
     public String getSelectQuery() {
         return selectQuery;
     }
 
+    /**
+     * Sets custom SQL Select query
+     */
     public void setSelectQuery(String selectQuery) {
         this.selectQuery = selectQuery;
     }
