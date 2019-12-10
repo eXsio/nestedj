@@ -26,7 +26,7 @@ How can we do it? We could:
 
 ```sql
 
--- repeat for each (sub)category in tree
+-- recursively repeat for each (sub)category in tree
 select cat_id from categories where cat_parent_id = :parent_id
 
 -- this solution causes N+1 select problem
