@@ -1,12 +1,12 @@
-# NestedJ - Read-optimized sorted Tree management for Java
+# NestedJ - Read-optimized sorted tree management for Java
 [![Build Status](https://travis-ci.org/eXsio/nestedj.svg?branch=master)](https://travis-ci.org/eXsio/nestedj)
 [![Coverity Status](https://scan.coverity.com/projects/8499/badge.svg?flat=1)](https://scan.coverity.com/projects/exsio-nestedj)
 [![codecov](https://codecov.io/gh/eXsio/nestedj/branch/master/graph/badge.svg)](https://codecov.io/gh/eXsio/nestedj)
 
 
 ## Overview
-NestedJ is a Java library that provides Spring Data type Repository to manage read-optimized, sorted Trees with the use of Nested Set Model.
-It provides an O(n) access to any Tree traversal logic, including:
+NestedJ is a Java library that provides **Spring Data type Repository** to manage read-optimized, **sorted** trees with the use of Nested Set Model.
+**It provides an O(n) access to any tree traversal logic, including:**
 - finding immediate children of any given node
 - finding all children (regardless of depth) of any given node
 - finding an immidiate parent if any fiven node
@@ -44,6 +44,28 @@ from product p
 inner join categories c on p.cat_id = c.cat_id
 connect by prior c.cat_id = c.cat_parent_id
 where c.cat_parent_id = :parent_id
+```
+
+or Recursive Common Table Expressions in SQL Server: 
+
+```sql
+
+-- increased complexity due to recursive logic hidden in database, but still present
+WITH Products as
+(
+  SELECT p.*
+  FROM product p
+  WHERE p.parent_id is null
+
+  UNION ALL
+
+  SELECT p1.*
+  FROM product p1  
+  INNER JOIN Products Ps
+  ON Ps.parent_id = p1.parent_id
+ )
+SELECT * From Products
+
 ```
 
 - use NestedJ:
@@ -103,12 +125,12 @@ Using the traditional ```parant_id``` relationship would require recursive execu
 ## Tradeoffs?
 
 Of course there is no free lunch :) Nested Set Model offers unbeatable tree traversal performance at the cost of elevated (but reasonable - no recursion) complexity
-of all tree modification operations. Any update of the Tree structure triggers cascade update of left/right/level values in multiple nodes.
+of all tree modification operations. Any update of the tree structure triggers cascade update of left/right/level values in multiple nodes.
 NestedJ should only be considered when the reads count highly outnumbers the modifications count. 
 
 Going back to our e-commerce example: Product Catalog of a medium size store could be updated up to 100 - 500 times a day. 
-At the same time the number of visitors could be 100k - 500k a day. Even with increased Tree modification complexity we are still 
-gaining a lot of performance. There is no recursiveness during the Tree update. 
+At the same time the number of visitors could be 100k - 500k a day. Even with increased tree modification complexity we are still 
+gaining a lot of performance. There is no recursiveness during the tree update. 
 
 ## Installation
 
@@ -147,16 +169,16 @@ gaining a lot of performance. There is no recursiveness during the Tree update.
  - [JDBC](README-JDBC.md) - uses Spring's JdbcTemplate
  - [In Memory](README-MEM.md) - uses java.util.Set and JDK8+ Streams  
  
- All of the implementations are interoperable - they use the same base abstractions. You can use the in-memory implementation to locally build, modify, traverse the Tree 
+ All of the implementations are interoperable - they use the same base abstractions. You can use the in-memory implementation to locally build, modify, traverse the tree 
  and once it's saved to the Database, you can pick up where you left off with JPA or JDBC implementation. 
 
-## Multiple Trees in one Table/Entity/Collection
+## Multiple trees in one Table/Entity/Collection
 
-You can have multiple independant trees in single Table/Entity/Collection. Just implement your own version of ```TreeDiscriminator``` that will narrow all Tree-related operations to your desired scope.
+You can have multiple independant trees in single Table/Entity/Collection. Just implement your own version of ```treeDiscriminator``` that will narrow all tree-related operations to your desired scope.
 
-## Fixing / Initializing / Rebuilding the Tree
+## Fixing / Initializing / Rebuilding the tree
 
-Nested Set is a pretty fragile structure. One bad manual modification of the table can destroy it. Also inserting big number of records manually would be very hard if you'd have to insert them with the correct treeLeft/treeRight/treeLevel values. Fortunately NestedJ can rebuild the Tree from scratch. Just use ```rebuild()``` method on the ```NestedNodeRepository<ID, N>```.
+Nested Set is a pretty fragile structure. One bad manual modification of the table can destroy it. Also inserting big number of records manually would be very hard if you'd have to insert them with the correct treeLeft/treeRight/treeLevel values. Fortunately NestedJ can rebuild the tree from scratch. Just use ```rebuild()``` method on the ```NestedNodeRepository<ID, N>```.
 
 ## Extending NestedJ
 
@@ -164,10 +186,10 @@ If you would need a custom implementation, or you want to enhance/customize one 
 
 ## Concurrency
 
-NestedJ supports Locking the ```NestedNodeRepository``` during any Tree modification using the ```NestedNodeRepository.Lock``` interface.
+NestedJ supports Locking the ```NestedNodeRepository``` during any tree modification using the ```NestedNodeRepository.Lock``` interface.
 There are 2 implementations available out of the box:
 - ```NoLock``` - no-op lock that doesn't lock anything
-- ```InMemoryLock``` - in-memory lock that locks Trees based on provided Lock Handle
+- ```InMemoryLock``` - in-memory lock that locks trees based on provided Lock Handle
 
 If you require more sophisticated locking (for example extarnal, distributed lock), feel free to implement and use your own ```NestedNodeRepository.Lock```
 
