@@ -13,6 +13,8 @@ NestedJ is a Java library that provides **Spring Data type Repository** to manag
 - finding an immidiate parent if any fiven node
 - finding all parents of any given node from immediate to root
 
+Like what you see? Let me know by leaving a Star! 
+
 ### What is Nested Set?
 
 The [Nested Set Model](https://en.wikipedia.org/wiki/Nested_set_model) is a technique for representing nested sets (also known as trees or hierarchies) in relational databases.
