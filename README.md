@@ -2,6 +2,7 @@
 [![Build Status](https://travis-ci.org/eXsio/nestedj.svg?branch=master)](https://travis-ci.org/eXsio/nestedj)
 [![Coverity Status](https://scan.coverity.com/projects/8499/badge.svg?flat=1)](https://scan.coverity.com/projects/exsio-nestedj)
 [![codecov](https://codecov.io/gh/eXsio/nestedj/branch/master/graph/badge.svg)](https://codecov.io/gh/eXsio/nestedj)
+[![](https://jitpack.io/v/eXsio/nestedj.svg)](https://jitpack.io/#eXsio/nestedj)
 
 
 ## Overview
