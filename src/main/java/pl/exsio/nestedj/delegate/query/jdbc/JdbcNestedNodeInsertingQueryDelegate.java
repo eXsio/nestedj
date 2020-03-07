@@ -26,6 +26,7 @@ import pl.exsio.nestedj.delegate.query.NestedNodeInsertingQueryDelegate;
 import pl.exsio.nestedj.model.NestedNode;
 
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.sql.PreparedStatement;
 import java.sql.Types;
 
@@ -79,7 +80,8 @@ public class JdbcNestedNodeInsertingQueryDelegate<ID extends Serializable, N ext
             }
             return ps;
         }, keyHolder);
-        node.setId((ID) keyHolder.getKey());
+        Number key = keyHolder.getKey();
+        node.setId((ID) (key.getClass().equals(BigInteger.class) ? key.longValue() : keyHolder.getKey()));
     }
 
     @Override
