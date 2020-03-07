@@ -31,6 +31,7 @@ import pl.exsio.nestedj.model.NestedNode;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
@@ -51,7 +52,7 @@ public class JdbcNestedNodeRepositoryConfiguration<ID extends Serializable, N ex
 
     private final Function<N, Object[]> insertValuesProvider;
 
-    private final Function<JdbcKeyHolder, ID> generatedKeyResolver;
+    private final BiFunction<N, JdbcKeyHolder, ID> generatedKeyResolver;
 
     private final JdbcTreeDiscriminator treeDiscriminator;
 
@@ -72,7 +73,7 @@ public class JdbcNestedNodeRepositoryConfiguration<ID extends Serializable, N ex
     public JdbcNestedNodeRepositoryConfiguration(JdbcTemplate jdbcTemplate, String tableName,
                                                  RowMapper<N> rowMapper, String insertQuery,
                                                  Function<N, Object[]> insertValuesProvider,
-                                                 Function<JdbcKeyHolder, ID> generatedKeyResolver,
+                                                 BiFunction<N, JdbcKeyHolder, ID> generatedKeyResolver,
                                                  JdbcTreeDiscriminator treeDiscriminator) {
         this.jdbcTemplate = jdbcTemplate;
         this.tableName = tableName;
@@ -101,7 +102,7 @@ public class JdbcNestedNodeRepositoryConfiguration<ID extends Serializable, N ex
     public JdbcNestedNodeRepositoryConfiguration(JdbcTemplate jdbcTemplate, String tableName,
                                                  RowMapper<N> rowMapper, String insertQuery,
                                                  Function<N, Object[]> insertValuesProvider,
-                                                 Function<JdbcKeyHolder, ID> generatedKeyResolver) {
+                                                 BiFunction<N, JdbcKeyHolder, ID> generatedKeyResolver) {
         this(jdbcTemplate, tableName, rowMapper, insertQuery, insertValuesProvider, generatedKeyResolver, new JdbcTreeDiscriminator() {
             @Override
             public String getQueryPart() {
@@ -214,7 +215,7 @@ public class JdbcNestedNodeRepositoryConfiguration<ID extends Serializable, N ex
     /**
      * @return JDBC Generated Keys Resolver
      */
-    public Function<JdbcKeyHolder, ID> getGeneratedKeyResolver() {
+    public BiFunction<N, JdbcKeyHolder, ID> getGeneratedKeyResolver() {
         return generatedKeyResolver;
     }
 

@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 @Configuration
@@ -135,7 +136,7 @@ public class TestConfiguration {
         Function<TestNode, Object[]> insertValuesProvider = n -> new Object[]{n.getTreeLeft(), n.getTreeLevel(), n.getTreeRight(), n.getName(), n.getParentId(), n.getDiscriminator()};
 
         // METHOD OF RETRIEVING GENERATED DATABASE PRIMARY KEYS
-        Function<JdbcKeyHolder, Long> generatedKeyResolver = jdbcKeyHolder -> jdbcKeyHolder.getKeyValueAs(Long.class);
+        BiFunction<TestNode, JdbcKeyHolder, Long> generatedKeyResolver = (node, jdbcKeyHolder) -> jdbcKeyHolder.getKeyValueAs(Long.class);
 
         JdbcNestedNodeRepositoryConfiguration<Long, TestNode> configuration = new JdbcNestedNodeRepositoryConfiguration<>(
                 new JdbcTemplate(dataSource), tableName, mapper, insertQuery, insertValuesProvider, generatedKeyResolver, new TestJdbcTreeDiscriminator()

@@ -31,6 +31,7 @@ import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public abstract class JdbcNestedNodeQueryDelegate<ID extends Serializable, N extends NestedNode<ID>> {
@@ -61,7 +62,7 @@ public abstract class JdbcNestedNodeQueryDelegate<ID extends Serializable, N ext
 
     protected final Map<String, String> treeColumnNames;
 
-    protected final Function<JdbcKeyHolder, ID> generatedKeyResolver;
+    protected final BiFunction<N, JdbcKeyHolder, ID> generatedKeyResolver;
 
     public JdbcNestedNodeQueryDelegate(JdbcNestedNodeRepositoryConfiguration<ID, N> configuration) {
         this.jdbcTemplate = configuration.getJdbcTemplate();

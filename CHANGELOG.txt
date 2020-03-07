@@ -1,5 +1,8 @@
 NestedJ Changelog:
 
+- 5.0.3
+    - pass the node instance into generated JDBC key resolver
+
 - 5.0.2
     - parametrize retrieving of generated JDBC keys
 

@@ -12,7 +12,7 @@
 <dependency>
     <groupId>com.github.eXsio</groupId>
     <artifactId>nestedj</artifactId>
-    <version>5.0.2</version>
+    <version>5.0.3</version>
 </dependency>
 <dependency>
     <groupId>org.springframework</groupId>
@@ -29,7 +29,7 @@ In order to use NestedJ, You have to configure it. In 9 our of 10 cases you will
 ```java
 
     //ROW MAPPER FOR CREATING INSTANCES OF THE NODE OBJECT FROM RESULT SET
-    RowMapper<TestNode> mapper = (resultSet, i) -> YourNode.fromResultSet(resultSet);
+    RowMapper<YourNode> mapper = (resultSet, i) -> YourNode.fromResultSet(resultSet);
 
     //TABLE NAME
     String tableName = "nested_nodes";
@@ -38,10 +38,10 @@ In order to use NestedJ, You have to configure it. In 9 our of 10 cases you will
     String insertQuery = "insert into nested_nodes(id, tree_left, tree_level, tree_right, node_name, parent_id, discriminator) values(next value for SEQ,?,?,?,?,?,?)";
 
     // INSERT QUERY VALUES PROVIDER, CONVERTS NODE OBJECT INTO AN OBJECT ARRAY
-    Function<TestNode, Object[]> insertValuesProvider = n -> new Object[]{n.getTreeLeft(), n.getTreeLevel(), n.getTreeRight(), n.getName(), n.getParentId(), n.getDiscriminator()};
+    Function<YourNode, Object[]> insertValuesProvider = n -> new Object[]{n.getTreeLeft(), n.getTreeLevel(), n.getTreeRight(), n.getName(), n.getParentId(), n.getDiscriminator()};
    
      // METHOD OF RETRIEVING GENERATED DATABASE PRIMARY KEYS
-     Function<JdbcKeyHolder, Long> generatedKeyResolver = jdbcKeyHolder -> jdbcKeyHolder.getKeyValueAs(Long.class);
+     BiFunction<YourNode, JdbcKeyHolder, Long> generatedKeyResolver = (node, jdbcKeyHolder) -> jdbcKeyHolder.getKeyValueAs(Long.class);
     
     //CONFIGURATION CLASS
     JdbcNestedNodeRepositoryConfiguration<Long, TestNode> configuration = new JdbcNestedNodeRepositoryConfiguration<>(
