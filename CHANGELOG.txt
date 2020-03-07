@@ -1,5 +1,8 @@
 NestedJ Changelog:
 
+- 5.0.2
+    - parametrize retrieving of generated JDBC keys
+
 - 5.0.0
     - new backing storage implementation - In Memory. Operates on Java Set using Streams
     - ability to add pessimistic locking to all Tree operations via new Lock interface
