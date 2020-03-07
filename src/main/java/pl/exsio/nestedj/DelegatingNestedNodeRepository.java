@@ -124,7 +124,7 @@ public class DelegatingNestedNodeRepository<ID extends Serializable, N extends N
     }
 
     private boolean isNodeInfoValid(NestedNodeInfo<ID> nodeInfo) {
-        return (nodeInfo.getLeft() != null && nodeInfo.getRight() != null);
+        return (nodeInfo.getLeft() != null && nodeInfo.getRight() != null && nodeInfo.getLeft() > 0 && nodeInfo.getRight() > 0);
     }
 
     /**
