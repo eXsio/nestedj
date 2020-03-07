@@ -12,7 +12,7 @@
 <dependency>
     <groupId>com.github.eXsio</groupId>
     <artifactId>nestedj</artifactId>
-    <version>5.0.0</version>
+    <version>5.0.2</version>
 </dependency>
 <dependency>
     <groupId>org.springframework</groupId>
@@ -39,10 +39,13 @@ In order to use NestedJ, You have to configure it. In 9 our of 10 cases you will
 
     // INSERT QUERY VALUES PROVIDER, CONVERTS NODE OBJECT INTO AN OBJECT ARRAY
     Function<TestNode, Object[]> insertValuesProvider = n -> new Object[]{n.getTreeLeft(), n.getTreeLevel(), n.getTreeRight(), n.getName(), n.getParentId(), n.getDiscriminator()};
-
+   
+     // METHOD OF RETRIEVING GENERATED DATABASE PRIMARY KEYS
+     Function<JdbcKeyHolder, Long> generatedKeyResolver = jdbcKeyHolder -> jdbcKeyHolder.getKeyValueAs(Long.class);
+    
     //CONFIGURATION CLASS
     JdbcNestedNodeRepositoryConfiguration<Long, TestNode> configuration = new JdbcNestedNodeRepositoryConfiguration<>(
-            new JdbcTemplate(dataSource), tableName, mapper, insertQuery, insertValuesProvider, new YourJdbcTreeDiscriminator() //Discriminator is optional, allows to create multiple trees in one table
+            new JdbcTemplate(dataSource), tableName, mapper, insertQuery, insertValuesProvider, generatedKeyResolver, new YourJdbcTreeDiscriminator()
     );
 
     //CUSTOM COLUMN NAMES

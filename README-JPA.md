@@ -12,7 +12,7 @@
 <dependency>
     <groupId>com.github.eXsio</groupId>
     <artifactId>nestedj</artifactId>
-    <version>5.0.0</version>
+    <version>5.0.2</version>
 </dependency>
 <dependency>
     <groupId>org.hibernate</groupId>

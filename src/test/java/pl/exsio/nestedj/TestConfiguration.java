@@ -22,6 +22,7 @@ import pl.exsio.nestedj.config.mem.InMemoryNestedNodeRepositoryConfiguration;
 import pl.exsio.nestedj.config.mem.discriminator.TestInMemoryTreeDiscriminator;
 import pl.exsio.nestedj.config.mem.factory.InMemoryNestedNodeRepositoryFactory;
 import pl.exsio.nestedj.config.mem.lock.InMemoryLock;
+import pl.exsio.nestedj.delegate.query.jdbc.JdbcKeyHolder;
 import pl.exsio.nestedj.model.TestNode;
 import pl.exsio.nestedj.qualifier.Jdbc;
 import pl.exsio.nestedj.qualifier.Jpa;
@@ -133,8 +134,11 @@ public class TestConfiguration {
         // INSERT QUERY VALUES PROVIDER, CONVERTS NODE OBJECT INTO AN OBJECT ARRAY
         Function<TestNode, Object[]> insertValuesProvider = n -> new Object[]{n.getTreeLeft(), n.getTreeLevel(), n.getTreeRight(), n.getName(), n.getParentId(), n.getDiscriminator()};
 
+        // METHOD OF RETRIEVING GENERATED DATABASE PRIMARY KEYS
+        Function<JdbcKeyHolder, Long> generatedKeyResolver = jdbcKeyHolder -> jdbcKeyHolder.getKeyValueAs(Long.class);
+
         JdbcNestedNodeRepositoryConfiguration<Long, TestNode> configuration = new JdbcNestedNodeRepositoryConfiguration<>(
-                new JdbcTemplate(dataSource), tableName, mapper, insertQuery, insertValuesProvider, new TestJdbcTreeDiscriminator()
+                new JdbcTemplate(dataSource), tableName, mapper, insertQuery, insertValuesProvider, generatedKeyResolver, new TestJdbcTreeDiscriminator()
         );
 
         configuration.setIdColumnName("id");

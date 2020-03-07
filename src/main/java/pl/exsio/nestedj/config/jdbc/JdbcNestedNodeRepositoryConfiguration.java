@@ -25,6 +25,7 @@ import com.google.common.collect.Maps;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import pl.exsio.nestedj.config.jdbc.discriminator.JdbcTreeDiscriminator;
+import pl.exsio.nestedj.delegate.query.jdbc.JdbcKeyHolder;
 import pl.exsio.nestedj.model.NestedNode;
 
 import java.io.Serializable;
@@ -50,6 +51,8 @@ public class JdbcNestedNodeRepositoryConfiguration<ID extends Serializable, N ex
 
     private final Function<N, Object[]> insertValuesProvider;
 
+    private final Function<JdbcKeyHolder, ID> generatedKeyResolver;
+
     private final JdbcTreeDiscriminator treeDiscriminator;
 
     private String selectQuery;
@@ -58,23 +61,25 @@ public class JdbcNestedNodeRepositoryConfiguration<ID extends Serializable, N ex
 
     /**
      * Creates new JDBC Repository with custm Tree Discriminator.
-     *
-     * @param jdbcTemplate - Spring JDBC Template to be used by the Repository
+     *  @param jdbcTemplate - Spring JDBC Template to be used by the Repository
      * @param tableName - name of the Database Table with Nested Nodes
      * @param rowMapper - Spring RowMapper that can create instances of N from SQL ResultSet
      * @param insertQuery - SQL Query used to insert the Nodes to the Table
      * @param insertValuesProvider - provider of Insert SQL values
+     * @param generatedKeyResolver - generated db keys resolver
      * @param treeDiscriminator - custom Tree Discriminator
      */
     public JdbcNestedNodeRepositoryConfiguration(JdbcTemplate jdbcTemplate, String tableName,
                                                  RowMapper<N> rowMapper, String insertQuery,
                                                  Function<N, Object[]> insertValuesProvider,
+                                                 Function<JdbcKeyHolder, ID> generatedKeyResolver,
                                                  JdbcTreeDiscriminator treeDiscriminator) {
         this.jdbcTemplate = jdbcTemplate;
         this.tableName = tableName;
         this.rowMapper = rowMapper;
         this.insertQuery = insertQuery;
         this.insertValuesProvider = insertValuesProvider;
+        this.generatedKeyResolver = generatedKeyResolver;
         this.treeDiscriminator = treeDiscriminator;
         treeColumnNames.put(NestedNode.ID, NestedNode.ID);
         treeColumnNames.put(NestedNode.LEFT, NestedNode.LEFT);
@@ -86,17 +91,18 @@ public class JdbcNestedNodeRepositoryConfiguration<ID extends Serializable, N ex
 
     /**
      * Creates new JDBC Repository with no Tree Discriminator.
-     *
-     * @param jdbcTemplate - Spring JDBC Template to be used by the Repository
+     *  @param jdbcTemplate - Spring JDBC Template to be used by the Repository
      * @param tableName - name of the Database Table with Nested Nodes
      * @param rowMapper - Spring RowMapper that can create instances of N from SQL ResultSet
      * @param insertQuery - SQL Query used to insert the Nodes to the Table
      * @param insertValuesProvider - provider of Insert SQL values
+     * @param generatedKeyResolver - generated db keys resolver
      */
     public JdbcNestedNodeRepositoryConfiguration(JdbcTemplate jdbcTemplate, String tableName,
                                                  RowMapper<N> rowMapper, String insertQuery,
-                                                 Function<N, Object[]> insertValuesProvider) {
-        this(jdbcTemplate, tableName, rowMapper, insertQuery, insertValuesProvider, new JdbcTreeDiscriminator() {
+                                                 Function<N, Object[]> insertValuesProvider,
+                                                 Function<JdbcKeyHolder, ID> generatedKeyResolver) {
+        this(jdbcTemplate, tableName, rowMapper, insertQuery, insertValuesProvider, generatedKeyResolver, new JdbcTreeDiscriminator() {
             @Override
             public String getQueryPart() {
                 return "";
@@ -203,6 +209,13 @@ public class JdbcNestedNodeRepositoryConfiguration<ID extends Serializable, N ex
      */
     public String getSelectQuery() {
         return selectQuery;
+    }
+
+    /**
+     * @return JDBC Generated Keys Resolver
+     */
+    public Function<JdbcKeyHolder, ID> getGeneratedKeyResolver() {
+        return generatedKeyResolver;
     }
 
     /**

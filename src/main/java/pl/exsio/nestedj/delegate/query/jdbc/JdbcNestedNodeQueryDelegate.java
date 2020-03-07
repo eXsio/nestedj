@@ -61,6 +61,8 @@ public abstract class JdbcNestedNodeQueryDelegate<ID extends Serializable, N ext
 
     protected final Map<String, String> treeColumnNames;
 
+    protected final Function<JdbcKeyHolder, ID> generatedKeyResolver;
+
     public JdbcNestedNodeQueryDelegate(JdbcNestedNodeRepositoryConfiguration<ID, N> configuration) {
         this.jdbcTemplate = configuration.getJdbcTemplate();
         this.tableName = configuration.getTableName();
@@ -75,6 +77,7 @@ public abstract class JdbcNestedNodeQueryDelegate<ID extends Serializable, N ext
         this.right = configuration.getTreeColumnNames().get(NestedNode.RIGHT);
         this.level = configuration.getTreeColumnNames().get(NestedNode.LEVEL);
         this.treeColumnNames = configuration.getTreeColumnNames();
+        this.generatedKeyResolver = configuration.getGeneratedKeyResolver();
     }
 
     protected String getDiscriminatedQuery(String baseQuery) {

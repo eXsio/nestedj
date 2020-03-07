@@ -20,13 +20,11 @@
 
 package pl.exsio.nestedj.delegate.query.jdbc;
 
-import org.springframework.jdbc.support.KeyHolder;
 import pl.exsio.nestedj.config.jdbc.JdbcNestedNodeRepositoryConfiguration;
 import pl.exsio.nestedj.delegate.query.NestedNodeInsertingQueryDelegate;
 import pl.exsio.nestedj.model.NestedNode;
 
 import java.io.Serializable;
-import java.math.BigInteger;
 import java.sql.PreparedStatement;
 import java.sql.Types;
 
@@ -69,9 +67,8 @@ public class JdbcNestedNodeInsertingQueryDelegate<ID extends Serializable, N ext
         );
     }
 
-    @SuppressWarnings("unchecked")
     private void doInsert(N node) {
-        KeyHolder keyHolder = new JdbcKeyHolder();
+        JdbcKeyHolder keyHolder = new JdbcKeyHolder();
         jdbcTemplate.update(con -> {
             PreparedStatement ps = con.prepareStatement(insertQuery, new String[]{id});
             Object[] params = insertValuesProvider.apply(node);
@@ -80,8 +77,7 @@ public class JdbcNestedNodeInsertingQueryDelegate<ID extends Serializable, N ext
             }
             return ps;
         }, keyHolder);
-        Number key = keyHolder.getKey();
-        node.setId((ID) (key.getClass().equals(BigInteger.class) ? key.longValue() : keyHolder.getKey()));
+        node.setId(generatedKeyResolver.apply(keyHolder));
     }
 
     @Override
