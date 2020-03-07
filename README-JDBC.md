@@ -40,8 +40,8 @@ In order to use NestedJ, You have to configure it. In 9 our of 10 cases you will
     // INSERT QUERY VALUES PROVIDER, CONVERTS NODE OBJECT INTO AN OBJECT ARRAY
     Function<YourNode, Object[]> insertValuesProvider = n -> new Object[]{n.getTreeLeft(), n.getTreeLevel(), n.getTreeRight(), n.getName(), n.getParentId(), n.getDiscriminator()};
    
-     // METHOD OF RETRIEVING GENERATED DATABASE PRIMARY KEYS
-     BiFunction<YourNode, JdbcKeyHolder, Long> generatedKeyResolver = (node, jdbcKeyHolder) -> jdbcKeyHolder.getKeyValueAs(Long.class);
+    // METHOD OF RETRIEVING GENERATED DATABASE PRIMARY KEYS
+    BiFunction<YourNode, JdbcKeyHolder, Long> generatedKeyResolver = (node, jdbcKeyHolder) -> jdbcKeyHolder.getKeyValueAs(Long.class);
     
     //CONFIGURATION CLASS
     JdbcNestedNodeRepositoryConfiguration<Long, TestNode> configuration = new JdbcNestedNodeRepositoryConfiguration<>(
