@@ -26,7 +26,7 @@
         <hibernate.version>5.4.9.Final</hibernate.version>
         <h2.version>1.4.200</h2.version>
         <junit.version>4.12</junit.version>
-        <guava.version>28.1-jre</guava.version>
+        <guava.version>29.0-jre</guava.version>
     </properties>
 
     <dependencies>
