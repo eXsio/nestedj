@@ -1,7 +1,6 @@
 package pl.exsio.nestedj.config.jdbc.discriminator;
 
-import com.google.common.collect.Lists;
-
+import java.util.ArrayList;
 import java.util.List;
 
 public class TestJdbcTreeDiscriminator implements JdbcTreeDiscriminator {
@@ -13,6 +12,8 @@ public class TestJdbcTreeDiscriminator implements JdbcTreeDiscriminator {
 
     @Override
     public List<Object> getParameters() {
-        return Lists.newArrayList("tree_1");
+        ArrayList<Object> result = new ArrayList<>();
+        result.add("tree_1");
+        return result;
     }
 }

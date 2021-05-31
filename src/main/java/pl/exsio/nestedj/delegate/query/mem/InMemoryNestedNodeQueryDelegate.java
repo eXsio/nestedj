@@ -20,18 +20,22 @@
 
 package pl.exsio.nestedj.delegate.query.mem;
 
-import com.google.common.collect.Maps;
 import pl.exsio.nestedj.config.mem.InMemoryNestedNodeRepositoryConfiguration;
 import pl.exsio.nestedj.config.mem.discriminator.InMemoryTreeDiscriminator;
 import pl.exsio.nestedj.config.mem.identity.InMemoryNestedNodeIdentityGenerator;
 import pl.exsio.nestedj.model.NestedNode;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static pl.exsio.nestedj.model.NestedNode.*;
+import static pl.exsio.nestedj.model.NestedNode.ID;
+import static pl.exsio.nestedj.model.NestedNode.LEFT;
+import static pl.exsio.nestedj.model.NestedNode.LEVEL;
+import static pl.exsio.nestedj.model.NestedNode.PARENT_ID;
+import static pl.exsio.nestedj.model.NestedNode.RIGHT;
 
 @SuppressWarnings("unchecked")
 public abstract class InMemoryNestedNodeQueryDelegate<ID extends Serializable, N extends NestedNode<ID>> {
@@ -42,9 +46,9 @@ public abstract class InMemoryNestedNodeQueryDelegate<ID extends Serializable, N
 
     protected final Set<N> nodes;
 
-    protected final static Map<String, InMemoryNestedNodeInsertingQueryDelegate.Setter> SETTERS = Maps.newHashMap();
+    protected final static Map<String, InMemoryNestedNodeInsertingQueryDelegate.Setter> SETTERS = new HashMap<>();
 
-    protected final static Map<String, InMemoryNestedNodeInsertingQueryDelegate.Getter> GETTERS = Maps.newHashMap();
+    protected final static Map<String, InMemoryNestedNodeInsertingQueryDelegate.Getter> GETTERS = new HashMap<>();
 
     static {
         SETTERS.put(RIGHT, (node, value) -> node.setTreeRight((Long) value));

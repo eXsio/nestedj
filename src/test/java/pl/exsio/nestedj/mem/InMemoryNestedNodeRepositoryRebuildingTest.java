@@ -23,7 +23,7 @@
  */
 package pl.exsio.nestedj.mem;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import pl.exsio.nestedj.DelegatingNestedNodeRepository;
@@ -41,7 +41,7 @@ public class InMemoryNestedNodeRepositoryRebuildingTest extends NestedNodeReposi
     @Mem
     private DelegatingNestedNodeRepository<Long, TestNode> inMemoryRepository;
 
-    @Before
+    @BeforeEach
     public void setup() {
         helper = new InMemoryTestHelper();
         helper.rollback();
@@ -89,7 +89,7 @@ public class InMemoryNestedNodeRepositoryRebuildingTest extends NestedNodeReposi
     }
 
     @Override
-    protected void save(TestNode node){
+    protected void save(TestNode node) {
         helper.save(node);
     }
 }

@@ -23,7 +23,7 @@
  */
 package pl.exsio.nestedj.jpa;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import pl.exsio.nestedj.DelegatingNestedNodeRepository;
@@ -46,7 +46,7 @@ public class JpaNestedNodeRepositoryRebuildingTest extends NestedNodeRepositoryR
     @Jpa
     private DelegatingNestedNodeRepository<Long, TestNode> jpaRepository;
 
-    @Before
+    @BeforeEach
     public void setup() {
         helper = new JpaTestHelper(em);
         this.repository = this.jpaRepository;
@@ -93,7 +93,7 @@ public class JpaNestedNodeRepositoryRebuildingTest extends NestedNodeRepositoryR
     }
 
     @Override
-    protected void save(TestNode node){
+    protected void save(TestNode node) {
         helper.save(node);
     }
 }

@@ -20,8 +20,6 @@
 
 package pl.exsio.nestedj.config.jdbc;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import pl.exsio.nestedj.config.jdbc.discriminator.JdbcTreeDiscriminator;
@@ -29,6 +27,8 @@ import pl.exsio.nestedj.delegate.query.jdbc.JdbcKeyHolder;
 import pl.exsio.nestedj.model.NestedNode;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -38,7 +38,7 @@ import java.util.function.Function;
  * Configuration class that serves as a base of creating new instances of JDBC Repository.
  *
  * @param <ID> - Nested Node Identifier Class
- * @param <N> - Nested Node Class
+ * @param <N>  - Nested Node Class
  */
 public class JdbcNestedNodeRepositoryConfiguration<ID extends Serializable, N extends NestedNode<ID>> {
 
@@ -58,17 +58,18 @@ public class JdbcNestedNodeRepositoryConfiguration<ID extends Serializable, N ex
 
     private String selectQuery;
 
-    private Map<String, String> treeColumnNames = Maps.newHashMap();
+    private Map<String, String> treeColumnNames = new HashMap<>();
 
     /**
      * Creates new JDBC Repository with custm Tree Discriminator.
-     *  @param jdbcTemplate - Spring JDBC Template to be used by the Repository
-     * @param tableName - name of the Database Table with Nested Nodes
-     * @param rowMapper - Spring RowMapper that can create instances of N from SQL ResultSet
-     * @param insertQuery - SQL Query used to insert the Nodes to the Table
+     *
+     * @param jdbcTemplate         - Spring JDBC Template to be used by the Repository
+     * @param tableName            - name of the Database Table with Nested Nodes
+     * @param rowMapper            - Spring RowMapper that can create instances of N from SQL ResultSet
+     * @param insertQuery          - SQL Query used to insert the Nodes to the Table
      * @param insertValuesProvider - provider of Insert SQL values
      * @param generatedKeyResolver - generated db keys resolver
-     * @param treeDiscriminator - custom Tree Discriminator
+     * @param treeDiscriminator    - custom Tree Discriminator
      */
     public JdbcNestedNodeRepositoryConfiguration(JdbcTemplate jdbcTemplate, String tableName,
                                                  RowMapper<N> rowMapper, String insertQuery,
@@ -92,10 +93,11 @@ public class JdbcNestedNodeRepositoryConfiguration<ID extends Serializable, N ex
 
     /**
      * Creates new JDBC Repository with no Tree Discriminator.
-     *  @param jdbcTemplate - Spring JDBC Template to be used by the Repository
-     * @param tableName - name of the Database Table with Nested Nodes
-     * @param rowMapper - Spring RowMapper that can create instances of N from SQL ResultSet
-     * @param insertQuery - SQL Query used to insert the Nodes to the Table
+     *
+     * @param jdbcTemplate         - Spring JDBC Template to be used by the Repository
+     * @param tableName            - name of the Database Table with Nested Nodes
+     * @param rowMapper            - Spring RowMapper that can create instances of N from SQL ResultSet
+     * @param insertQuery          - SQL Query used to insert the Nodes to the Table
      * @param insertValuesProvider - provider of Insert SQL values
      * @param generatedKeyResolver - generated db keys resolver
      */
@@ -111,7 +113,7 @@ public class JdbcNestedNodeRepositoryConfiguration<ID extends Serializable, N ex
 
             @Override
             public List<Object> getParameters() {
-                return Lists.newLinkedList();
+                return new LinkedList<>();
             }
         });
     }

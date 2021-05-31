@@ -20,7 +20,6 @@
 
 package pl.exsio.nestedj.delegate.query.mem;
 
-import com.google.common.base.Preconditions;
 import pl.exsio.nestedj.config.mem.InMemoryNestedNodeRepositoryConfiguration;
 import pl.exsio.nestedj.delegate.query.NestedNodeRebuildingQueryDelegate;
 import pl.exsio.nestedj.ex.InvalidNodeException;
@@ -64,17 +63,19 @@ public class InMemoryNestedNodeRebuildingQueryDelegate<ID extends Serializable, 
     @Override
     public void resetFirst(N first) {
         nodesStream()
-              .filter(n -> n.getId().equals(first.getId()))
-              .forEach(n -> {
-                  n.setTreeLeft(1L);
-                  n.setTreeRight(2L);
-                  n.setTreeLevel(0L);
-              });
+                .filter(n -> n.getId().equals(first.getId()))
+                .forEach(n -> {
+                    n.setTreeLeft(1L);
+                    n.setTreeRight(2L);
+                    n.setTreeLevel(0L);
+                });
     }
 
     @Override
     public List<N> getSiblings(ID first) {
-        Preconditions.checkNotNull(first);
+        if (first == null) {
+            throw new NullPointerException("first cannot be null");
+        }
         return nodesStream()
                 .filter(n -> getSerializable(PARENT_ID, n) == null)
                 .filter(n -> !getSerializable(ID, n).equals(first))

@@ -23,12 +23,13 @@
  */
 package pl.exsio.nestedj.base;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.transaction.annotation.Transactional;
 import pl.exsio.nestedj.model.TestNode;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 
 @Transactional
 public abstract class NestedNodeRepositoryRebuildingTest extends FunctionalNestedjTest {

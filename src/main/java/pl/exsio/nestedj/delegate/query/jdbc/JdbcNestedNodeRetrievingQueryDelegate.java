@@ -20,7 +20,6 @@
 
 package pl.exsio.nestedj.delegate.query.jdbc;
 
-import com.google.common.collect.Lists;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import pl.exsio.nestedj.config.jdbc.JdbcNestedNodeRepositoryConfiguration;
 import pl.exsio.nestedj.delegate.query.NestedNodeRetrievingQueryDelegate;
@@ -28,6 +27,7 @@ import pl.exsio.nestedj.model.NestedNode;
 import pl.exsio.nestedj.model.NestedNodeInfo;
 
 import java.io.Serializable;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -106,7 +106,7 @@ public class JdbcNestedNodeRetrievingQueryDelegate<ID extends Serializable, N ex
                     rowMapper
             );
         } else {
-            return Lists.newLinkedList();
+            return new LinkedList<>();
         }
     }
 
@@ -152,7 +152,7 @@ public class JdbcNestedNodeRetrievingQueryDelegate<ID extends Serializable, N ex
                     setDiscriminatorParams(preparedStatement, 2);
                 },
                 (ResultSetExtractor<NestedNodeInfo<ID>>) rs -> {
-                    if(!rs.next()) {
+                    if (!rs.next()) {
                         return null;
                     }
                     return new NestedNodeInfo((ID) rs.getObject(id), (ID) rs.getObject(parentId), rs.getLong(left), rs.getLong(right), rs.getLong(level));

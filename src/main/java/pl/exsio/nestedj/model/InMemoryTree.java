@@ -19,9 +19,8 @@
  */
 package pl.exsio.nestedj.model;
 
-import com.google.common.collect.Lists;
-
 import java.io.Serializable;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -36,7 +35,7 @@ public class InMemoryTree<ID extends Serializable, N extends NestedNode<ID>> imp
     private N node;
 
     private InMemoryTree() {
-        this.children = Lists.newLinkedList();
+        this.children = new LinkedList<>();
     }
 
     public InMemoryTree(N node) {

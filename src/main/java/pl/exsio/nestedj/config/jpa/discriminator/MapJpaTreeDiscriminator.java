@@ -20,14 +20,14 @@
 
 package pl.exsio.nestedj.config.jpa.discriminator;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import pl.exsio.nestedj.model.NestedNode;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -36,7 +36,7 @@ import java.util.function.Supplier;
  * Default implementation of JPA Tree Discriminator based on Map of <String, Supplier<Object>>
  *
  * @param <ID> - Nested Node Identifier Class
- * @param <N> - Nested Node Class
+ * @param <N>  - Nested Node Class
  */
 public class MapJpaTreeDiscriminator<ID extends Serializable, N extends NestedNode<ID>> implements JpaTreeDiscriminator<ID, N> {
 
@@ -57,7 +57,7 @@ public class MapJpaTreeDiscriminator<ID extends Serializable, N extends NestedNo
      * Create no-up Tree Discriminator
      */
     public MapJpaTreeDiscriminator() {
-        this.valueProviders = Maps.newHashMap();
+        this.valueProviders = new HashMap<>();
     }
 
     /**
@@ -76,7 +76,7 @@ public class MapJpaTreeDiscriminator<ID extends Serializable, N extends NestedNo
      */
     @Override
     public List<Predicate> getPredicates(CriteriaBuilder cb, Root<N> root) {
-        List<Predicate> predicates = Lists.newArrayList();
+        List<Predicate> predicates = new ArrayList<>();
         for (Map.Entry<String, Supplier<Object>> providerEntry : valueProviders.entrySet()) {
             predicates.add(cb.equal(root.get(providerEntry.getKey()), providerEntry.getValue().get()));
         }

@@ -7,7 +7,7 @@
 
 ## Overview
 NestedJ is a Java library that provides **Spring Data type Repository** to manage read-optimized, **sorted** trees with the use of Nested Set Model.
-**It provides an O(n) access to any tree traversal logic, including:**
+**It provides an O(log2(n)) access to any tree traversal logic, including:**
 - finding immediate children of any given node
 - finding all children (regardless of depth) of any given node
 - finding an immidiate parent if any fiven node
@@ -29,7 +29,9 @@ How can we do it? We could:
 
 ```sql
 
--- recursively repeat for each (sub)category in tree
+
+-- has an O(b^d) Time complexity where b == branching factor and d == depth of tree
+-- due to the need of recursively repeating below query for each (sub)category in tree
 select cat_id from categories where cat_parent_id = :parent_id
 
 -- this solution causes N+1 select problem
@@ -41,7 +43,8 @@ select * from products where cat_id in (:gathered_cat_ids)
 
 ```sql
 
--- increased complexity due to recursive logic hidden in database, but still present
+-- has an O(b^d) complexity where b == branching factor and d == depth of tree
+-- due to recursive logic hidden in database, but still present
 select p.* 
 from product p 
 inner join categories c on p.cat_id = c.cat_id
@@ -53,7 +56,8 @@ or Recursive Common Table Expressions in SQL Server:
 
 ```sql
 
--- increased complexity due to recursive logic hidden in database, but still present
+-- has an O(b^d) complexity where b == branching factor and d == depth of tree
+-- due to recursive logic hidden in database, but still present
 WITH Products as
 (
   SELECT p.*
@@ -75,7 +79,8 @@ SELECT * From Products
 
 ```sql
 
--- O(n) access
+-- has O(log2(n)) complexity (assuming that table is correctly indexed) 
+-- or at worst O(n) for full table scan
 select p.* 
 from product p 
 inner join categories c on p.cat_id = c.cat_id
@@ -105,7 +110,7 @@ Given the below structure:
 You can query for an entire tree branch of node ```C``` using a query similar to this:
 
 ```sql
- select * from tree_table where tree_left >=8 and tree_right <= 17
+ select * from tree_table where tree_left >= 8 and tree_right <= 17
 ```
 
 You can query for a top treeLevel parent of a given (```H``` in this example) node using a query similar to this:
@@ -114,10 +119,16 @@ You can query for a top treeLevel parent of a given (```H``` in this example) no
 select * from tree_table where tree_left < 12 and tree_right > 13 and tree_level = 0
 ```
 
-You can also query for an entire path leading to a given (```D``` in this example) node using a query similar to this:
+You can query for an entire path leading to a given (```D``` in this example) node using a query similar to this:
 
 ```sql
 select * from tree_table where tree_left < 3 and tree_right > 4 order by tree_level asc
+```
+
+You can query for all leafs of a given parent/branch (```C``` in this example) node using a query similar to this:
+
+```sql
+select * from tree_table where tree_left > 8 and tree_right < 17 and tree_right - tree_left = 1 order by tree_level asc
 ```
 
 
@@ -149,7 +160,7 @@ gaining a lot of performance. There is no recursiveness during the tree update.
 <dependency>
     <groupId>com.github.eXsio</groupId>
     <artifactId>nestedj</artifactId>
-    <version>5.0.0</version>
+    <version>5.0.4</version>
 </dependency>
 
 ```
@@ -163,7 +174,7 @@ gaining a lot of performance. There is no recursiveness during the tree update.
    - **No ID/PK class enforced** - no hardwired requirements for any particular ID/Primary Key class
    - **Fully customizable** - you can repimplement the parts you need and leave the rest intact
    - **Fully tested** - integration tests created for all possible tree operations
-   - **Minimal number of Project dependencies** - only Guava and (JPA API or Spring JDBC) - depending on which implementation you want to use 
+   - **Minimal number of Project dependencies** - only JPA API or Spring JDBC - depending on which implementation you want to use 
    - **Multiple Implementations** - choose between JPA, JDBC or in-memory storage
 
 ## Storage implementations

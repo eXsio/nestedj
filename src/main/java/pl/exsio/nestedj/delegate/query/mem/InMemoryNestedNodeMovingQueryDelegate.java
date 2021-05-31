@@ -20,7 +20,6 @@
 
 package pl.exsio.nestedj.delegate.query.mem;
 
-import com.google.common.base.Preconditions;
 import pl.exsio.nestedj.config.mem.InMemoryNestedNodeRepositoryConfiguration;
 import pl.exsio.nestedj.delegate.query.NestedNodeMovingQueryDelegate;
 import pl.exsio.nestedj.model.NestedNode;
@@ -28,7 +27,10 @@ import pl.exsio.nestedj.model.NestedNodeInfo;
 
 import java.io.Serializable;
 
-import static pl.exsio.nestedj.model.NestedNode.*;
+import static pl.exsio.nestedj.model.NestedNode.ID;
+import static pl.exsio.nestedj.model.NestedNode.LEFT;
+import static pl.exsio.nestedj.model.NestedNode.LEVEL;
+import static pl.exsio.nestedj.model.NestedNode.RIGHT;
 
 public class InMemoryNestedNodeMovingQueryDelegate<ID extends Serializable, N extends NestedNode<ID>>
         extends InMemoryNestedNodeQueryDelegate<ID, N>
@@ -76,7 +78,9 @@ public class InMemoryNestedNodeMovingQueryDelegate<ID extends Serializable, N ex
 
     @Override
     public void updateParentField(ID newParentId, NestedNodeInfo<ID> node) {
-        Preconditions.checkNotNull(newParentId);
+        if (newParentId == null) {
+            throw new NullPointerException("newParentId cannot be null");
+        }
         doUpdateParentField(newParentId, node);
     }
 

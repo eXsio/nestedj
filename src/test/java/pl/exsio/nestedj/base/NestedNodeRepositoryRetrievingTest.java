@@ -23,7 +23,7 @@
  */
 package pl.exsio.nestedj.base;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.transaction.annotation.Transactional;
 import pl.exsio.nestedj.ex.InvalidNodesHierarchyException;
 import pl.exsio.nestedj.model.TestNode;
@@ -32,7 +32,11 @@ import pl.exsio.nestedj.model.Tree;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Fail.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 
 @Transactional
 public abstract class NestedNodeRepositoryRetrievingTest extends FunctionalNestedjTest {

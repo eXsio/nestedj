@@ -23,7 +23,7 @@
  */
 package pl.exsio.nestedj.jdbc;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import pl.exsio.nestedj.DelegatingNestedNodeRepository;
@@ -45,7 +45,7 @@ public class JdbcNestedNodeRepositoryTest extends NestedNodeRepositoryTest {
     @Jdbc
     private DelegatingNestedNodeRepository<Long, TestNode> jdbcRepository;
 
-    @Before
+    @BeforeEach
     public void setup() {
         helper = new JdbcTestHelper(dataSource);
         this.repository = this.jdbcRepository;
@@ -92,7 +92,7 @@ public class JdbcNestedNodeRepositoryTest extends NestedNodeRepositoryTest {
     }
 
     @Override
-    protected void save(TestNode node){
+    protected void save(TestNode node) {
         helper.save(node);
     }
 }

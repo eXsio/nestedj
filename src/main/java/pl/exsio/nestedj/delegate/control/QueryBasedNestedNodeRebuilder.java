@@ -19,7 +19,6 @@
  */
 package pl.exsio.nestedj.delegate.control;
 
-import com.google.common.base.Preconditions;
 import pl.exsio.nestedj.delegate.NestedNodeInserter;
 import pl.exsio.nestedj.delegate.NestedNodeMover;
 import pl.exsio.nestedj.delegate.NestedNodeRebuilder;
@@ -77,7 +76,9 @@ public class QueryBasedNestedNodeRebuilder<ID extends Serializable, N extends Ne
     }
 
     private NestedNodeInfo<ID> getNodeInfo(ID nodeId) {
-        Preconditions.checkNotNull(nodeId);
+        if (nodeId == null) {
+            throw new NullPointerException("nodeId cannot be null");
+        }
         Optional<NestedNodeInfo<ID>> nodeInfo = retriever.getNodeInfo(nodeId);
         if (!nodeInfo.isPresent()) {
             throw new InvalidNodeException(String.format("Couldn't find node with Id %s", nodeId));

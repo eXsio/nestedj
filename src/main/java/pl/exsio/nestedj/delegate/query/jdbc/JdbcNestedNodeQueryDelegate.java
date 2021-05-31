@@ -20,7 +20,6 @@
 
 package pl.exsio.nestedj.delegate.query.jdbc;
 
-import com.google.common.collect.Maps;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import pl.exsio.nestedj.config.jdbc.JdbcNestedNodeRepositoryConfiguration;
@@ -30,6 +29,7 @@ import pl.exsio.nestedj.model.NestedNode;
 import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -100,7 +100,7 @@ public abstract class JdbcNestedNodeQueryDelegate<ID extends Serializable, N ext
 
         private final String query;
 
-        private final Map<String, String> parts = Maps.newHashMap();
+        private final Map<String, String> parts = new HashMap<>();
 
         protected Query(String query) {
             this.query = query;

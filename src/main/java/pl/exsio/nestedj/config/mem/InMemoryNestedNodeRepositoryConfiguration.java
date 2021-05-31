@@ -20,21 +20,22 @@
 
 package pl.exsio.nestedj.config.mem;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import pl.exsio.nestedj.config.mem.discriminator.InMemoryTreeDiscriminator;
 import pl.exsio.nestedj.config.mem.identity.InMemoryNestedNodeIdentityGenerator;
 import pl.exsio.nestedj.model.NestedNode;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
  * Configuration class that serves as a base of creating new instances of InMemory Repository.
  *
  * @param <ID> - Nested Node Identifier Class
- * @param <N> - Nested Node Class
+ * @param <N>  - Nested Node Class
  */
 public class InMemoryNestedNodeRepositoryConfiguration<ID extends Serializable, N extends NestedNode<ID>> {
 
@@ -42,7 +43,7 @@ public class InMemoryNestedNodeRepositoryConfiguration<ID extends Serializable, 
 
     private final InMemoryNestedNodeIdentityGenerator<ID> identityGenerator;
 
-    private final Set<N> nodes = Sets.newConcurrentHashSet();
+    private final Set<N> nodes = Collections.synchronizedSet(new HashSet<>());
 
     /**
      * Creates new InMemory Repository with empty Tree and no Tree Discriminator.
@@ -50,7 +51,7 @@ public class InMemoryNestedNodeRepositoryConfiguration<ID extends Serializable, 
      * @param identityGenerator - Identity generator used for inserting new Nodes into an InMemory Repository.
      */
     public InMemoryNestedNodeRepositoryConfiguration(InMemoryNestedNodeIdentityGenerator<ID> identityGenerator) {
-        this(identityGenerator, Lists.newArrayList(), null);
+        this(identityGenerator, new ArrayList<>(), null);
     }
 
     /**
@@ -58,10 +59,10 @@ public class InMemoryNestedNodeRepositoryConfiguration<ID extends Serializable, 
      * If the Nodes do not have proper LEFT/RIGHT/LEVEL values, Tree can be initialized with NestedNodeRepository::rebuildTree() method.
      *
      * @param identityGenerator - Identity generator used for inserting new Nodes into an InMemory Repository.
-     * @param nodes - initial collection of Nodes
+     * @param nodes             - initial collection of Nodes
      */
     public InMemoryNestedNodeRepositoryConfiguration(InMemoryNestedNodeIdentityGenerator<ID> identityGenerator, Collection<N> nodes) {
-       this(identityGenerator, nodes, null);
+        this(identityGenerator, nodes, null);
     }
 
     /**
@@ -69,7 +70,7 @@ public class InMemoryNestedNodeRepositoryConfiguration<ID extends Serializable, 
      * If the Nodes do not have proper LEFT/RIGHT/LEVEL values, Tree can be initialized with NestedNodeRepository::rebuildTree() method.
      *
      * @param identityGenerator - Identity generator used for inserting new Nodes into an InMemory Repository.
-     * @param nodes - initial collection of Nodes
+     * @param nodes             - initial collection of Nodes
      * @param treeDiscriminator - custom Tree Discriminator
      */
     public InMemoryNestedNodeRepositoryConfiguration(InMemoryNestedNodeIdentityGenerator<ID> identityGenerator, Collection<N> nodes, InMemoryTreeDiscriminator<ID, N> treeDiscriminator) {
@@ -93,7 +94,6 @@ public class InMemoryNestedNodeRepositoryConfiguration<ID extends Serializable, 
     }
 
     /**
-     *
      * This method can be used to retrieve the data structure backing the InMemory Repository.
      * You can store the collection to (no)SQL storage or use it for custom data retrieval logic.
      * It is not recommended to manually modify the LEFT/RIGHT/LEVEL values of the Nodes contained in the returned Set.

@@ -20,8 +20,6 @@
 
 package pl.exsio.nestedj.model;
 
-import com.google.common.base.MoreObjects;
-
 import java.io.Serializable;
 
 /**
@@ -71,12 +69,12 @@ public class NestedNodeInfo<ID extends Serializable> {
 
     @Override
     public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("id", id)
-                .add("parentId", parentId)
-                .add("left", left)
-                .add("right", right)
-                .add("level", level)
-                .toString();
+        return "NestedNodeInfo{" +
+                "id=" + id +
+                ", parentId=" + parentId +
+                ", left=" + left +
+                ", right=" + right +
+                ", level=" + level +
+                '}';
     }
 }

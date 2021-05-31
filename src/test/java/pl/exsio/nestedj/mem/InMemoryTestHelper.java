@@ -5,6 +5,7 @@ import pl.exsio.nestedj.base.TestHelper;
 import pl.exsio.nestedj.config.mem.InMemoryNestedNodeRepositoryConfiguration;
 import pl.exsio.nestedj.model.TestNode;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class InMemoryTestHelper implements TestHelper {
@@ -45,8 +46,9 @@ public class InMemoryTestHelper implements TestHelper {
 
     @Override
     public void removeTree() {
-        config.getNodes().stream().filter(n -> n.getDiscriminator().equals("tree_1"))
-                .forEach(n -> config.getNodes().remove(n));
+        List<TestNode> nodes = config.getNodes().stream().filter(n -> n.getDiscriminator().equals("tree_1"))
+                .collect(Collectors.toList());
+        config.getNodes().removeAll(nodes);
     }
 
     @Override

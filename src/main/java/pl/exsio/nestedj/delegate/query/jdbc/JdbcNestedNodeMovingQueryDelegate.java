@@ -20,7 +20,6 @@
 
 package pl.exsio.nestedj.delegate.query.jdbc;
 
-import com.google.common.base.Preconditions;
 import pl.exsio.nestedj.config.jdbc.JdbcNestedNodeRepositoryConfiguration;
 import pl.exsio.nestedj.delegate.query.NestedNodeMovingQueryDelegate;
 import pl.exsio.nestedj.model.NestedNode;
@@ -80,7 +79,9 @@ public class JdbcNestedNodeMovingQueryDelegate<ID extends Serializable, N extend
 
     @Override
     public void updateParentField(ID newParentId, NestedNodeInfo<ID> node) {
-        Preconditions.checkNotNull(newParentId);
+        if (newParentId == null) {
+            throw new NullPointerException("newParentId cannot be null");
+        }
         doUpdateParentField(newParentId, node);
     }
 
@@ -97,7 +98,7 @@ public class JdbcNestedNodeMovingQueryDelegate<ID extends Serializable, N extend
                         new Query("update :tableName set :columnName = :columnName :sign ? where :columnName > ? and :columnName < ?")
                                 .set("columnName", columnName)
                                 .set("sign", sign)
-                        .build()
+                                .build()
                 ),
                 preparedStatement -> {
                     preparedStatement.setLong(1, delta);
@@ -132,7 +133,7 @@ public class JdbcNestedNodeMovingQueryDelegate<ID extends Serializable, N extend
                         new Query("update :tableName set :parentId = ? where :id = ?").build()
                 ),
                 preparedStatement -> {
-                    if(newParentId == null) {
+                    if (newParentId == null) {
                         preparedStatement.setNull(1, Types.OTHER);
                     } else {
                         preparedStatement.setObject(1, newParentId);

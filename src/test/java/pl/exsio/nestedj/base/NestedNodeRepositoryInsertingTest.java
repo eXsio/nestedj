@@ -23,64 +23,60 @@
  */
 package pl.exsio.nestedj.base;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.transaction.annotation.Transactional;
 import pl.exsio.nestedj.ex.InvalidNodesHierarchyException;
 import pl.exsio.nestedj.model.TestNode;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 
 @Transactional
 public abstract class NestedNodeRepositoryInsertingTest extends FunctionalNestedjTest {
 
-    @Test(expected = InvalidNodesHierarchyException.class)
+    @Test
     public void testInsertParentToChildAsSibling() {
         TestNode a = this.findNode("a");
         TestNode e = this.findNode("e");
-        this.repository.insertAsNextSiblingOf(a, e);
+        assertThrows(InvalidNodesHierarchyException.class, () -> this.repository.insertAsNextSiblingOf(a, e));
         assertSecondTreeIntact();
     }
 
-    @Test(expected = InvalidNodesHierarchyException.class)
+    @Test
     public void testInsertParentToChildAsChild() {
         TestNode a = this.findNode("a");
         TestNode e = this.findNode("e");
-        this.repository.insertAsLastChildOf(a, e);
+        assertThrows(InvalidNodesHierarchyException.class, () -> this.repository.insertAsLastChildOf(a, e));
         assertSecondTreeIntact();
     }
 
-    @Test(expected = InvalidNodesHierarchyException.class)
+    @Test
     public void testInsertAsNextSiblingSameNode() {
         TestNode a = this.findNode("a");
-
-        this.repository.insertAsNextSiblingOf(a, a);
-
+        assertThrows(InvalidNodesHierarchyException.class, () -> this.repository.insertAsNextSiblingOf(a, a));
         assertSecondTreeIntact();
     }
 
-    @Test(expected = InvalidNodesHierarchyException.class)
+    @Test
     public void testInsertAsLastChildSameNode() {
         TestNode b = this.findNode("b");
-
-        this.repository.insertAsLastChildOf(b, b);
+        assertThrows(InvalidNodesHierarchyException.class, () -> this.repository.insertAsLastChildOf(b, b));
         assertSecondTreeIntact();
     }
 
-    @Test(expected = InvalidNodesHierarchyException.class)
+    @Test
     public void testInsertAsPrevSiblingSameNode() {
         TestNode c = this.findNode("c");
-
-        this.repository.insertAsPrevSiblingOf(c, c);
+        assertThrows(InvalidNodesHierarchyException.class, () -> this.repository.insertAsPrevSiblingOf(c, c));
         assertSecondTreeIntact();
     }
 
-    @Test(expected = InvalidNodesHierarchyException.class)
+    @Test
     public void testInsertAsFirstChildSameNode() {
         TestNode d = this.findNode("d");
-
-        this.repository.insertAsFirstChildOf(d, d);
-
+        assertThrows(InvalidNodesHierarchyException.class, () -> this.repository.insertAsFirstChildOf(d, d));
         assertSecondTreeIntact();
     }
 

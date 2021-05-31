@@ -23,16 +23,20 @@
  */
 package pl.exsio.nestedj.model;
 
-import com.google.common.base.MoreObjects;
-
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Objects;
 
 @Entity
 @Table(name = "nested_nodes")
-@SequenceGenerator(name="seq", initialValue=1, allocationSize=1)
+@SequenceGenerator(name = "seq", initialValue = 1, allocationSize = 1)
 public class TestNode implements NestedNode<Long> {
 
     @Id
@@ -139,15 +143,15 @@ public class TestNode implements NestedNode<Long> {
 
     @Override
     public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("id", id)
-                .add("name", name)
-                .add("treeLeft", treeLeft)
-                .add("treeRight", treeRight)
-                .add("treeLevel", treeLevel)
-                .add("parentId", parentId)
-                .add("discriminator", discriminator)
-                .toString();
+        return "TestNode{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", treeLeft=" + treeLeft +
+                ", treeRight=" + treeRight +
+                ", treeLevel=" + treeLevel +
+                ", parentId=" + parentId +
+                ", discriminator='" + discriminator + '\'' +
+                '}';
     }
 
     @Override
@@ -171,7 +175,7 @@ public class TestNode implements NestedNode<Long> {
         n.setTreeRight(resultSet.getLong("TREE_RIGHT"));
         n.setName(resultSet.getString("NODE_NAME"));
         n.setParentId(resultSet.getLong("PARENT_ID"));
-        if(resultSet.wasNull()) {
+        if (resultSet.wasNull()) {
             n.setParentId(null);
         }
         n.setDiscriminator(resultSet.getString("DISCRIMINATOR"));

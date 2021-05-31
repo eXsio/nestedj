@@ -20,7 +20,6 @@
 
 package pl.exsio.nestedj.delegate.query.jpa;
 
-import com.google.common.base.Preconditions;
 import pl.exsio.nestedj.config.jpa.JpaNestedNodeRepositoryConfiguration;
 import pl.exsio.nestedj.delegate.query.NestedNodeMovingQueryDelegate;
 import pl.exsio.nestedj.model.NestedNode;
@@ -32,7 +31,11 @@ import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Root;
 import java.io.Serializable;
 
-import static pl.exsio.nestedj.model.NestedNode.*;
+import static pl.exsio.nestedj.model.NestedNode.ID;
+import static pl.exsio.nestedj.model.NestedNode.LEFT;
+import static pl.exsio.nestedj.model.NestedNode.LEVEL;
+import static pl.exsio.nestedj.model.NestedNode.PARENT_ID;
+import static pl.exsio.nestedj.model.NestedNode.RIGHT;
 
 public class JpaNestedNodeMovingQueryDelegate<ID extends Serializable, N extends NestedNode<ID>>
         extends JpaNestedNodeQueryDelegate<ID, N>
@@ -86,7 +89,9 @@ public class JpaNestedNodeMovingQueryDelegate<ID extends Serializable, N extends
 
     @Override
     public void updateParentField(ID newParentId, NestedNodeInfo<ID> node) {
-        Preconditions.checkNotNull(newParentId);
+        if (newParentId == null) {
+            throw new NullPointerException("newParentId cannot be null");
+        }
         doUpdateParentField(newParentId, node);
     }
 
