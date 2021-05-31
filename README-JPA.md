@@ -12,12 +12,12 @@
 <dependency>
     <groupId>com.github.eXsio</groupId>
     <artifactId>nestedj</artifactId>
-    <version>5.0.3</version>
+    <version>5.0.4</version>
 </dependency>
 <dependency>
     <groupId>org.hibernate</groupId>
     <artifactId>hibernate-core</artifactId>
-    <version>5.4.9.Final</version>
+    <version>5.4.32.Final</version>
 </dependency>
 
 ```

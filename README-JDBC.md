@@ -12,12 +12,12 @@
 <dependency>
     <groupId>com.github.eXsio</groupId>
     <artifactId>nestedj</artifactId>
-    <version>5.0.3</version>
+    <version>5.0.4</version>
 </dependency>
 <dependency>
     <groupId>org.springframework</groupId>
     <artifactId>spring-jdbc</artifactId>
-    <version>5.2.1.RELEASE</version>
+    <version>5.3.7</version>
 </dependency>
 
 ```

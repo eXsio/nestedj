@@ -10,7 +10,7 @@ NestedJ is a Java library that provides **Spring Data type Repository** to manag
 **It provides an O(log2(n)) access to any tree traversal logic, including:**
 - finding immediate children of any given node
 - finding all children (regardless of depth) of any given node
-- finding an immidiate parent if any fiven node
+- finding an immediate parent if any fiven node
 - finding all parents of any given node from immediate to root
 
 Like what you see? Let me know by leaving a Star! 
@@ -188,7 +188,7 @@ gaining a lot of performance. There is no recursiveness during the tree update.
 
 ## Multiple trees in one Table/Entity/Collection
 
-You can have multiple independant trees in single Table/Entity/Collection. Just implement your own version of ```treeDiscriminator``` that will narrow all tree-related operations to your desired scope.
+You can have multiple independent trees in single Table/Entity/Collection. Just implement your own version of ```treeDiscriminator``` that will narrow all tree-related operations to your desired scope.
 
 ## Fixing / Initializing / Rebuilding the tree
 
