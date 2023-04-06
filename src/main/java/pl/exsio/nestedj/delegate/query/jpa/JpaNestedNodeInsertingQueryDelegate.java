@@ -20,13 +20,13 @@
 
 package pl.exsio.nestedj.delegate.query.jpa;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaUpdate;
+import jakarta.persistence.criteria.Root;
 import pl.exsio.nestedj.config.jpa.JpaNestedNodeRepositoryConfiguration;
 import pl.exsio.nestedj.delegate.query.NestedNodeInsertingQueryDelegate;
 import pl.exsio.nestedj.model.NestedNode;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaUpdate;
-import javax.persistence.criteria.Root;
 import java.io.Serializable;
 
 public class JpaNestedNodeInsertingQueryDelegate<ID extends Serializable, N extends NestedNode<ID>>

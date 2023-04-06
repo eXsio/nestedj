@@ -19,7 +19,12 @@
  */
 package pl.exsio.nestedj;
 
-import pl.exsio.nestedj.delegate.*;
+import pl.exsio.nestedj.delegate.NestedNodeHierarchyManipulator;
+import pl.exsio.nestedj.delegate.NestedNodeInserter;
+import pl.exsio.nestedj.delegate.NestedNodeMover;
+import pl.exsio.nestedj.delegate.NestedNodeRebuilder;
+import pl.exsio.nestedj.delegate.NestedNodeRemover;
+import pl.exsio.nestedj.delegate.NestedNodeRetriever;
 import pl.exsio.nestedj.ex.InvalidNodeException;
 import pl.exsio.nestedj.ex.InvalidParentException;
 import pl.exsio.nestedj.ex.RepositoryLockedException;

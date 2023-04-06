@@ -31,7 +31,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static pl.exsio.nestedj.model.NestedNode.*;
+import static pl.exsio.nestedj.model.NestedNode.ID;
+import static pl.exsio.nestedj.model.NestedNode.LEFT;
+import static pl.exsio.nestedj.model.NestedNode.LEVEL;
+import static pl.exsio.nestedj.model.NestedNode.PARENT_ID;
+import static pl.exsio.nestedj.model.NestedNode.RIGHT;
 
 public class InMemoryNestedNodeRetrievingQueryDelegate<ID extends Serializable, N extends NestedNode<ID>>
         extends InMemoryNestedNodeQueryDelegate<ID, N>

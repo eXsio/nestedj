@@ -20,18 +20,26 @@
 
 package pl.exsio.nestedj.delegate.query.jpa;
 
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaDelete;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.CriteriaUpdate;
+import jakarta.persistence.criteria.Root;
 import pl.exsio.nestedj.config.jpa.JpaNestedNodeRepositoryConfiguration;
 import pl.exsio.nestedj.delegate.query.NestedNodeRemovingQueryDelegate;
 import pl.exsio.nestedj.ex.InvalidNodeException;
 import pl.exsio.nestedj.model.NestedNode;
 import pl.exsio.nestedj.model.NestedNodeInfo;
 
-import javax.persistence.NoResultException;
-import javax.persistence.criteria.*;
 import java.io.Serializable;
 import java.util.Optional;
 
-import static pl.exsio.nestedj.model.NestedNode.*;
+import static pl.exsio.nestedj.model.NestedNode.ID;
+import static pl.exsio.nestedj.model.NestedNode.LEFT;
+import static pl.exsio.nestedj.model.NestedNode.LEVEL;
+import static pl.exsio.nestedj.model.NestedNode.PARENT_ID;
+import static pl.exsio.nestedj.model.NestedNode.RIGHT;
 
 public class JpaNestedNodeRemovingQueryDelegate<ID extends Serializable, N extends NestedNode<ID>>
         extends JpaNestedNodeQueryDelegate<ID, N>

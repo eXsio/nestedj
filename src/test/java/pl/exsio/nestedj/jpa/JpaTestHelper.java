@@ -1,12 +1,11 @@
 package pl.exsio.nestedj.jpa;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import pl.exsio.nestedj.base.TestHelper;
 import pl.exsio.nestedj.model.TestNode;
-
-import javax.persistence.EntityManager;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 
 public class JpaTestHelper implements TestHelper {
 

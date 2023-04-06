@@ -23,8 +23,16 @@ package pl.exsio.nestedj.config.jpa.factory;
 import pl.exsio.nestedj.DelegatingNestedNodeRepository;
 import pl.exsio.nestedj.NestedNodeRepository;
 import pl.exsio.nestedj.config.jpa.JpaNestedNodeRepositoryConfiguration;
-import pl.exsio.nestedj.delegate.control.*;
-import pl.exsio.nestedj.delegate.query.jpa.*;
+import pl.exsio.nestedj.delegate.control.QueryBasedNestedNodeInserter;
+import pl.exsio.nestedj.delegate.control.QueryBasedNestedNodeMover;
+import pl.exsio.nestedj.delegate.control.QueryBasedNestedNodeRebuilder;
+import pl.exsio.nestedj.delegate.control.QueryBasedNestedNodeRemover;
+import pl.exsio.nestedj.delegate.control.QueryBasedNestedNodeRetriever;
+import pl.exsio.nestedj.delegate.query.jpa.JpaNestedNodeInsertingQueryDelegate;
+import pl.exsio.nestedj.delegate.query.jpa.JpaNestedNodeMovingQueryDelegate;
+import pl.exsio.nestedj.delegate.query.jpa.JpaNestedNodeRebuildingQueryDelegate;
+import pl.exsio.nestedj.delegate.query.jpa.JpaNestedNodeRemovingQueryDelegate;
+import pl.exsio.nestedj.delegate.query.jpa.JpaNestedNodeRetrievingQueryDelegate;
 import pl.exsio.nestedj.lock.NoLock;
 import pl.exsio.nestedj.model.NestedNode;
 
