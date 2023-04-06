@@ -1,5 +1,8 @@
 NestedJ Changelog:
 
+- 6.0.0
+    - support JPA 3 (replace javax.persistence.* with jakarta.persistence.*)
+
 - 5.0.3
     - pass the node instance into generated JDBC key resolver
 

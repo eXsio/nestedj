@@ -23,6 +23,8 @@
  */
 package pl.exsio.nestedj.jpa;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,9 +32,6 @@ import pl.exsio.nestedj.DelegatingNestedNodeRepository;
 import pl.exsio.nestedj.base.NestedNodeRepositoryTest;
 import pl.exsio.nestedj.model.TestNode;
 import pl.exsio.nestedj.qualifier.Jpa;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
 @Transactional
 public class JpaNestedNodeRepositoryTest extends NestedNodeRepositoryTest {

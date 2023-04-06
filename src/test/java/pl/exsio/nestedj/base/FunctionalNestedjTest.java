@@ -27,13 +27,14 @@ package pl.exsio.nestedj.base;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import pl.exsio.nestedj.DelegatingNestedNodeRepository;
+import pl.exsio.nestedj.RepositoryConfiguration;
 import pl.exsio.nestedj.TestConfiguration;
 import pl.exsio.nestedj.model.TestNode;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-@ContextConfiguration(classes = {TestConfiguration.class})
+@ContextConfiguration(classes = {TestConfiguration.class, RepositoryConfiguration.class})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public abstract class FunctionalNestedjTest {
 

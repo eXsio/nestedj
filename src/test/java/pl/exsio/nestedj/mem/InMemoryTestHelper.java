@@ -1,6 +1,6 @@
 package pl.exsio.nestedj.mem;
 
-import pl.exsio.nestedj.TestConfiguration;
+import pl.exsio.nestedj.RepositoryConfiguration;
 import pl.exsio.nestedj.base.TestHelper;
 import pl.exsio.nestedj.config.mem.InMemoryNestedNodeRepositoryConfiguration;
 import pl.exsio.nestedj.model.TestNode;
@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 public class InMemoryTestHelper implements TestHelper {
 
-    private final InMemoryNestedNodeRepositoryConfiguration<Long, TestNode> config = TestConfiguration.IN_MEM_CONFIG;
+    private final InMemoryNestedNodeRepositoryConfiguration<Long, TestNode> config = RepositoryConfiguration.IN_MEM_CONFIG;
 
     @Override
     public TestNode findNode(String symbol) {
@@ -33,10 +33,10 @@ public class InMemoryTestHelper implements TestHelper {
         config.getNodes().stream()
                 .filter(n -> n.getDiscriminator()
                         .equals("tree_1")).forEach(n -> {
-            n.setTreeLevel(0L);
-            n.setTreeLeft(0L);
-            n.setTreeRight(0L);
-        });
+                    n.setTreeLevel(0L);
+                    n.setTreeLeft(0L);
+                    n.setTreeRight(0L);
+                });
     }
 
     @Override
@@ -59,6 +59,6 @@ public class InMemoryTestHelper implements TestHelper {
 
     public void rollback() {
         config.getNodes().clear();
-        config.getNodes().addAll(TestConfiguration.IN_MEM_NODES.stream().map(TestNode::copy).collect(Collectors.toList()));
+        config.getNodes().addAll(RepositoryConfiguration.IN_MEM_NODES.stream().map(TestNode::copy).collect(Collectors.toList()));
     }
 }

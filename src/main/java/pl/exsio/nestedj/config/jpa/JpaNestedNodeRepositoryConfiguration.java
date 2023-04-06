@@ -20,11 +20,11 @@
 
 package pl.exsio.nestedj.config.jpa;
 
+import jakarta.persistence.EntityManager;
 import pl.exsio.nestedj.config.jpa.discriminator.JpaTreeDiscriminator;
 import pl.exsio.nestedj.config.jpa.discriminator.MapJpaTreeDiscriminator;
 import pl.exsio.nestedj.model.NestedNode;
 
-import javax.persistence.EntityManager;
 import java.io.Serializable;
 
 /**
